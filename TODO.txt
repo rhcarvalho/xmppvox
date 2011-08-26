@@ -1,0 +1,5 @@
+XMPPVOX
+
+* Servidor que recebe mensagens de clientes papovox.
+* Servidor que conecta usuário do papovox a uma conta xmpp/google.
+* Servidor que envia mensagem para sua lista de amigos via xmpp.
