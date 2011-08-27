@@ -87,6 +87,7 @@ CANCELAMANDAR     = 10; # sem parâmetros
 
 # Echo server program
 import socket
+import time
 
 if __name__ == "__main__":
     HOST = ''                 # Symbolic name meaning all available interfaces
@@ -99,13 +100,17 @@ if __name__ == "__main__":
     print "Serving on port %s" % PORT
     conn, addr = s.accept()
     print "Connected by %s" % (addr,)
+    conn.sendall("+OK\n")
+    print "OK sent"
+    nickname = conn.recv(1024)
+    print nickname
+    conn.sendall("+OK\n")
+    print "+OK sent"
     while True:
-        conn.sendall("OK\n")
-        print "OK sent"
-        data = conn.recv(1024)
-        print data
-        conn.sendall("+\n")
-        print "+ sent"
+        time.sleep(5)
+        s = "Oi oi oi " + str(time.ctime()) + "\n"
+        print s
+        conn.sendall(chr(1) + chr(len(s)) + chr(0) + s)
         #break
     print s.getpeername()
     print "Closing connection..."
