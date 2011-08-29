@@ -89,6 +89,10 @@ CANCELAMANDAR     = 10; # sem parâmetros
 import socket
 import time
 
+def sendmessage(msg, sock):
+        print msg
+        conn.sendall(chr(DADOTECLADO) + chr(len(s)) + chr(0) + s)
+
 if __name__ == "__main__":
     HOST = ''                 # Symbolic name meaning all available interfaces
     PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
@@ -108,9 +112,7 @@ if __name__ == "__main__":
     print "+OK sent"
     while True:
         time.sleep(5)
-        s = "Oi oi oi " + str(time.ctime()) + "\n"
-        print s
-        conn.sendall(chr(1) + chr(len(s)) + chr(0) + s)
+        sendmessage(u"Agora são %s" % time.ctime(), conn)
         #break
     print s.getpeername()
     print "Closing connection..."
