@@ -90,9 +90,12 @@ import socket
 import struct
 import time
 
+# Constants
+SYSTEM_ENCODING = 'cp1252'
+
 def sendmessage(msg, sock):
         print msg
-        conn.sendall(struct.pack('<BH', DADOTECLADO, len(msg)) + msg)
+        conn.sendall(struct.pack('<BH', DADOTECLADO, len(msg)) + msg.encode(SYSTEM_ENCODING))
 
 if __name__ == "__main__":
     HOST = ''                 # Symbolic name meaning all available interfaces
