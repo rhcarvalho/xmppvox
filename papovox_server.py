@@ -87,11 +87,12 @@ CANCELAMANDAR     = 10; # sem parâmetros
 
 # Echo server program
 import socket
+import struct
 import time
 
 def sendmessage(msg, sock):
         print msg
-        conn.sendall(chr(DADOTECLADO) + chr(len(s)) + chr(0) + s)
+        conn.sendall(struct.pack('<BH', DADOTECLADO, len(msg)) + msg)
 
 if __name__ == "__main__":
     HOST = ''                 # Symbolic name meaning all available interfaces
