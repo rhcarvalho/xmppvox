@@ -1,0 +1,8 @@
+﻿XMPPVOX
+
+
+Dependências:
+    DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
+    Python 2.x (testado com 2.7.2)
+    dnspython (testado com 1.9.4)
+    SleekXMPP (testado com 1.0rc3)
