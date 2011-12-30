@@ -74,6 +74,7 @@ import struct
 import time
 from functools import partial
 from itertools import count
+from cStringIO import StringIO
 
 import getpass
 import logging
@@ -113,12 +114,28 @@ def sendline(sock, line):
     line = line.encode(SYSTEM_ENCODING)
     sock.sendall("%s\r\n" % (line,))
 
+def recv(sock, size):
+    data = sock.recv(size)
+    if not data and size:
+        raise socket.error(u"Nenhum dado recebido do socket, conexão perdida.")
+    return data
+
+def recvall(sock, size):
+    data = StringIO()
+    while data.tell() < size:
+        data.write(recv(sock, size - data.tell()))
+    data_str = data.getvalue()
+    data.close()
+    return data_str
+
+#------------------------------------------------------------------------------#
+
 def main():
     # Setup logging.
     logging.basicConfig(level=logging.INFO,
                         format='%(levelname)-8s %(message)s')
 
-    jid = raw_input("Conta XMPP: ")
+    jid = raw_input("Conta (ex.: fulano@gmail.com): ")
     password = getpass.getpass("Senha para %r: " % jid)
     xmpp = EchoBot(jid, password)
     xmpp.register_plugin('xep_0030') # Service Discovery
@@ -146,8 +163,9 @@ def main():
             print u"Aceitei conexão de %s:%s" % addr
             
             # Funções úteis usando a conexão atual
-            _sendline, _sendmessage = map(partial, (sendline, sendmessage),
-                                                   (conn, conn))
+            _sendline, _sendmessage, _recvall = map(partial,
+                                                    (sendline, sendmessage, recvall),
+                                                    (conn, conn, conn))
             xmpp.func_receive_msg = _sendmessage
             
             #------------------ Handshake inicial -----------------------------#
@@ -162,20 +180,31 @@ def main():
             # Provavelmente está relacionado a alguma temporização / espera
             # na leitura de algum buffer.
             time.sleep(0.1)
-            _sendmessage(u"Olá companheiro, bem-vindo ao bate papo!")
+            _sendmessage(u"Olá companheiro, bem-vindo ao Gugou Tolk Vox!")
             for i in count(1):
-                data = conn.recv(4096)
-                if data:
-                    # TODO se for uma mensagem (DADOTECLADO), então enviar
-                    # mensagem via XMPP.
-                    print u"#%d. %s" % (i, repr(data))
-                else:
-                    print u"Conexão encerrada."
-                    break
+                datatype, datalen = struct.unpack('<BH', _recvall(3))
+                
+                # Recusa dados do Papovox que não sejam do tipo DADOTECLADO
+                if datatype != DADOTECLADO:
+                    print u"<<== Recebi tipo de dados desconhecido: (%d) <<==" % datatype
+                    continue
+                
+                # Recebe dados/mensagem do Papovox
+                data = _recvall(datalen)
+                
+                # Envia mensagem XMPP para o último remetente
+                if xmpp.last_sender is not None:
+                    xmpp.send_message(mto=xmpp.last_sender,
+                                      mbody=data,
+                                      mtype='chat')
+                print u"#%03d. %s ** para %s" % (i, repr(data),
+                                                 xmpp.last_sender or u"ninguém")
         except socket.error, e:
             print u"Erro: %s" % (e,)
+        finally:
             conn.close()
             print u"Conexão encerrada."
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

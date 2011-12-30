@@ -51,6 +51,7 @@ class EchoBot(sleekxmpp.ClientXMPP):
         self.add_event_handler("message", self.message)
         
         self.func_receive_msg = func_receive_msg
+        self.last_sender = None
 
     def start(self, event):
         """
@@ -83,6 +84,7 @@ class EchoBot(sleekxmpp.ClientXMPP):
         if msg['type'] in ('chat', 'normal'):
             #msg.reply("Thanks for sending\n%(body)s" % msg).send()
             self.func_receive_msg(msg['body'])
+            self.last_sender = msg['from']
 
 
 if __name__ == '__main__':
