@@ -1,5 +1,61 @@
 XMPPVOX
 
-* Servidor que recebe mensagens de clientes papovox.
-* Servidor que conecta usuário do papovox a uma conta xmpp/google.
-* Servidor que envia mensagem para sua lista de amigos via xmpp.
+* Suporte para tarefas administrativas do usuário XMPP:
+    - Adicionar/remover/listar contatos
+    - Dos contatos:
+        - Ver/ler presença (online/ocupado/invisível/etc)
+        - Ver/ler status
+        - Ver/ler "apelido"
+    - Dados pessoais:
+        - Alterar presença (online/ocupado/invisível/etc)
+        - Alterar status
+        - Alterar "apelido"
+
+* Usar Python Keyring para guardar login/senha XMPP
+
+* Interface com o usuário Papovox:
+    - Quem me enviou mensagem?
+        = Posso fazer como nos clientes existentes: ao receber a primeira
+          mensagem de um contato, digo [HH:MM FULANO] mensagem1, e as mensagens
+          seguintes de FULANO vão se acumulando naturalmente.
+          Quando CICLANO fala, então [HH:MM CICLANO] mensagemA.
+          Depois de um timeout (digamos, 3 minutos) voltamos a exibir
+          [HH:MM QUEM] independente de quem fale.
+          Para descobrir quem enviou a mensagem anterior, posso sempre enviar um
+          comando "?quem".
+          Adicionalmente, "?quem -2" fala quem mandou a penúltima mensagem.
+          "?quem" e "?quem -1" são equivalmentes.
+    - Para quem estou enviando a mensagem atual?
+        = Por padrão, a mensagem é enviada para o último remetente (a última
+          pessoa que falou comigo).
+          É possível especificar/forçar um destinatário usando
+          "+ID_DO_FULANO msg_pro_fulano".
+    - Ajuda:
+        = "?" exibe os comando disponíveis.
+
+* Adicionar termos de licença (GPL)
+
+* Sintetizar perguntas de usuário e senha ao iniciar servidor
+
+* Carregar XMPPVOX e Papovox com um comando único
+
+* Congelar dependências: adicionar ao projeto todas as dependências
+
+* Possibilidade de fechar a XMPPVOX a qualquer momento (ex.: Ctrl+C)
+    - Para tal, thread principal do XMPPVOX não pode bloquear em I/O.
+    - Pode existir um comando via Papovox, ex.: "?sair"
+
+
+Casos de teste:
+* O que acontece quando:
+    - não há acesso à Internet?
+    - dnspython não funciona?
+    - autenticação xmpp falha?
+    - conexão com a Internet falha / conexão XMPP cai?
+    - usuário sai do Papovox?
+        - Como terminar o XMPPVOX corretamente?
+
+--------------------------- DONE -----------------------------------------------
+* Servidor recebe mensagens de clientes Papovox.
+* Servidor conecta usuário do Papovox a uma conta XMPP/Google Chat.
+* Servidor envia mensagem para um amigo de sua lista via XMPP.
