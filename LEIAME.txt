@@ -1,15 +1,40 @@
 ﻿XMPPVOX
 
-Se você quiser conversar com seus amigos do Google Talk, utilize sua conta
-Google: fulano@gmail.com.
-
-Se quiser conversar com amigos do Facebook, utilize como login o seu "nome de
-usuário do Facebook" assim: meu_nome@chat.facebook.com. Seu nome de usuário
-é o que aparece quando você visita seu perfil, ex.: http://www.facebook.com/meu_nome
+1. O que é o XMPPVOX?
 
 
-Dependências:
-    DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
-    Python 2.x (testado com 2.7.2)
-    dnspython (testado com 1.9.4)
-    SleekXMPP (testado com 1.0rc3)
+2. Como usar o XMPPVOX?
+
+2.1. Dependências
+
+    Para utilizar o XMPPVOX é preciso que estejam instalados os seguintes
+    programas e bibliotecas:
+        - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
+        - Python 2.x (testado com 2.7.2)
+        - dnspython (testado com 1.9.4)
+        - SleekXMPP (testado com 1.0rc3)
+
+2.2. Executar o programa papovox_server.py
+
+    > python papovox_server.py
+
+    Ao iniciar o servidor local, serão solicitados seus dados de autenticação
+    em um serviço XMPP. Existem diversas possibilidades, como Google, Facebook,
+    Jabber e outros.
+
+    Se você quiser conversar com seus amigos do Google Talk, utilize sua conta
+    Google: fulano@gmail.com.
+
+    Se quiser conversar com amigos do Facebook, utilize como login o seu "nome
+    de usuário do Facebook" assim: meu_nome@chat.facebook.com. Seu nome de
+    usuário é o que aparece quando você visita seu perfil. Por exemplo, se o
+    perfil está em http://www.facebook.com/meu_nome, então seu nome de usuário
+    é "meu_nome".
+
+2.3. Executar o Papovox
+
+    Abra o DOSVOX, e escolha a opção rede (r), seguida de Papovox (p).
+    Configure o Papovox para se conectar a "localhost", e peça para chamar
+    o servidor local (l).
+
+2.4. Converse com seus amigos
