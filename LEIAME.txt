@@ -1,5 +1,12 @@
 ﻿XMPPVOX
 
+Se você quiser conversar com seus amigos do Google Talk, utilize sua conta
+Google: fulano@gmail.com.
+
+Se quiser conversar com amigos do Facebook, utilize como login o seu "nome de
+usuário do Facebook" assim: meu_nome@chat.facebook.com. Seu nome de usuário
+é o que aparece quando você visita seu perfil, ex.: http://www.facebook.com/meu_nome
+
 
 Dependências:
     DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
