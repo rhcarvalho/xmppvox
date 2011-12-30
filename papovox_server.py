@@ -191,13 +191,14 @@ def main():
                 
                 # Recebe dados/mensagem do Papovox
                 data = _recvall(datalen)
+                data = data.decode(SYSTEM_ENCODING)
                 
                 # Envia mensagem XMPP para o último remetente
                 if xmpp.last_sender is not None:
                     xmpp.send_message(mto=xmpp.last_sender,
                                       mbody=data,
                                       mtype='chat')
-                print u"#%03d. %s ** para %s" % (i, repr(data),
+                print u"#%03d. %s ** para %s" % (i, data,
                                                  xmpp.last_sender or u"ninguém")
         except socket.error, e:
             print u"Erro: %s" % (e,)
