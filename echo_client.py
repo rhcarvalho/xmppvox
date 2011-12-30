@@ -35,7 +35,7 @@ class EchoBot(sleekxmpp.ClientXMPP):
     receives, along with a short thank you message.
     """
 
-    def __init__(self, jid, password):
+    def __init__(self, jid, password, func_receive_msg=lambda msg: None):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # The session_start event will be triggered when
@@ -49,6 +49,8 @@ class EchoBot(sleekxmpp.ClientXMPP):
         # stanza is received. Be aware that that includes
         # MUC messages and error messages.
         self.add_event_handler("message", self.message)
+        
+        self.func_receive_msg = func_receive_msg
 
     def start(self, event):
         """
@@ -79,7 +81,8 @@ class EchoBot(sleekxmpp.ClientXMPP):
                    how it may be used.
         """
         if msg['type'] in ('chat', 'normal'):
-            msg.reply("Thanks for sending\n%(body)s" % msg).send()
+            #msg.reply("Thanks for sending\n%(body)s" % msg).send()
+            self.func_receive_msg(msg['body'])
 
 
 if __name__ == '__main__':

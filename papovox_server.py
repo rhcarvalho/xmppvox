@@ -75,6 +75,10 @@ import time
 from functools import partial
 from itertools import count
 
+import getpass
+import logging
+from echo_client import EchoBot
+
 #---------------- Constantes --------------------------------------------------#
 
 # Todas as strings passadas para o Papovox devem ser codificadas usando a
@@ -94,7 +98,7 @@ DADOTECLADO       = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
 #DADOENVIA         = 7   # sem parâmetros
 #CANCARQENVIA      = 8   # pode enviar uma frase junto
 #PODEMANDAR        = 9   # sem parâmetros
-#CANCELAMANDAR     = 10; # sem parâmetros
+#CANCELAMANDAR     = 10  # sem parâmetros
 
 #------------------------------------------------------------------------------#
 
@@ -110,6 +114,22 @@ def sendline(sock, line):
     sock.sendall("%s\r\n" % (line,))
 
 def main():
+    # Setup logging.
+    logging.basicConfig(level=logging.INFO,
+                        format='%(levelname)-8s %(message)s')
+
+    jid = raw_input("Conta XMPP: ")
+    password = getpass.getpass("Senha para %r: " % jid)
+    xmpp = EchoBot(jid, password)
+    xmpp.register_plugin('xep_0030') # Service Discovery
+    xmpp.register_plugin('xep_0004') # Data Forms
+    xmpp.register_plugin('xep_0060') # PubSub
+    xmpp.register_plugin('xep_0199') # XMPP Ping
+    
+    if xmpp.connect():
+        print "<<XMPP conectado>>"
+        xmpp.process(threaded=True)
+
     HOST = ''                 # Symbolic name meaning all available interfaces
     PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -128,6 +148,7 @@ def main():
             # Funções úteis usando a conexão atual
             _sendline, _sendmessage = map(partial, (sendline, sendmessage),
                                                    (conn, conn))
+            xmpp.func_receive_msg = _sendmessage
             
             #------------------ Handshake inicial -----------------------------#
             _sendline(u"+OK - %s:%s conectado" % addr)
@@ -145,6 +166,8 @@ def main():
             for i in count(1):
                 data = conn.recv(4096)
                 if data:
+                    # TODO se for uma mensagem (DADOTECLADO), então enviar
+                    # mensagem via XMPP.
                     print u"#%d. %s" % (i, repr(data))
                 else:
                     print u"Conexão encerrada."
