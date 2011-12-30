@@ -67,37 +67,49 @@ após o email."
    Resposta com linhas múltiplas: terminar por uma linha contendo só
 um ponto (.).
 '''
+#------------------------------------------------------------------------------#
+
+import socket
+import struct
+import time
+from functools import partial
+from itertools import count
+
+#---------------- Constantes --------------------------------------------------#
+
+# Todas as strings passadas para o Papovox devem ser codificadas usando a
+# codificação padrão do Windows.
+SYSTEM_ENCODING = 'cp1252'
 
 PORTA_PAPOVOX = 1963
 #PORTA_URGENTE = 1964
 #PORTA_NOMES   = 1956
 
 DADOTECLADO       = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
-INICIOSOM         = 2   # sem parâmetros
-FIMSOM            = 3   # sem parâmetros
-INICIOARQENVIA    = 5   # parâmetro: nome do arquivo
-FIMARQENVIA       = 6   # sem parâmetros
-DADOSOM           = 4   # enviados dados raw
-DADOENVIA         = 7   # sem parâmetros
-CANCARQENVIA      = 8   # pode enviar uma frase junto
-PODEMANDAR        = 9   # sem parâmetros
-CANCELAMANDAR     = 10; # sem parâmetros
+#INICIOSOM         = 2   # sem parâmetros
+#FIMSOM            = 3   # sem parâmetros
+#INICIOARQENVIA    = 5   # parâmetro: nome do arquivo
+#FIMARQENVIA       = 6   # sem parâmetros
+#DADOSOM           = 4   # enviados dados raw
+#DADOENVIA         = 7   # sem parâmetros
+#CANCARQENVIA      = 8   # pode enviar uma frase junto
+#PODEMANDAR        = 9   # sem parâmetros
+#CANCELAMANDAR     = 10; # sem parâmetros
 
-# -----------------------------------------------------------------------------
+#------------------------------------------------------------------------------#
 
-# Echo server program
-import socket
-import struct
-import time
+def sendmessage(sock, msg):
+    print "[[[[ %s ]]]]" % (msg,)
+    msg = msg.encode(SYSTEM_ENCODING)
+    sock.sendall("%s%s" % (struct.pack('<BH', DADOTECLADO, len(msg)),
+                           msg))
 
-# Constants
-SYSTEM_ENCODING = 'cp1252'
+def sendline(sock, line):
+    print "==>> %s ==>>" % (line,)
+    line = line.encode(SYSTEM_ENCODING)
+    sock.sendall("%s\r\n" % (line,))
 
-def sendmessage(msg, sock):
-        print msg
-        conn.sendall(struct.pack('<BH', DADOTECLADO, len(msg)) + msg.encode(SYSTEM_ENCODING))
-
-if __name__ == "__main__":
+def main():
     HOST = ''                 # Symbolic name meaning all available interfaces
     PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -105,21 +117,42 @@ if __name__ == "__main__":
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
     s.listen(1)
-    print "Serving on port %s" % PORT
-    conn, addr = s.accept()
-    print "Connected by %s" % (addr,)
-    conn.sendall("+OK\n")
-    print "OK sent"
-    nickname = conn.recv(1024)
-    print nickname
-    conn.sendall("+OK\n")
-    print "+OK sent"
     while True:
-        time.sleep(5)
-        sendmessage(u"Agora são %s" % time.ctime(), conn)
-        #break
-    print s.getpeername()
-    print "Closing connection..."
-    conn.close()
-    print "Bye!"
+        try:
+            print u"XMPPVOX servindo na porta %s" % PORT
+            
+            # Aceita conexão do Papovox
+            conn, addr = s.accept()
+            print u"Aceitei conexão de %s:%s" % addr
+            
+            # Funções úteis usando a conexão atual
+            _sendline, _sendmessage = map(partial, (sendline, sendmessage),
+                                                   (conn, conn))
+            
+            #------------------ Handshake inicial -----------------------------#
+            _sendline(u"+OK - %s:%s conectado" % addr)
+            nickname = conn.recv(1024)
+            print u"Apelido: %s" % (nickname,)
+            _sendline(u"+OK")
+            #------------------------------------------------------------------#
+            
+            # Se enviar mensagens logo em seguida, o Papovox não recebe
+            # corretamente. O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
+            # Provavelmente está relacionado a alguma temporização / espera
+            # na leitura de algum buffer.
+            time.sleep(0.1)
+            _sendmessage(u"Olá companheiro, bem-vindo ao bate papo!")
+            for i in count(1):
+                data = conn.recv(4096)
+                if data:
+                    print u"#%d. %s" % (i, repr(data))
+                else:
+                    print u"Conexão encerrada."
+                    break
+        except socket.error, e:
+            print u"Erro: %s" % (e,)
+            conn.close()
+            print u"Conexão encerrada."
 
+if __name__ == "__main__":
+    main()
