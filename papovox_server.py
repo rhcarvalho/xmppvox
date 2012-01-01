@@ -101,6 +101,8 @@ DADOTECLADO       = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
 #PODEMANDAR        = 9   # sem parâmetros
 #CANCELAMANDAR     = 10  # sem parâmetros
 
+REMETENTE_DESCONHECIDO = u"remetente desconhecido"
+
 #------------------------------------------------------------------------------#
 
 def sendmessage(sock, msg):
@@ -166,7 +168,14 @@ def main():
             _sendline, _sendmessage, _recvall = map(partial,
                                                     (sendline, sendmessage, recvall),
                                                     (conn, conn, conn))
-            xmpp.func_receive_msg = _sendmessage
+            
+            def recv_new_msg(msg):
+                m = dict(sender=msg['from'].user or REMETENTE_DESCONHECIDO,
+                         body=msg['body'],
+                         timestamp=time.strftime('%H:%M'))
+                _sendmessage(u"(%(timestamp)s) %(sender)s: %(body)s" % m)
+            
+            xmpp.func_receive_msg = recv_new_msg
             
             #------------------ Handshake inicial -----------------------------#
             _sendline(u"+OK - %s:%s conectado" % addr)
