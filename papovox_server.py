@@ -132,33 +132,66 @@ def accept(sock):
     print u"Apelido: %s" % (nickname,)
     return conn, addr, nickname
 
+
+# Funções de envio de dados para o Papovox ------------------------------------#
+
+def sendline(sock, line):
+    u"""Codifica e envia texto via socket pelo protocolo do Papovox.
+    
+    Uma quebra de linha é adicionada automaticamente ao fim da mensagem.
+    
+    Nota: esta função *não* deve ser usada para enviar mensagens. Use apenas
+    para transmitir dados brutos de comunicação.
+    """
+    print "==>> %s ==>>" % (line,)
+    line = line.encode(SYSTEM_ENCODING)
+    sock.sendall("%s\r\n" % (line,))
+
 def sendmessage(sock, msg):
+    u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
     print "[[[[ %s ]]]]" % (msg,)
     msg = msg.encode(SYSTEM_ENCODING)
     sock.sendall("%s%s" % (struct.pack('<BH', DADOTECLADO, len(msg)),
                            msg))
 
-def sendline(sock, line):
-    print "==>> %s ==>>" % (line,)
-    line = line.encode(SYSTEM_ENCODING)
-    sock.sendall("%s\r\n" % (line,))
+def send_chat_message(sock, sender, body):
+    u"""Formata e envia uma mensagem de bate-papo via socket.
+    
+    Use esta função para enviar uma mensagem para o Papovox sintetizar.
+    """
+    sendmessage(sock, u"%(sender)s disse: %(body)s" % locals())
+
+
+# Funções de recebimento de dados do Papovox ----------------------------------#
 
 def recv(sock, size):
+    u"""Recebe dados via socket.
+    
+    Use esta função para receber do socket `size' bytes ou menos.
+    Levanta uma exceção caso nenhum byte seja recebido.
+    
+    Nota: em geral, use esta função ao invés do método 'sock.recv'.
+    Veja também a função 'recvall'.
+    """
     data = sock.recv(size)
     if not data and size:
         raise socket.error(u"Nenhum dado recebido do socket, conexão perdida.")
     return data
 
 def recvall(sock, size):
+    u"""Recebe dados exaustivamente via socket.
+    
+    Use esta função para receber do socket exatamente `size' bytes.
+    Levanta uma exceção caso nenhum byte seja recebido.
+    
+    Nota: em geral, use esta função ou 'recv' ao invés do método 'sock.recv'.
+    """
     data = StringIO()
     while data.tell() < size:
         data.write(recv(sock, size - data.tell()))
     data_str = data.getvalue()
     data.close()
     return data_str
-
-def send_chat_message(sock, sender, body):
-    sendmessage(sock, u"%(sender)s disse: %(body)s" % locals())
 
 #------------------------------------------------------------------------------#
 
