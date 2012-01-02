@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+u"""
+XMPPVOX - módulo cliente
 
-"""
-    SleekXMPP: The Sleek XMPP Library
-    Copyright (C) 2010  Nathanael C. Fritz
-    This file is part of SleekXMPP.
-
-    See the file LICENSE for copying permission.
+Este módulo implementa um cliente do protocolo XMPP, usando a biblioteca
+SleekXMPP, que permite estabelecer comunicação com servidores diversos, como
+Google Talk, Facebook chat e Jabber.
 """
 
 import sys
