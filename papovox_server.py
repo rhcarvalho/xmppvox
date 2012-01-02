@@ -78,7 +78,7 @@ from cStringIO import StringIO
 
 import getpass
 import logging
-from echo_client import EchoBot
+from echo_client import GenericBot
 
 #---------------- Constantes --------------------------------------------------#
 
@@ -169,7 +169,7 @@ def main():
 
     jid = raw_input("Conta (ex.: fulano@gmail.com): ")
     password = getpass.getpass("Senha para %r: " % jid)
-    xmpp = EchoBot(jid, password)
+    xmpp = GenericBot(jid, password)
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0004') # Data Forms
     xmpp.register_plugin('xep_0060') # PubSub
