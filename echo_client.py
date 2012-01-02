@@ -28,10 +28,14 @@ else:
 
 
 class GenericBot(sleekxmpp.ClientXMPP):
-    """Um rob� simples que chama uma fun��o sempre que recebe uma nova mensagem.
+    u"""Um robô simples para processar mensagens recebidas via XMPP.
+    
+    Sempre que uma mensagem do tipo 'normal' ou 'chat' for recebida, uma função
+    é chamada e a mensagem é passada como argumento.
+    É possível fornecer sua própria função para tratar mensagens.
     """
 
-    def __init__(self, jid, password, func_receive_msg=lambda msg: None):
+    def __init__(self, jid, password, func_receive_msg=None):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # The session_start event will be triggered when
@@ -46,6 +50,15 @@ class GenericBot(sleekxmpp.ClientXMPP):
         # MUC messages and error messages.
         self.add_event_handler("message", self.message)
         
+        if func_receive_msg is None:
+            def func_receive_msg(msg):
+                u"""Função padrão ao receber mensagens.
+                
+                Esta função só é usada se nenhuma função personalizada for
+                especificada.
+                """
+                logging.info(msg)
+                msg.reply(u"Você disse: %(body)s" % msg).send()
         self.func_receive_msg = func_receive_msg
         self.last_sender = None
 
