@@ -19,9 +19,10 @@ from papovox_server import *
 
 
 def main():
-    # Setup logging.
+    # Configura logging.
     logging.basicConfig(level=logging.INFO,
-                        format='%(levelname)-8s %(message)s')
+                        format='%(levelname)-8s %(asctime)s %(message)s',
+                        datefmt='%H:%M:%S')
 
     jid = raw_input("Conta (ex.: fulano@gmail.com): ")
     password = getpass.getpass("Senha para %r: " % jid)
