@@ -15,7 +15,7 @@ import getpass
 import logging
 
 from echo_client import GenericBot
-from papovox_server import *
+from server import *
 
 
 def main():
