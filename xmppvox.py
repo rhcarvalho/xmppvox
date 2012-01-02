@@ -11,6 +11,7 @@ import struct
 from functools import partial
 from itertools import count
 
+from optparse import OptionParser
 import getpass
 import logging
 
@@ -19,14 +20,36 @@ from server import *
 
 
 def main():
+    # Setup the command line arguments.
+    optp = OptionParser()
+
+    # Output verbosity options.
+    optp.add_option('-q', '--quiet', help='set logging to ERROR',
+                    action='store_const', dest='loglevel',
+                    const=logging.ERROR, default=logging.INFO)
+    optp.add_option('-d', '--debug', help='set logging to DEBUG',
+                    action='store_const', dest='loglevel',
+                    const=logging.DEBUG, default=logging.INFO)
+
+    # JID and password options.
+    optp.add_option("-j", "--jid", dest="jid",
+                    help="JID to use")
+    optp.add_option("-p", "--password", dest="password",
+                    help="password to use")
+
+    opts, args = optp.parse_args()
+    
     # Configura logging.
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=opts.loglevel,
                         format='%(levelname)-8s %(asctime)s %(message)s',
                         datefmt='%H:%M:%S')
 
-    jid = raw_input("Conta (ex.: fulano@gmail.com): ")
-    password = getpass.getpass("Senha para %r: " % jid)
-    xmpp = GenericBot(jid, password)
+    if opts.jid is None:
+        opts.jid = raw_input("Conta (ex.: fulano@gmail.com): ")
+    if opts.password is None:
+        opts.password = getpass.getpass("Senha para %r: " % opts.jid)
+    
+    xmpp = GenericBot(opts.jid, opts.password)
     xmpp.register_plugin('xep_0030') # Service Discovery
     xmpp.register_plugin('xep_0004') # Data Forms
     xmpp.register_plugin('xep_0060') # PubSub
@@ -34,7 +57,7 @@ def main():
     
     if xmpp.connect():
         print "<<XMPP conectado>>"
-        xmpp.process(threaded=True)
+        xmpp.process(block=False)
 
     HOST = ''                 # Symbolic name meaning all available interfaces
     PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
