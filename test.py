@@ -26,8 +26,12 @@ class TestRecv(unittest.TestCase):
         self.assertRaises(socket.error, recv, sock, 23)
     
     def test_recv_nothing_is_not_an_error_when_asked_for_nothing(self):
-        sock = SocketMock()
+        sock = SocketMock(recv_size=0)
         self.assertEqual(len(recv(sock, 0)), 0)
+    
+    def test_recv_no_more_than_asked(self):
+        sock = SocketMock(recv_size=42)
+        self.assertEqual(len(recv(sock, 23)), 23)
 
 
 class TestRecvAll(unittest.TestCase):
@@ -42,6 +46,18 @@ class TestRecvAll(unittest.TestCase):
     def test_recvall_can_ask_for_nothing(self):
         sock = SocketMock(recv_size=2)
         self.assertEqual(len(recvall(sock, 0)), 0)
+    
+    def test_recvall_nothing_is_an_error(self):
+        sock = SocketMock(recv_size=0)
+        self.assertRaises(socket.error, recvall, sock, 23)
+    
+    def test_recvall_nothing_is_not_an_error_when_asked_for_nothing(self):
+        sock = SocketMock(recv_size=0)
+        self.assertEqual(len(recvall(sock, 0)), 0)
+    
+    def test_recvall_no_more_than_asked(self):
+        sock = SocketMock(recv_size=42)
+        self.assertEqual(len(recvall(sock, 23)), 23)
 
 
 if __name__ == '__main__':
