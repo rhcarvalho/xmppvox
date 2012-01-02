@@ -157,6 +157,10 @@ def recvall(sock, size):
     data.close()
     return data_str
 
+def send_chat_message(sock, sender, body):
+    timestamp = time.strftime('%H:%M')
+    sendmessage(sock, u"(%(timestamp)s) %(sender)s: %(body)s" % locals())
+
 #------------------------------------------------------------------------------#
 
 def main():
@@ -199,10 +203,9 @@ def main():
                                                 (conn, conn, conn))
         
         def recv_new_msg(msg):
-            m = dict(sender=msg['from'].user or REMETENTE_DESCONHECIDO,
-                     body=msg['body'],
-                     timestamp=time.strftime('%H:%M'))
-            _sendmessage(u"(%(timestamp)s) %(sender)s: %(body)s" % m)
+            sender = msg['from'].user or REMETENTE_DESCONHECIDO
+            body = msg['body']
+            send_chat_message(conn, sender, body)
         
         xmpp.func_receive_msg = recv_new_msg
         
@@ -228,6 +231,7 @@ def main():
                     xmpp.send_message(mto=xmpp.last_sender,
                                       mbody=data,
                                       mtype='chat')
+                    send_chat_message(conn, u"eu", data)
                 print u"#%03d. %s ** para %s" % (i, data,
                                                  xmpp.last_sender or u"ninguém")
         except socket.error, e:
