@@ -14,7 +14,7 @@ from itertools import count
 import getpass
 import logging
 
-from echo_client import GenericBot
+from client import GenericBot
 from server import *
 
 
