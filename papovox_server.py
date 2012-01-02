@@ -158,8 +158,7 @@ def recvall(sock, size):
     return data_str
 
 def send_chat_message(sock, sender, body):
-    timestamp = time.strftime('%H:%M')
-    sendmessage(sock, u"(%(timestamp)s) %(sender)s: %(body)s" % locals())
+    sendmessage(sock, u"%(sender)s disse: %(body)s" % locals())
 
 #------------------------------------------------------------------------------#
 
