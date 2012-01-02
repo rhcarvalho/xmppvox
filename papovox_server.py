@@ -101,9 +101,36 @@ DADOTECLADO       = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
 #PODEMANDAR        = 9   # sem parâmetros
 #CANCELAMANDAR     = 10  # sem parâmetros
 
+TAMANHO_DO_BUFFER = 4096 # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
+
 REMETENTE_DESCONHECIDO = u"remetente desconhecido"
 
 #------------------------------------------------------------------------------#
+
+def accept(sock):
+    ur"""Aceita uma conexão via socket com o Papovox.
+    
+    Retorna socket e endereço de rede do Papovox e o nome do usuário conectado.
+    
+    Ver 'C:\winvox\Fontes\PAPOVOX\PPLIGA.PAS' e
+    'C:\winvox\Fontes\SITIOVOX\SVPROC.PAS'.
+    """
+    conn, addr = sock.accept()
+    sendline(conn, u"+OK - %s:%s conectado" % addr)
+    nickname = recv(conn, TAMANHO_DO_BUFFER)
+    sendline(conn, u"+OK")
+    
+    # Espera Papovox estar pronto para receber mensagens.
+    #
+    # A espera é necessária pois se enviar mensagens logo em seguida o Papovox
+    # as ignora, provavelmente relacionado a alguma temporização ou espera na
+    # leitura de algum buffer ou estado da variável global 'conversando'.
+    # O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
+    time.sleep(0.1)
+    
+    print u"Aceitei conexão de %s:%s" % addr
+    print u"Apelido: %s" % (nickname,)
+    return conn, addr, nickname
 
 def sendmessage(sock, msg):
     print "[[[[ %s ]]]]" % (msg,)
@@ -157,39 +184,33 @@ def main():
     s.bind((HOST, PORT))
     s.listen(1)
     while True:
+        print u"XMPPVOX servindo na porta %s" % PORT
+        
+        # Conecta ao Papovox -----------------------------------------------#
         try:
-            print u"XMPPVOX servindo na porta %s" % PORT
-            
-            # Aceita conexão do Papovox
-            conn, addr = s.accept()
-            print u"Aceitei conexão de %s:%s" % addr
-            
-            # Funções úteis usando a conexão atual
-            _sendline, _sendmessage, _recvall = map(partial,
-                                                    (sendline, sendmessage, recvall),
-                                                    (conn, conn, conn))
-            
-            def recv_new_msg(msg):
-                m = dict(sender=msg['from'].user or REMETENTE_DESCONHECIDO,
-                         body=msg['body'],
-                         timestamp=time.strftime('%H:%M'))
-                _sendmessage(u"(%(timestamp)s) %(sender)s: %(body)s" % m)
-            
-            xmpp.func_receive_msg = recv_new_msg
-            
-            #------------------ Handshake inicial -----------------------------#
-            _sendline(u"+OK - %s:%s conectado" % addr)
-            nickname = conn.recv(1024)
-            print u"Apelido: %s" % (nickname,)
-            _sendline(u"+OK")
-            #------------------------------------------------------------------#
-            
-            # Se enviar mensagens logo em seguida, o Papovox não recebe
-            # corretamente. O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
-            # Provavelmente está relacionado a alguma temporização / espera
-            # na leitura de algum buffer.
-            time.sleep(0.1)
+            conn, addr, nickname = accept(s)
+        except socket.error:
+            print u"Erro: Não foi possível conectar ao Papovox."
+        #----------------------------------------------------------------------#
+        
+        # Funções úteis usando a conexão atual
+        _sendline, _sendmessage, _recvall = map(partial,
+                                                (sendline, sendmessage, recvall),
+                                                (conn, conn, conn))
+        
+        def recv_new_msg(msg):
+            m = dict(sender=msg['from'].user or REMETENTE_DESCONHECIDO,
+                     body=msg['body'],
+                     timestamp=time.strftime('%H:%M'))
+            _sendmessage(u"(%(timestamp)s) %(sender)s: %(body)s" % m)
+        
+        xmpp.func_receive_msg = recv_new_msg
+        
+        try:
+            # Envia mensagem de boas-vindas
             _sendmessage(u"Olá companheiro, bem-vindo ao Gugou Tolk Vox!")
+            
+            # Processa mensagens do Papovox para a rede XMPP
             for i in count(1):
                 datatype, datalen = struct.unpack('<BH', _recvall(3))
                 
