@@ -1,74 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-Essência do protocolo papovox:
-
-   PORTA_PAPOVOX = 1963;
-   PORTA_URGENTE = 1964;
-   PORTA_NOMES   = 1956;
-
-Papovox:
-
-Todas as mensagens têm o mesmo formato:
-    1 byte com o tipo de mensagem (valor binário)
-    2 bytes com o tamanho da mensagem (binário little endian)
-    n bytes com a mensagem
-    (não há terminador nem checksum)
-
-const
-   DADOTECLADO       = 1;    texto da mensagem (sem tab, nem lf nem cr ao final)
-   INICIOSOM         = 2;    sem parâmetros
-   FIMSOM            = 3;    sem parâmetros
-   DADOSOM           = 4;    enviados dados raw
-   INICIOARQENVIA    = 5;    parâmetro: nome do arquivo
-   FIMARQENVIA       = 6;    sem parâmetros
-   DADOENVIA         = 7;    sem parâmetros
-   CANCARQENVIA      = 8;    pode enviar uma frase junto
-   PODEMANDAR        = 9;    sem parâmetros
-   CANCELAMANDAR     = 10;   sem parâmetros
-
-Mensagens urgentes:
-
-   três linhas contendo ao final de cada uma um CR LF
-
-       nomeUsuario   a repassar a mensagem
-       enderUsuario   a repassar a mensagem
-       msg
-
-   Resposta:  +OK
-
-Consulta ao servidor de nomes:  (pouco usado hoje em dia)
-
-            HELP                   Fornece informações sobre os comandos"
-            QUIT                   Encerra o serviço do servidor"
-            NOOP                  Apenas responde +OK"
-            NOW                   Mostra data/hora da máquina"
-            IP <email>           Obtém o IP do usuário"
-            GET <email>            Obtém IP e outras informações do usuário"
-            REGISTER <email>       Registra informação do usuário"
-            REMOVE <email>         Remove o registro de um usuário"
-            LOGON <email>          Altera o IP de um usuário já cadastrado"
-            LOGON <email> <informação sobre o logon>"
-            LOGOFF <email>         Limpa informação do IP, mantendo as outras"
-            FIND <nome_buscado>    Busca um nome e retorna seu
-endereço eletrônico"
-                           Para procurar só os ativos acrescentar + na
-frente do e-mail"
-            DATE <email> dd/mm/aaaa hh:mm  Muda data/hora de um nome
-no registro"
-            STOP                   Encerra o Findip"
-               Para email com senha, acrescentar dois pontos e a senha
-após o email."
-               Exemplo:  eu@da.silva:minhasenha"
-               Nota1: Não coloque espaços no e-mail e na senha.
-
-   Respostas: +OK
-                   -ERR
-   Resposta com linhas múltiplas: terminar por uma linha contendo só
-um ponto (.).
-'''
-#------------------------------------------------------------------------------#
-
 import socket
 import struct
 import time
@@ -88,18 +19,9 @@ SYSTEM_ENCODING = 'cp1252'
 
 PORTA_PAPOVOX = 1963
 #PORTA_URGENTE = 1964
-#PORTA_NOMES   = 1956
+#PORTA_NOMES = 1956
 
-DADOTECLADO       = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
-#INICIOSOM         = 2   # sem parâmetros
-#FIMSOM            = 3   # sem parâmetros
-#INICIOARQENVIA    = 5   # parâmetro: nome do arquivo
-#FIMARQENVIA       = 6   # sem parâmetros
-#DADOSOM           = 4   # enviados dados raw
-#DADOENVIA         = 7   # sem parâmetros
-#CANCARQENVIA      = 8   # pode enviar uma frase junto
-#PODEMANDAR        = 9   # sem parâmetros
-#CANCELAMANDAR     = 10  # sem parâmetros
+DADOTECLADO = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
 
 TAMANHO_DO_BUFFER = 4096 # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
 
