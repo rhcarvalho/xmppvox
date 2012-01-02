@@ -233,7 +233,6 @@ def main():
         except socket.error, e:
             print u"Erro: %s" % (e,)
         finally:
-            conn.close()
             print u"Conexão encerrada."
 
 
