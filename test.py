@@ -3,6 +3,13 @@ import socket
 import sys
 from server import recv, recvall, accept, SYSTEM_ENCODING
 
+# Necessário para corrigir bug no unittest.
+# A versão da biblioteca presente no Python 2.7
+# tem problemas em comparar strings unicode.
+if sys.version_info < (3, 0):
+    reload(sys)
+    sys.setdefaultencoding(SYSTEM_ENCODING)
+
 
 class SocketMock(object):
     def __init__(self, recv_size=sys.maxint):
@@ -89,6 +96,12 @@ class TestAccept(unittest.TestCase):
     def test_basic(self):
         nickname = u"Olavo".encode(SYSTEM_ENCODING)
         s = PapovoxSocketMock(self.addr, nickname)
+        self.assertEqual(accept(s), (s, self.addr, nickname))
+    
+    def test_nickname_with_accents(self):
+        nickname = u"Anônimo".encode(SYSTEM_ENCODING)
+        s = PapovoxSocketMock(self.addr, nickname)
+        #accept(s)
         self.assertEqual(accept(s), (s, self.addr, nickname))
 
 

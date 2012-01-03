@@ -112,10 +112,11 @@ def recv(sock, size):
 def recvline(sock, size):
     u"""Recebe uma linha via socket.
     
-    A string retornada não contém \r nem \n.
+    A string é retornada em unicode e não contém \r nem \n.
     """
     # Assume que apenas uma linha está disponível no socket.
     data = recv(sock, size).rstrip('\r\n')
+    data = data.decode(SYSTEM_ENCODING)
     if any(c in data for c in '\r\n'):
         log.warning("[recvline] recebeu mais que uma linha!")
     return data
