@@ -105,6 +105,11 @@ while True:
                 log.warning(u"Recebi tipo de dados desconhecido: (%d)" % datatype)
                 continue
             
+            # Ignora mensagens vazias
+            if datalen == 0:
+                log.debug(u"Mensagem vazia ignorada")
+                continue
+            
             # Recebe dados/mensagem do Papovox
             data = _recvall(datalen)
             data = data.decode(SYSTEM_ENCODING)
