@@ -108,14 +108,28 @@ while True:
             data = _recvall(datalen)
             data = data.decode(SYSTEM_ENCODING)
             
-            # Envia mensagem XMPP para o último remetente
-            if xmpp.last_sender is not None:
-                xmpp.send_message(mto=xmpp.last_sender,
-                                  mbody=data,
-                                  mtype='chat')
-                send_chat_message(conn, u"eu", data)
-            mto = xmpp.last_sender or u"ninguém"
-            log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
+            if data.startswith("?quem"):
+                log.debug("[comando ?quem]")
+                def is_friend(jid):
+                    return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
+                for f, friend in enumerate(filter(is_friend, xmpp.client_roster), 1):
+                    name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
+                    subscription = xmpp.client_roster[friend]['subscription']
+                    extra = u""
+                    if subscription == 'to':
+                        extra = u" * não estou na lista deste contato."
+                    elif subscription == 'from':
+                        extra = u" * este contato me adicionou mas eu não autorizei."
+                    _sendmessage(u"%d %s%s" % (f, name, extra))
+            else:
+                # Envia mensagem XMPP para o último remetente
+                if xmpp.last_sender is not None:
+                    xmpp.send_message(mto=xmpp.last_sender,
+                                      mbody=data,
+                                      mtype='chat')
+                    send_chat_message(conn, u"eu", data)
+                mto = xmpp.last_sender or u"ninguém"
+                log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
     except socket.error, e:
         log.error(u"Erro: %s" % (e,))
     finally:
