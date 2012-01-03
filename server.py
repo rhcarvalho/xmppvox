@@ -60,8 +60,15 @@ def accept(sock):
     
     # Envia mensagem de boas-vindas
     sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
+    sendhelp(conn)
     
     return conn, addr, nickname
+
+def sendhelp(sock):
+    sendmessage(sock, u"""\
+    Para ver sua lista de contatos, digite ?quem.
+    Para conversar com alguém, digite ?para seguido do número do contato.
+    """)
 
 
 # Funções de envio de dados para o Papovox ------------------------------------#
