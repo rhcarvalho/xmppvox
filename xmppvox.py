@@ -6,6 +6,7 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
+import re
 import socket
 import struct
 from functools import partial
@@ -108,10 +109,11 @@ while True:
             data = _recvall(datalen)
             data = data.decode(SYSTEM_ENCODING)
             
+            def is_friend(jid):
+                return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
+            
             if data.startswith("?quem"):
                 log.debug("[comando ?quem]")
-                def is_friend(jid):
-                    return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
                 for f, friend in enumerate(filter(is_friend, xmpp.client_roster), 1):
                     name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
                     subscription = xmpp.client_roster[friend]['subscription']
@@ -119,8 +121,19 @@ while True:
                     if subscription == 'to':
                         extra = u" * não estou na lista deste contato."
                     elif subscription == 'from':
-                        extra = u" * este contato me adicionou mas eu não autorizei."
+                        extra = u" * este contato me adicionou mas não autorizei."
                     _sendmessage(u"%d %s%s" % (f, name, extra))
+            elif data.startswith("?para"):
+                log.debug("[comando ?para]")
+                mo = re.match(r"\?para (\d+)", data)
+                if mo is None:
+                    _sendmessage(u"Faltou número do contato! Use ?quem.")
+                else:
+                    idx = int(mo.group(1))
+                    xmpp.last_sender = dict(enumerate(filter(is_friend, xmpp.client_roster), 1)).get(idx, None)
+                    if xmpp.last_sender is None:
+                        _sendmessage(u"Número de contato inexistente! Use ?quem.")
+                _sendmessage(u"Agora estou falando com %s." % (xmpp.last_sender or u"ninguém"))
             else:
                 # Envia mensagem XMPP para o último remetente
                 if xmpp.last_sender is not None:
