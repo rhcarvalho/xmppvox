@@ -1,7 +1,7 @@
 ﻿import unittest
 import socket
 import sys
-from papovox_server import recv, recvall
+from server import recv, recvall, accept, SYSTEM_ENCODING
 
 
 class SocketMock(object):
@@ -13,51 +13,83 @@ class SocketMock(object):
 
 
 class TestRecv(unittest.TestCase):
-    def test_recv_exact_amount(self):
+    def test_exact_amount(self):
         sock = SocketMock()
         self.assertEqual(len(recv(sock, 23)), 23)
     
-    def test_recv_less_data(self):
+    def test_less_data(self):
         sock = SocketMock(recv_size=2)
         self.assertEqual(len(recv(sock, 23)), 2)
     
-    def test_recv_nothing_is_an_error(self):
+    def test_nothing_is_an_error(self):
         sock = SocketMock(recv_size=0)
         self.assertRaises(socket.error, recv, sock, 23)
     
-    def test_recv_nothing_is_not_an_error_when_asked_for_nothing(self):
+    def test_nothing_is_not_an_error_when_asked_for_nothing(self):
         sock = SocketMock(recv_size=0)
         self.assertEqual(len(recv(sock, 0)), 0)
     
-    def test_recv_no_more_than_asked(self):
+    def test_no_more_than_asked(self):
         sock = SocketMock(recv_size=42)
         self.assertEqual(len(recv(sock, 23)), 23)
 
 
 class TestRecvAll(unittest.TestCase):
-    def test_recvall_single_try(self):
+    def test_single_try(self):
         sock = SocketMock()
         self.assertEqual(len(recvall(sock, 23)), 23)
     
-    def test_recvall_multiple_tries(self):
+    def test_multiple_tries(self):
         sock = SocketMock(recv_size=2)
         self.assertEqual(len(recvall(sock, 23)), 23)
     
-    def test_recvall_can_ask_for_nothing(self):
+    def test_can_ask_for_nothing(self):
         sock = SocketMock(recv_size=2)
         self.assertEqual(len(recvall(sock, 0)), 0)
     
-    def test_recvall_nothing_is_an_error(self):
+    def test_nothing_is_an_error(self):
         sock = SocketMock(recv_size=0)
         self.assertRaises(socket.error, recvall, sock, 23)
     
-    def test_recvall_nothing_is_not_an_error_when_asked_for_nothing(self):
+    def test_nothing_is_not_an_error_when_asked_for_nothing(self):
         sock = SocketMock(recv_size=0)
         self.assertEqual(len(recvall(sock, 0)), 0)
     
-    def test_recvall_no_more_than_asked(self):
+    def test_no_more_than_asked(self):
         sock = SocketMock(recv_size=42)
         self.assertEqual(len(recvall(sock, 23)), 23)
+
+
+class PapovoxSocketMock(object):
+    def __init__(self, addr, nickname):
+        self.conn = self
+        self.addr = addr
+        self.nickname = nickname
+        self.__stage = 0
+    
+    def accept(self):
+        return self.conn, self.addr
+    
+    def sendall(self, data):
+        if data.startswith('+OK'):
+            self.__stage += 1
+        elif self.__stage == 2:
+            pass
+        else:
+            raise socket.error
+    
+    def recv(self, size):
+        if self.__stage == 1:
+            return self.nickname + "\r\n"
+        raise socket.error
+
+class TestAccept(unittest.TestCase):
+    addr = ('127.9.9.9', 9999)
+    
+    def test_basic(self):
+        nickname = u"Olavo".encode(SYSTEM_ENCODING)
+        s = PapovoxSocketMock(self.addr, nickname)
+        self.assertEqual(accept(s), (s, self.addr, nickname))
 
 
 if __name__ == '__main__':
