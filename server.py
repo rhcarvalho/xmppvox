@@ -131,6 +131,31 @@ def recvall(sock, size):
     data.close()
     return data_str
 
+def recvmessage(sock):
+    u"""Recebe uma mensagem via socket pelo protocolo do Papovox.
+    
+    A mensagem é retornada em unicode.
+    Se uma exceção não for levantada, esta função sempre retorna uma mensagem.
+    """
+    # Tenta receber mensagem até obter sucesso.
+    while True:
+        datatype, datalen = struct.unpack('<BH', recvall(sock, 3))
+        
+        # Recusa dados do Papovox que não sejam do tipo DADOTECLADO
+        if datatype != DADOTECLADO:
+            log.warning(u"Recebi tipo de dados desconhecido: (%d)" % datatype)
+            continue
+        
+        # Ignora mensagens vazias
+        if datalen == 0:
+            log.debug(u"Mensagem vazia ignorada")
+            continue
+        
+        # Recebe dados/mensagem do Papovox
+        data = recvall(sock, datalen)
+        data = data.decode(SYSTEM_ENCODING)
+        return data
+
 
 if __name__ == '__main__':
     print "Execute 'python xmppvox.py'"

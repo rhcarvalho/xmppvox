@@ -81,9 +81,7 @@ while True:
     #----------------------------------------------------------------------#
     
     # Funções úteis usando a conexão atual
-    _sendline, _sendmessage, _recvall = map(partial,
-                                            (sendline, sendmessage, recvall),
-                                            (conn, conn, conn))
+    _sendmessage = partial(sendmessage, conn)
     
     def recv_new_msg(msg):
         sender = msg['from'].user or REMETENTE_DESCONHECIDO
@@ -98,21 +96,7 @@ while True:
         
         # Processa mensagens do Papovox para a rede XMPP
         for i in count(1):
-            datatype, datalen = struct.unpack('<BH', _recvall(3))
-            
-            # Recusa dados do Papovox que não sejam do tipo DADOTECLADO
-            if datatype != DADOTECLADO:
-                log.warning(u"Recebi tipo de dados desconhecido: (%d)" % datatype)
-                continue
-            
-            # Ignora mensagens vazias
-            if datalen == 0:
-                log.debug(u"Mensagem vazia ignorada")
-                continue
-            
-            # Recebe dados/mensagem do Papovox
-            data = _recvall(datalen)
-            data = data.decode(SYSTEM_ENCODING)
+            data = recvmessage(conn)
             
             def is_friend(jid):
                 return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
