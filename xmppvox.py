@@ -91,9 +91,6 @@ while True:
     xmpp.func_receive_msg = recv_new_msg
     
     try:
-        # Envia mensagem de boas-vindas
-        _sendmessage(u"Olá companheiro, bem-vindo ao XMPPVOX!")
-        
         # Processa mensagens do Papovox para a rede XMPP
         for i in count(1):
             data = recvmessage(conn)

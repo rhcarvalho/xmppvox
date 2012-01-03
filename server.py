@@ -57,6 +57,10 @@ def accept(sock):
     
     log.info(u"Conectado ao Papovox em %s:%s", *addr)
     log.info(u"Apelido: %s", nickname)
+    
+    # Envia mensagem de boas-vindas
+    sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
+    
     return conn, addr, nickname
 
 
