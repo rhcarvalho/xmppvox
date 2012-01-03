@@ -44,7 +44,7 @@ def accept(sock):
     """
     conn, addr = sock.accept()
     sendline(conn, u"+OK - %s:%s conectado" % addr)
-    nickname = recv(conn, TAMANHO_DO_BUFFER)
+    nickname = recvline(conn, TAMANHO_DO_BUFFER)
     sendline(conn, u"+OK")
     
     # Espera Papovox estar pronto para receber mensagens.
@@ -103,6 +103,17 @@ def recv(sock, size):
     data = sock.recv(size)
     if not data and size:
         raise socket.error(u"Nenhum dado recebido do socket, conexão perdida.")
+    return data
+
+def recvline(sock, size):
+    u"""Recebe uma linha via socket.
+    
+    A string retornada não contém \r nem \n.
+    """
+    # Assume que apenas uma linha está disponível no socket.
+    data = recv(sock, size).rstrip('\r\n')
+    if any(c in data for c in '\r\n'):
+        log.warning("[recvline] recebeu mais que uma linha!")
     return data
 
 def recvall(sock, size):
