@@ -12,6 +12,9 @@ import struct
 import time
 from cStringIO import StringIO
 
+import logging
+log = logging.getLogger(__name__)
+
 
 # Constantes ------------------------------------------------------------------#
 
@@ -52,8 +55,8 @@ def accept(sock):
     # O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
     time.sleep(0.1)
     
-    print u"Aceitei conexão de %s:%s" % addr
-    print u"Apelido: %s" % (nickname,)
+    log.info(u"Conectado ao Papovox em %s:%s", *addr)
+    log.info(u"Apelido: %s", nickname)
     return conn, addr, nickname
 
 
@@ -67,13 +70,13 @@ def sendline(sock, line):
     Nota: esta função *não* deve ser usada para enviar mensagens. Use apenas
     para transmitir dados brutos de comunicação.
     """
-    print "==>> %s ==>>" % (line,)
+    log.debug(u"[sendline] %s", line)
     line = line.encode(SYSTEM_ENCODING)
     sock.sendall("%s\r\n" % (line,))
 
 def sendmessage(sock, msg):
     u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
-    print "[[[[ %s ]]]]" % (msg,)
+    log.debug(u"[sendmessage] %s", msg)
     msg = msg.encode(SYSTEM_ENCODING)
     sock.sendall("%s%s" % (struct.pack('<BH', DADOTECLADO, len(msg)),
                            msg))

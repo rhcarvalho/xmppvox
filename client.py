@@ -9,11 +9,14 @@ Google Talk, Facebook chat e Jabber.
 """
 
 import sys
-import logging
 import getpass
 from optparse import OptionParser
 
 import sleekxmpp
+
+import logging
+log = logging.getLogger(__name__)
+
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
@@ -56,7 +59,7 @@ class GenericBot(sleekxmpp.ClientXMPP):
                 Esta função só é usada se nenhuma função personalizada for
                 especificada.
                 """
-                logging.info(msg)
+                log.debug(u"[func_receive_msg] %s", msg)
                 msg.reply(u"Você disse: %(body)s" % msg).send()
         self.func_receive_msg = func_receive_msg
         self.last_sender = None
