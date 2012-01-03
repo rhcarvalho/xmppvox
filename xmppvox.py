@@ -93,7 +93,7 @@ while True:
     
     try:
         # Envia mensagem de boas-vindas
-        _sendmessage(u"Olá companheiro, bem-vindo ao Gugou Tolk Vox!")
+        _sendmessage(u"Olá companheiro, bem-vindo ao XMPPVOX!")
         
         # Processa mensagens do Papovox para a rede XMPP
         for i in count(1):
