@@ -1,17 +1,61 @@
 XMPPVOX
 
+#--------- Para segunda-feira, 02/01/2012 --------------------------------------
+
+* Configurar XMPPVOX no HP Mini (para demonstrar na terça)                         [OK]
+
+Para facilitar o entendimento:
+    * renomear scripts                                                             [OK]
+    * documentar funções                                                           [OK]
+
+Vai facilitar o desenvolvimento:
+    * Possibilidade de fechar a XMPPVOX a qualquer momento (ex.: Ctrl+C)           [IGNORE: already working]
+        - Para tal, thread principal do XMPPVOX não pode bloquear em I/O.
+        - Pode existir um comando via Papovox, ex.: "?sair"
+    * opção de linha de comando --no-internet para testes                          [Not Implemented Yet, probabily to be ignored... it's easier to install a XMPP server locally]
+        = janela para enviar e receber mensagens sem usar XMPP
+    * lembrar configuração xmpp                                                    [IGNORE: I can use command-line parameters]
+
+#-------------------------------------------------------------------------------
+
+* adicionar comando ajuda ("?")
+* usar sempre str.{de,en}code(errors='replace' ou 'ignore')
+
+* mover código que não pertence ao xmppvox.py para server.py
+
+* reimplementar comandos da forma correta.
+
+* unicode_first :: http://farmdev.com/talks/unicode/
+    >>> def to_unicode_or_bust(
+    ...         obj, encoding='utf-8'):
+    ...     if isinstance(obj, basestring):
+    ...         if not isinstance(obj, unicode):
+    ...             obj = unicode(obj, encoding)
+    ...     return obj
+
+* sys.getfilesystemencoding() ou sys.std{in,out}.encoding ao invés de 'cp1252' hardcoded (talvez... é preciso testar)
+
+* separar xmpp / papovox em processos
+
+* Escrever testes automatizados
+
+
 * Suporte para tarefas administrativas do usuário XMPP:
+    Ver https://github.com/fritzy/SleekXMPP/wiki/Roster-Management
+    e https://github.com/fritzy/SleekXMPP/wiki/Stanzas:-Presence
     - Adicionar/remover/listar contatos
+        = Usar comandos similares ao Sítiovox (?, ?quem, ?quantos, +apelido, ...)
     - Dos contatos:
         - Ver/ler presença (online/ocupado/invisível/etc)
-        - Ver/ler status
+        - Ver/ler status                                            (v1.1+)
         - Ver/ler "apelido"
+        - Alterar "apelido"                                         (v1.1+)
     - Dados pessoais:
         - Alterar presença (online/ocupado/invisível/etc)
-        - Alterar status
+        - Alterar status                                            (v1.1+)
         - Alterar "apelido"
 
-* Usar Python Keyring para guardar login/senha XMPP
+* Usar Python Keyring para guardar login/senha XMPP            (dropped feature)
 
 * Interface com o usuário Papovox:
     - Quem me enviou mensagem?
@@ -41,21 +85,68 @@ XMPPVOX
 
 * Congelar dependências: adicionar ao projeto todas as dependências
 
-* Possibilidade de fechar a XMPPVOX a qualquer momento (ex.: Ctrl+C)
-    - Para tal, thread principal do XMPPVOX não pode bloquear em I/O.
-    - Pode existir um comando via Papovox, ex.: "?sair"
+* Empacotar XMPPVOX versão 0.1
+    http://hackerboss.com/how-to-distribute-commercial-python-applications/
+    
+    -> py2exe http://www.py2exe.org/
+    -> Pyinstaller http://www.pyinstaller.org/
+    -> cx_Freeze http://cx-freeze.sourceforge.net/
+    -> bbfreeze http://pypi.python.org/pypi/bbfreeze/
+    
+    não soluções:
+    -> Somente Mac: py2app
+    -> Somente UNIX: Tools/freeze
+        http://docs.python.org/faq/programming.html#how-can-i-create-a-stand-alone-binary-from-a-python-script
+    -> http://docs.python.org/distutils/builtdist.html
+        dá pra criar instalador .msi, mas precisa ter Python na máquina
+    
+    *** Lembrar de desativar logging
 
-
-Casos de teste:
+--------------------------------------------------------------------------------
+Casos "críticos":
 * O que acontece quando:
     - não há acesso à Internet?
+        = mensagem "não consegui encontrar o servidor XMPP, verifique sua
+        = conexão com a Internet"
     - dnspython não funciona?
+        = se não for possível conectar ao servidor XMMP, "falha na conexão,
+        = não consegui encontrar o servidor"
     - autenticação xmpp falha?
+        = mensagem "usuário ou senha incorretos, digite fulano@servidor / senha"
+        = solicitar usuário e senha novamente ou sair
     - conexão com a Internet falha / conexão XMPP cai?
+        = Mensagem de aviso "rede XMPP offline" e, caso conexão volte,
+        = "rede XMMP online"
     - usuário sai do Papovox?
         - Como terminar o XMPPVOX corretamente?
+            = ?? Thread que fica verificando se o Papovox está rodando, e caso
+            = ele pare de rodar o XMPPVOX é automaticamente fechado.
+    - recebe uma mensagem via XMPP muito grande (maior que os buffers do Papovox)?
+        = quebrar a mensagem em várias
+    - receber muitas mensagens:
+        - num caso normal, digamos até 20 mensagens simultâneas?
+        - num caso de ataque, mais de 100 mensagens por segundo
+            = No método do sleekxmpp.ClientXMPP que recebe mensagens, verificar
+            = número de mensagens recebidas no último minuto. Se for maior que
+            = um limite, joga fora mensagens, ou seja, envia pro Papovox no
+            = máximo uma quantidade fixa de mensagens por minuto -- e avisa que
+            = mensagens foram ignoradas.
+            = (v1.1+) indica de quem foram as mensagens ignoradas
+    - a porta do servidor já está em uso (por exemplo o XMPPVOX já está em
+      execução noutro processo)
+        = Mensagem de erro "Porta do XMPPVOX ocupada, verifique se outra
+        = instância do XMPPVOX está em execução, ou Sítiovox"
 
---------------------------- DONE -----------------------------------------------
+________________________________________________________________________________
+-**------------------------------  DONE  ------------------------------------**-
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 * Servidor recebe mensagens de clientes Papovox.
 * Servidor conecta usuário do Papovox a uma conta XMPP/Google Chat.
 * Servidor envia mensagem para um amigo de sua lista via XMPP.
+
+* abstrair accept
+* repetir/falar mensagem enviada
+* usar logging ao inves de print
+* inibir mensagens vazias (apertar ENTER várias vezes no Papovox por exemplo)
+* readline (remover quebra de linha str.rstrip('\r\n') (ex: apelido recebido no início da conexão)
+* decodificar data.decode(SYSTEM_ENCODING) em recv (ex: apelido com acentos)
