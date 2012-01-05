@@ -1,0 +1,34 @@
+Escopo do XMPPVOX 1.0 (a ser descrito na monografia)                                  -STATUS-
+---
+* Sistema empacotado com todas as dependências                                          TODO
+* Possibilidade de usar Google Talk, Facebook Chat, Jabber ou outro                     DONE
+* Bate papo 1-pra-1 com vários contatos simultaneamente                                 PART (falta melhorar UI)
+* Gerenciamento de conta:                                                               ----
+    * usuário e senha (para conectar)                                                   DONE    
+    * adicionar contatos                                                                TODO
+    * listar amigos online                                                              TODO
+    * listar todos os amigos                                                            DONE
+    * definir "apelido"                                                                 TODO
+    * alterar presença: online/ocupado                                                  TODO
+* Escolher amigo online para falar                                                      DONE
+* Papovox e XMPPVOX integrados (usuário executa 1 aplicação e consegue se comunicar)   *TODO*
+  ??????????????????????????????????????????????????????????????????????????
+  ? O usuário executa o Papovox e este inicia o XMPPVOX sob demanda, passando
+  ? usuário/domínio/senha.
+  ?    -- OU --
+  ? O usuário executa o XMPPVOX e este inicia o Papovox, passando um parâmetro
+  ? que indique a utilização no "modo" XMPPVOX.
+  //////////////////////////////////////////////////////////////////////////
+* Ajuda na tela e breve manual de utilização TXT                                        PART (falta atualizar)
+* Algum nível de tratamento dos casos "críticos" estabelecidos                          TODO
+* Funcionamento correto com caracteres acentuados                                       PART (verificar)    
+* Testes automatizados
+
+--- v1.1 ("trabalhos futuros"/durante escrita da monografia/baseado em feedback)
+
+* Múltiplas vozes
+* Dos contatos:
+    * Ver/ler status
+    * Alterar "apelido"
+* Dados pessoais:
+    * Alterar status
