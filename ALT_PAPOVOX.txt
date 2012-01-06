@@ -15,23 +15,24 @@ Alterações necessárias no Papovox para integrar com o XMPPVOX
     - mensagens urgentes não são usadas pelo XMPPVOX
 
 2. Alterações
-    - o XMPPVOX poderia usar uma porta diferente do Sítiovox/SACI se isso for suportado pelo Papovox.
+    - o XMPPVOX poderia usar uma porta diferente do Sítiovox/SACI se isso for suportado pelo Papovox
+    - verificar itens do menu de configuração quando a sua relevância atual
 
 3. A ser adicionado
     - adicionar XMPPVOX ao menu de rede do DOSVOX
-        >>> depende se o XMPPVOX vai iniciar o Papovox ou o contrário (ver ESCOPO)
+        >>> comentário: depende se o XMPPVOX vai iniciar o Papovox ou o contrário (ver ESCOPO)
     - suporte a múltiplas vozes (uma voz por contato na conversa) (proposto para v1.1+)
     - "Menu de conexão com servidores XMPP"
         - qual seu usuário?
         - qual a sua senha?
-        >>> Problema: no caso do SACI, o servidor remoto está "sempre online",
-        >>> enquanto que XMPPVOX precisa ser iniciado localmente.
+        >>> comentário: um problema é que no caso do SACI, o servidor remoto está "sempre online",
+                        enquanto que XMPPVOX precisa ser iniciado localmente.
     - caracter especial na mensagem para disparar bip
-        Isso foi proposto em reunião 03/01/2012, mas será que é bom mesmo?
-        Um usuário malicioso pode enviar bips no conteúdo das suas mensagens
-        e enganar seus contatos:
-            eu{bip}: oi fulano!
-            fulano{bip}: oi rodolfo. ciclano{bip}: rodolfo, liga pra mim!
+        >>> comentário: Isso foi proposto em reunião 03/01/2012, mas será que é bom mesmo?
+                        Um usuário malicioso pode enviar bips no conteúdo das suas mensagens
+                        e enganar seus contatos:
+                            eu{bip}: oi fulano!
+                            fulano{bip}: oi rodolfo. ciclano{bip}: rodolfo, liga pra mim!
     - ajuda navegável
         Ao invés de o servidor Sítiovox/SACI/XMPPVOX enviar um texto
         simples pra ser sintetizado, o ideal seria poder navegar nos comandos
