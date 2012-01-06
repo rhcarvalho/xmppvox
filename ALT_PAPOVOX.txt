@@ -1,0 +1,47 @@
+-------------------------------------------------------------
+Alterações necessárias no Papovox para integrar com o XMPPVOX
+-------------------------------------------------------------
+
+1. O que deve/pode sair
+    - "Deseja manter sua real identidade em segredo?"
+        - "Informe então seus dados de fantasia" / 
+        - "Qual o seu nome?" (no caso do XMPPVOX é preciso usuario@servidor + senha)
+    - Menu de opções:
+        - P - pesquisa usuários no servidor de nomes (não funciona)
+        - E - espera que alguém inicie uma conexão com este programa (não é usado no XMPPVOX)
+        - L - inicia uma ligação com outro usuário (este recurso é usado para conectar ao Sítiovox/XMPPVOX, mas não é necessário se a conexão ocorrer por outro item de menu)
+        - M - envia mensagem urgente (não é usado pelo XMPPVOX)
+    - remover coisas relacionadas ao servidor de nomes
+    - mensagens urgentes não são usadas pelo XMPPVOX
+
+2. Alterações
+    - o XMPPVOX poderia usar uma porta diferente do Sítiovox/SACI se isso for suportado pelo Papovox.
+
+3. A ser adicionado
+    - adicionar XMPPVOX ao menu de rede do DOSVOX
+        >>> depende se o XMPPVOX vai iniciar o Papovox ou o contrário (ver ESCOPO)
+    - suporte a múltiplas vozes (uma voz por contato na conversa) (proposto para v1.1+)
+    - "Menu de conexão com servidores XMPP"
+        - qual seu usuário?
+        - qual a sua senha?
+        >>> Problema: no caso do SACI, o servidor remoto está "sempre online",
+        >>> enquanto que XMPPVOX precisa ser iniciado localmente.
+    - caracter especial na mensagem para disparar bip
+        Isso foi proposto em reunião 03/01/2012, mas será que é bom mesmo?
+        Um usuário malicioso pode enviar bips no conteúdo das suas mensagens
+        e enganar seus contatos:
+            eu{bip}: oi fulano!
+            fulano{bip}: oi rodolfo. ciclano{bip}: rodolfo, liga pra mim!
+    - ajuda navegável
+        Ao invés de o servidor Sítiovox/SACI/XMPPVOX enviar um texto
+        simples pra ser sintetizado, o ideal seria poder navegar nos comandos
+        assim como a ajuda com F1.
+        Uma ideia seria poder passar via protocolo pares de (comando, descrição).
+        Exemplo:
+            [
+                ("?", "ajuda"),
+                ("?quem", "exibe sua lista de contatos"),
+                ("?quem online", "...")
+            ]
+        No Papovox, apertar ENTER numa opção envia automaticamente o
+        texto do comando para ser processado no servidor.
