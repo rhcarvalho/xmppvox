@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 raise SystemExit(u"""
     setup.py não deve ser usado no momento.
     Ao invés de usar o py2exe, use o PyInstaller

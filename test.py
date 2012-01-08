@@ -1,4 +1,5 @@
-﻿import unittest
+﻿# -*- coding: utf-8 -*-
+import unittest
 import socket
 import sys
 from server import recv, recvall, accept, SYSTEM_ENCODING
