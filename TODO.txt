@@ -23,6 +23,8 @@ Vai facilitar o desenvolvimento:
 
 * mover código que não pertence ao xmppvox.py para server.py
 
+* except KeyboardInterrupt: sys.exit(0) // os._exit(0)
+
 * reimplementar comandos da forma correta.
 
 * unicode_first :: http://farmdev.com/talks/unicode/
