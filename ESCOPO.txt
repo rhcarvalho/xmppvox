@@ -2,7 +2,7 @@
 Escopo do XMPPVOX 1.0 (a ser descrito na monografia)                                 |-STATUS-
 Prazo: quarta-feira, 11/01/2012                                                      |
 -------------------------------------------------------------------------------------|
-* Sistema empacotado com todas as dependências                                       |  TODO
+* Sistema empacotado com todas as dependências                                       |  DONE
 * Possibilidade de usar Google Talk, Facebook Chat, Jabber ou outro                  |  DONE
 * Bate papo 1-pra-1 com vários contatos simultaneamente                              |  PART (falta melhorar UI)
 * Gerenciamento de conta:                                                            |  ----
