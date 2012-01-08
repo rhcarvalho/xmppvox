@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+raise SystemExit(u"""
+    setup.py não deve ser usado no momento.
+    Ao invés de usar o py2exe, use o PyInstaller
+    através do script build.bat.
+""")
+
 from distutils.core import setup
 import py2exe
 
