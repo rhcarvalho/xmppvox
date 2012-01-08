@@ -36,6 +36,9 @@ class GenericBot(sleekxmpp.ClientXMPP):
     é chamada e a mensagem é passada como argumento.
     É possível fornecer sua própria função para tratar mensagens.
     """
+    # Accept and create bidirectional subscription requests:
+    auto_authorize = True
+    auto_subscribe = True
 
     def __init__(self, jid, password, func_receive_msg=None):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
