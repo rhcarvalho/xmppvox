@@ -9,6 +9,7 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 import re
 import socket
 import struct
+import sys
 from functools import partial
 from itertools import count
 
@@ -77,8 +78,9 @@ while True:
     try:
         conn, addr, nickname = accept(s)
     except socket.error:
-        # FIXME: caso não consiga conectar, não posso continuar!
         log.error(u"Erro: Não foi possível conectar ao Papovox.")
+        xmpp.disconnect()
+        sys.exit(1)
     #----------------------------------------------------------------------#
     
     # Funções úteis usando a conexão atual
