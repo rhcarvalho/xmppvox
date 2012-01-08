@@ -77,6 +77,7 @@ while True:
     try:
         conn, addr, nickname = accept(s)
     except socket.error:
+        # FIXME: caso não consiga conectar, não posso continuar!
         log.error(u"Erro: Não foi possível conectar ao Papovox.")
     #----------------------------------------------------------------------#
     
@@ -130,6 +131,6 @@ while True:
                 mto = xmpp.last_sender or u"ninguém"
                 log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
     except socket.error, e:
-        log.error(u"Erro: %s" % (e,))
+        log.info(e)
     finally:
         log.info(u"Conexão com o Papovox encerrada.")
