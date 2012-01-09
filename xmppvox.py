@@ -6,11 +6,9 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
-import re
 import socket
 import struct
 import sys
-from functools import partial
 from itertools import count
 
 from optparse import OptionParser
@@ -18,6 +16,7 @@ import getpass
 
 from client import GenericBot
 from server import *
+from commands import process_commands
 
 import logging
 log = logging.getLogger(__name__)
@@ -62,6 +61,7 @@ xmpp.register_plugin('xep_0199') # XMPP Ping
 
 if xmpp.connect():
     log.info(u"Conectado ao servidor XMPP")
+    # Run XMPP client in another thread
     xmpp.process(block=False)
 
 HOST = ''                 # Symbolic name meaning all available interfaces
@@ -83,9 +83,6 @@ while True:
         sys.exit(1)
     #----------------------------------------------------------------------#
     
-    # Funções úteis usando a conexão atual
-    _sendmessage = partial(sendmessage, conn)
-    
     def recv_new_msg(msg):
         sender = msg['from'].user or REMETENTE_DESCONHECIDO
         body = msg['body']
@@ -98,40 +95,20 @@ while True:
         for i in count(1):
             data = recvmessage(conn)
             
-            def is_friend(jid):
-                return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
+            # Tenta executar algum comando contido na mensagem
+            if process_commands(conn, xmpp, data):
+                # Caso algum comando seja executado, sai do loop e passa para
+                # a próxima mensagem.
+                continue
             
-            if data.startswith("?quem"):
-                log.debug("[comando ?quem]")
-                for f, friend in enumerate(filter(is_friend, xmpp.client_roster), 1):
-                    name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
-                    subscription = xmpp.client_roster[friend]['subscription']
-                    extra = u""
-                    if subscription == 'to':
-                        extra = u" * não estou na lista deste contato."
-                    elif subscription == 'from':
-                        extra = u" * este contato me adicionou mas não autorizei."
-                    _sendmessage(u"%d %s%s" % (f, name, extra))
-            elif data.startswith("?para"):
-                log.debug("[comando ?para]")
-                mo = re.match(r"\?para (\d+)", data)
-                if mo is None:
-                    _sendmessage(u"Faltou número do contato! Use ?quem.")
-                else:
-                    idx = int(mo.group(1))
-                    xmpp.last_sender = dict(enumerate(filter(is_friend, xmpp.client_roster), 1)).get(idx, None)
-                    if xmpp.last_sender is None:
-                        _sendmessage(u"Número de contato inexistente! Use ?quem.")
-                _sendmessage(u"Agora estou falando com %s." % (xmpp.last_sender or u"ninguém"))
-            else:
-                # Envia mensagem XMPP para o último remetente
-                if xmpp.last_sender is not None:
-                    xmpp.send_message(mto=xmpp.last_sender,
-                                      mbody=data,
-                                      mtype='chat')
-                    send_chat_message(conn, u"eu", data)
-                mto = xmpp.last_sender or u"ninguém"
-                log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
+            # Envia mensagem XMPP para o último remetente
+            if xmpp.last_sender is not None:
+                xmpp.send_message(mto=xmpp.last_sender,
+                                  mbody=data,
+                                  mtype='chat')
+                send_chat_message(conn, u"eu", data)
+            mto = xmpp.last_sender or u"ninguém"
+            log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
     except socket.error, e:
         log.info(e)
     finally:
