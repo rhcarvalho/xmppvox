@@ -18,6 +18,13 @@ Vai facilitar o desenvolvimento:
 
 #-------------------------------------------------------------------------------
 
+* listar caracteres em grupos pra evitar leitura de longas listas:
+    - por letra do alfabeto
+    - de 5 em 5
+    - etc
+
+* remover contato usando seu número na lista de contatos (opcional)
+
 * adicionar comando ajuda ("?")
 * usar sempre str.{de,en}code(errors='replace' ou 'ignore')
 
@@ -157,3 +164,6 @@ ________________________________________________________________________________
         dá pra criar instalador .msi, mas precisa ter Python na máquina
 
 * "Agora estou falando com" => "Falando com"
+
+* adicionar contatos
+* remover contatos
