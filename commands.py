@@ -141,6 +141,7 @@ def enumerate_friends(xmpp, subscription_type=('both', 'to'), start=1):
 
 def async_update_roster(xmpp):
     u"""Pede a lista de contatos sem bloquear."""
+    # Ver discussão em http://groups.google.com/group/sleekxmpp-discussion/browse_thread/thread/46ed755210432403
     def cb(payload):
         xmpp._handle_roster(payload, request=True)
     xmpp.get_roster(block=False, callback=cb)
