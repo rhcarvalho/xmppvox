@@ -37,4 +37,9 @@ Trabalhos futuros / durante escrita da monografia / baseado em feedback         
     * Alterar "apelido"                                                              |
 * Dados pessoais:                                                                    |
     * Alterar status                                                                 |
+* Chamar comandos usando parte do nome do comando                                    |
+    Exemplo: /q ao invés de /quem                                                    |
+        Na v1.0 foi implementado de forma mais simples:                              |
+        /q e /quem apontam pro mesmo comando                                         |
+    Ver: http://stackoverflow.com/questions/5434813/longest-prefix-matches-for-urls  |
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯

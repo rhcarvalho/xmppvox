@@ -85,24 +85,12 @@ Vai facilitar o desenvolvimento:
 
 * Carregar XMPPVOX e Papovox com um comando único
 
-* Congelar dependências: adicionar ao projeto todas as dependências
+* Congelar dependências: adicionar ao projeto todas as dependências                 [é feito quando gero executável distribuível]
 
-* Empacotar XMPPVOX versão 0.1
-    http://hackerboss.com/how-to-distribute-commercial-python-applications/
-    
-    -> py2exe http://www.py2exe.org/
-    -> Pyinstaller http://www.pyinstaller.org/
-    -> cx_Freeze http://cx-freeze.sourceforge.net/
-    -> bbfreeze http://pypi.python.org/pypi/bbfreeze/
-    
-    não soluções:
-    -> Somente Mac: py2app
-    -> Somente UNIX: Tools/freeze
-        http://docs.python.org/faq/programming.html#how-can-i-create-a-stand-alone-binary-from-a-python-script
-    -> http://docs.python.org/distutils/builtdist.html
-        dá pra criar instalador .msi, mas precisa ter Python na máquina
-    
-    *** Lembrar de desativar logging
+* Coletar dados de uso do XMPPVOX (?)
+
+
+*** Lembrar de desativar logging
 
 --------------------------------------------------------------------------------
 Casos "críticos":
@@ -152,3 +140,20 @@ ________________________________________________________________________________
 * inibir mensagens vazias (apertar ENTER várias vezes no Papovox por exemplo)
 * readline (remover quebra de linha str.rstrip('\r\n') (ex: apelido recebido no início da conexão)
 * decodificar data.decode(SYSTEM_ENCODING) em recv (ex: apelido com acentos)
+
+* Empacotar XMPPVOX versão 0.1
+    http://hackerboss.com/how-to-distribute-commercial-python-applications/
+    
+    -> py2exe http://www.py2exe.org/
+    -> Pyinstaller http://www.pyinstaller.org/
+    -> cx_Freeze http://cx-freeze.sourceforge.net/
+    -> bbfreeze http://pypi.python.org/pypi/bbfreeze/
+    
+    não soluções:
+    -> Somente Mac: py2app
+    -> Somente UNIX: Tools/freeze
+        http://docs.python.org/faq/programming.html#how-can-i-create-a-stand-alone-binary-from-a-python-script
+    -> http://docs.python.org/distutils/builtdist.html
+        dá pra criar instalador .msi, mas precisa ter Python na máquina
+
+* "Agora estou falando com" => "Falando com"
