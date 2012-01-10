@@ -69,8 +69,6 @@ def lista(sock, xmpp, mo=None):
         extra = u""
         if subscription == 'to':
             extra = u" * não estou na lista deste contato."
-        elif subscription == 'from':
-            extra = u" * este contato me adicionou mas não autorizei."
         server.sendmessage(sock, u"%d %s%s" % (number, name, extra))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
@@ -111,7 +109,12 @@ def remover(sock, xmpp, mo):
 
 # Utilitários -----------------------------------------------------------------#
 
-def enumerate_friends(xmpp, start=1):
+def enumerate_friends(xmpp, subscription_type=('both', 'to'), start=1):
+    u"""Enumera minha lista de contatos."""
+    # Tipos comuns de subscription:
+    # 'both': eu estou na lista do outro e o outro está na minha lista
+    # 'to'  : eu *não* estou na lista do outro e o outro está na minha lista
+    # 'from': eu estou na lista do outro e o outro *não* está na minha lista
     def is_friend(jid):
-        return xmpp.client_roster[jid]['subscription'] in ('both', 'to', 'from')
+        return xmpp.client_roster[jid]['subscription'] in subscription_type
     return enumerate(filter(is_friend, xmpp.client_roster), start)
