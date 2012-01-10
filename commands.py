@@ -39,6 +39,7 @@ def process_command(sock, xmpp, data):
         (r'l(?:ista)?\s*$', lista),
         (r'p(?:ara)?\s*(\d*)\s*$', para),
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
+        (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
     )
     
     # Tenta encontrar um comando dentre os existentes
@@ -95,6 +96,15 @@ def adicionar(sock, xmpp, mo):
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='subscribe')
         server.sendmessage(sock, u"Adicionei contato: %s" % user_jid)
+    else:
+        server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+
+def remover(sock, xmpp, mo):
+    email_mo = email_regexp.match(mo.group(1))
+    if email_mo is not None:
+        user_jid = email_mo.group(0)
+        xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
+        server.sendmessage(sock, u"Removi contato: %s" % user_jid)
     else:
         server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
