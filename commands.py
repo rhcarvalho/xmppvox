@@ -16,6 +16,9 @@ log = logging.getLogger(__name__)
 # Prefixo que ativa o modo de comando
 PREFIX = '/'
 
+# Origem: http://www.regular-expressions.info/email.html
+email_regexp = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', re.I)
+
 
 def process_command(sock, xmpp, data):
     u"""Tenta processar algum comando contido em 'data'.
@@ -35,6 +38,7 @@ def process_command(sock, xmpp, data):
         (r'q(?:uem)?\s*$', quem),
         (r'l(?:ista)?\s*$', lista),
         (r'p(?:ara)?\s*(\d*)\s*$', para),
+        (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
     )
     
     # Tenta encontrar um comando dentre os existentes
@@ -68,6 +72,7 @@ def lista(sock, xmpp, mo=None):
             extra = u" * este contato me adicionou mas não autorizei."
         server.sendmessage(sock, u"%d %s%s" % (number, name, extra))
     else:
+        # FIXME
         server.sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def para(sock, xmpp, mo):
@@ -81,6 +86,15 @@ def para(sock, xmpp, mo):
     except ValueError:
         server.sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
     quem(sock, xmpp)
+
+def adicionar(sock, xmpp, mo):
+    email_mo = email_regexp.match(mo.group(1))
+    if email_mo is not None:
+        user_jid = email_mo.group(0)
+        xmpp.send_presence_subscription(pto=user_jid, ptype='subscribe')
+        server.sendmessage(sock, u"Adicionei contato: %s" % user_jid)
+    else:
+        server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 
 # Utilitários -----------------------------------------------------------------#
