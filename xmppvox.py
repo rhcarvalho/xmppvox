@@ -16,7 +16,7 @@ import getpass
 
 from client import GenericBot
 from server import *
-from commands import process_commands
+from commands import process_command
 
 import logging
 log = logging.getLogger(__name__)
@@ -96,7 +96,7 @@ while True:
             data = recvmessage(conn)
             
             # Tenta executar algum comando contido na mensagem
-            if process_commands(conn, xmpp, data):
+            if process_command(conn, xmpp, data):
                 # Caso algum comando seja executado, sai do loop e passa para
                 # a próxima mensagem.
                 continue
