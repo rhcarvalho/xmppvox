@@ -71,8 +71,10 @@ def lista(sock, xmpp, mo=None):
         elif subscription == 'from':
             extra = u" * este contato me adicionou mas não autorizei."
         server.sendmessage(sock, u"%d %s%s" % (number, name, extra))
-    else:
-        # FIXME
+    # Se 'number' não está definido, então nenhum contato foi listado.
+    try:
+        number
+    except NameError:
         server.sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def para(sock, xmpp, mo):
