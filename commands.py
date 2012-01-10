@@ -37,6 +37,7 @@ def process_command(sock, xmpp, data):
     commands = (
         (r'q(?:uem)?\s*$', quem),
         (r'l(?:ista)?\s*$', lista),
+        (r'lt\s*$', lista_todos),
         (r'p(?:ara)?\s*(\d*)\s*$', para),
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
         (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
@@ -63,6 +64,9 @@ def quem(sock, xmpp, mo=None):
     server.sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
 
 def lista(sock, xmpp, mo=None):
+    # Atualiza lista de contatos em outra thread
+    async_update_roster(xmpp)
+    
     for number, friend in enumerate_friends(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
@@ -70,6 +74,21 @@ def lista(sock, xmpp, mo=None):
         if subscription == 'to':
             extra = u" * não estou na lista deste contato."
         server.sendmessage(sock, u"%d %s%s" % (number, name, extra))
+    # Se 'number' não está definido, então nenhum contato foi listado.
+    try:
+        number
+    except NameError:
+        server.sendmessage(sock, u"Nenhum contato na sua lista!")
+
+def lista_todos(sock, xmpp, mo=None):
+    # Atualiza lista de contatos em outra thread
+    async_update_roster(xmpp)
+    
+    subs_type = ('to', 'from', 'both', 'none', 'remove', '')
+    for number, friend in enumerate_friends(xmpp, subscription_type=subs_type):
+        name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
+        subscription = xmpp.client_roster[friend]['subscription']
+        server.sendmessage(sock, u"%d %s %s" % (number, name, subscription or u"?"))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
@@ -102,6 +121,7 @@ def remover(sock, xmpp, mo):
     if email_mo is not None:
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
+        # ... ou talvez usar xmpp.del_roster_item(user_jid)
         server.sendmessage(sock, u"Removi contato: %s" % user_jid)
     else:
         server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
@@ -118,3 +138,9 @@ def enumerate_friends(xmpp, subscription_type=('both', 'to'), start=1):
     def is_friend(jid):
         return xmpp.client_roster[jid]['subscription'] in subscription_type
     return enumerate(filter(is_friend, xmpp.client_roster), start)
+
+def async_update_roster(xmpp):
+    u"""Pede a lista de contatos sem bloquear."""
+    def cb(payload):
+        xmpp._handle_roster(payload, request=True)
+    xmpp.get_roster(block=False, callback=cb)
