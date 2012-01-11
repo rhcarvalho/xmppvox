@@ -103,11 +103,14 @@ while True:
             
             # Envia mensagem XMPP para o último remetente
             if xmpp.last_sender is not None:
-                xmpp.send_message(mto=xmpp.last_sender,
+                mto = xmpp.last_sender
+                xmpp.send_message(mto=mto,
                                   mbody=data,
                                   mtype='chat')
                 send_chat_message(conn, u"eu", data)
-            mto = xmpp.last_sender or u"ninguém"
+            else:
+                mto = u"ninguém"
+                sendmessage(conn, u"Não estou em nenhuma conversa.")
             log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
     except socket.error, e:
         log.info(e)
