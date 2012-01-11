@@ -167,3 +167,4 @@ ________________________________________________________________________________
 
 * adicionar contatos
 * remover contatos
+* quebrar mensagens grandes em várias

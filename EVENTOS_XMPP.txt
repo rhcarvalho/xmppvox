@@ -44,7 +44,7 @@ Chat em grupo
                 'muc::%s::presence'                  -
 
 Outros
-                'chatstate_%s'                       ?
+                'chatstate_%s'                       ? v1.1+ "fulano está digitando"
                 'command_%s'                         ?
                 'disco_info'                         -
                 'disco_items'                        -
