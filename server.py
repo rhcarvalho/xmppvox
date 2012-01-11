@@ -9,6 +9,7 @@ e Sítiovox.
 
 import socket
 import struct
+import textwrap
 import time
 from cStringIO import StringIO
 
@@ -29,6 +30,8 @@ PORTA_PAPOVOX = 1963
 DADOTECLADO = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
 
 TAMANHO_DO_BUFFER = 4096 # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
+
+TAMANHO_MAXIMO_MSG = 255
 
 REMETENTE_DESCONHECIDO = u"remetente desconhecido"
 
@@ -83,8 +86,23 @@ def sendmessage(sock, msg):
     u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
     log.debug(u"[sendmessage] %s", msg)
     msg = msg.encode(SYSTEM_ENCODING)
-    sock.sendall("%s%s" % (struct.pack('<BH', DADOTECLADO, len(msg)),
-                           msg))
+    
+    # Apesar de teoricamente o protocolo do Papovox suportar mensagens com até
+    # 65535 (2^16 - 1) caracteres, na prática apenas os 255 primeiros são
+    # exibidos, e os restantes acabam ignorados.
+    # Portanto, é necessário quebrar mensagens grandes em várias menores.
+    chunks = textwrap.wrap(
+        text=msg,
+        width=TAMANHO_MAXIMO_MSG,
+        expand_tabs=False,
+        replace_whitespace=False,
+        drop_whitespace=False,
+    )
+    
+    def sendmsg(msg):
+        sock.sendall("%s%s" % (struct.pack('<BH', DADOTECLADO, len(msg)), msg))
+    # Envia uma ou mais mensagens pelo socket
+    map(sendmsg, chunks)
 
 def send_chat_message(sock, sender, body):
     u"""Formata e envia uma mensagem de bate-papo via socket.
