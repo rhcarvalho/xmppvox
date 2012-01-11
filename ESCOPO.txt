@@ -7,7 +7,8 @@ Prazo: quarta-feira, 11/01/2012                                                 
 * Bate papo 1-pra-1 com vários contatos simultaneamente                              |  PART (falta melhorar UI)
 * Gerenciamento de conta:                                                            |  ----
     * usuário e senha (para conectar)                                                |  DONE    
-    * adicionar contatos                                                             |  TODO
+    * adicionar contatos                                                             |  DONE
+    * remover contatos                                                               |  DONE
     * listar amigos online                                                           |  TODO
     * listar todos os amigos                                                         |  DONE
     * definir "apelido"                                                              |  TODO
@@ -22,7 +23,7 @@ Prazo: quarta-feira, 11/01/2012                                                 
   ? que indique a utilização no "modo" XMPPVOX.                                      |
   //////////////////////////////////////////////////////////////////////////         |
 * Ajuda na tela e breve manual de utilização TXT                                     |  PART (falta atualizar)
-* Algum nível de tratamento dos casos "críticos" estabelecidos                       |  TODO
+* Algum nível de tratamento dos casos "críticos" estabelecidos                       |  PART
 * Funcionamento correto com caracteres acentuados                                    |  PART (verificar)
 * Testes automatizados                                                               |  PART (fazer mais)
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
