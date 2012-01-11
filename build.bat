@@ -23,7 +23,7 @@ REM
 
 REM Executa o pyinstaller.py se existir ou exibe mensagem e termina.
 IF EXIST c:\pyinstaller\pyinstaller.py (
-    c:\pyinstaller\pyinstaller.py --onefile xmppvox.py
+    c:\pyinstaller\pyinstaller.py --onefile --version-file=version xmppvox.py
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     GOTO END
