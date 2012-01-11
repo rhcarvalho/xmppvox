@@ -12,8 +12,6 @@ import struct
 import time
 from cStringIO import StringIO
 
-from commands import PREFIX as CMD_PREFIX
-
 import logging
 log = logging.getLogger(__name__)
 
@@ -62,16 +60,9 @@ def accept(sock):
     
     # Envia mensagem de boas-vindas
     sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
-    sendhelp(conn)
+    sendmessage(conn, u"Digite /? para obter ajuda.")
     
     return conn, addr, nickname
-
-def sendhelp(sock):
-    sendmessage(sock, u"""\
-    Para ver sua lista de contatos, digite %(cmd_prefix)slista.
-    Para conversar com alguém, digite %(cmd_prefix)spara seguido do número do contato.
-    Para saber com quem fala agora digite %(cmd_prefix)squem.
-    """ % dict(cmd_prefix=CMD_PREFIX))
 
 
 # Funções de envio de dados para o Papovox ------------------------------------#

@@ -7,7 +7,7 @@ Este módulo implementa comandos que o servidor reconhece.
 
 import re
 
-import server
+from server import sendmessage
 
 import logging
 log = logging.getLogger(__name__)
@@ -35,6 +35,7 @@ def process_command(sock, xmpp, data):
     # As expressões regulares são testadas em ordem e o primeiro comando que der
     # match é executado. Os comandos posteriores não são testados.
     commands = (
+        (r'(\?|ajuda)\s*$', ajuda),
         (r'q(?:uem)?\s*$', quem),
         (r'l(?:ista)?\s*$', lista),
         (r'lt\s*$', lista_todos),
@@ -54,14 +55,22 @@ def process_command(sock, xmpp, data):
             break
     else:
         # Nenhum comando foi executado no loop
-        server.sendmessage(sock, u"Comando desconhecido: %s" % cmd)
+        sendmessage(sock, u"Comando desconhecido: %s" % cmd)
     return True
 
 
 # Comandos --------------------------------------------------------------------#
 
+def ajuda(sock, xmpp=None, mo=None):
+    sendmessage(sock, u"""\
+    Para ver sua lista de contatos, digite %(prefix)slista.
+    Para conversar com alguém, digite %(prefix)spara seguido do número do contato.
+    Para saber com quem fala agora digite %(prefix)squem.
+    Para adicionar ou remover um contato, digite /adicionar ou /remover seguido do endereço completo (fulano@gmail.com).
+    """ % dict(prefix=PREFIX))
+
 def quem(sock, xmpp, mo=None):
-    server.sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
+    sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
 
 def lista(sock, xmpp, mo=None):
     # Atualiza lista de contatos em outra thread
@@ -73,12 +82,12 @@ def lista(sock, xmpp, mo=None):
         extra = u""
         if subscription == 'to':
             extra = u" * não estou na lista deste contato."
-        server.sendmessage(sock, u"%d %s%s" % (number, name, extra))
+        sendmessage(sock, u"%d %s%s" % (number, name, extra))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        server.sendmessage(sock, u"Nenhum contato na sua lista!")
+        sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def lista_todos(sock, xmpp, mo=None):
     # Atualiza lista de contatos em outra thread
@@ -88,23 +97,23 @@ def lista_todos(sock, xmpp, mo=None):
     for number, friend in enumerate_friends(xmpp, subscription_type=subs_type):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
-        server.sendmessage(sock, u"%d %s %s" % (number, name, subscription or u"?"))
+        sendmessage(sock, u"%d %s %s" % (number, name, subscription or u"?"))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        server.sendmessage(sock, u"Nenhum contato na sua lista!")
+        sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def para(sock, xmpp, mo):
     try:
         number = int(mo.group(1))
         friend = dict(enumerate_friends(xmpp)).get(number, None)
         if friend is None:
-            server.sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
+            sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
         else:
             xmpp.last_sender = friend
     except ValueError:
-        server.sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
+        sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
     quem(sock, xmpp)
 
 def adicionar(sock, xmpp, mo):
@@ -112,9 +121,9 @@ def adicionar(sock, xmpp, mo):
     if email_mo is not None:
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='subscribe')
-        server.sendmessage(sock, u"Adicionei contato: %s" % user_jid)
+        sendmessage(sock, u"Adicionei contato: %s" % user_jid)
     else:
-        server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 def remover(sock, xmpp, mo):
     email_mo = email_regexp.match(mo.group(1))
@@ -122,9 +131,9 @@ def remover(sock, xmpp, mo):
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
         # ... ou talvez usar xmpp.del_roster_item(user_jid)
-        server.sendmessage(sock, u"Removi contato: %s" % user_jid)
+        sendmessage(sock, u"Removi contato: %s" % user_jid)
     else:
-        server.sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 
 # Utilitários -----------------------------------------------------------------#
