@@ -13,6 +13,10 @@ Alterações necessárias no Papovox para integrar com o XMPPVOX
         - M - envia mensagem urgente (não é usado pelo XMPPVOX)
     - remover coisas relacionadas ao servidor de nomes
     - mensagens urgentes não são usadas pelo XMPPVOX
+    - interpretação de caracteres como #
+      Exemplo:
+        [digitado]                            => [resultado no Papovox]
+        "se eu escrever #ert nesta mensagem"  => "se eu escrever " + (som) + Não posso tocar ---ERT NESTA MENSAGEM---
 
 2. Alterações
     - o XMPPVOX poderia usar uma porta diferente do Sítiovox/SACI se isso for suportado pelo Papovox
