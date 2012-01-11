@@ -62,12 +62,14 @@ def process_command(sock, xmpp, data):
 # Comandos --------------------------------------------------------------------#
 
 def ajuda(sock, xmpp=None, mo=None):
-    sendmessage(sock, u"""\
-    Para ver sua lista de contatos, digite %(prefix)slista.
-    Para conversar com alguém, digite %(prefix)spara seguido do número do contato.
-    Para saber com quem fala agora digite %(prefix)squem.
-    Para adicionar ou remover um contato, digite /adicionar ou /remover seguido do endereço completo (fulano@gmail.com).
-    """ % dict(prefix=PREFIX))
+    help = u"""\
+    Para ver sua lista de contatos, digite %(prefix)slista
+    Para conversar com alguém, digite %(prefix)spara, seguido do número do contato
+    Para saber com quem fala agora, digite %(prefix)squem
+    Para adicionar ou remover um contato, digite /adicionar ou /remover, seguido do contato
+    """ % dict(prefix=PREFIX)
+    # Envia uma mensagem por linha/comando
+    map(lambda m: sendmessage(sock, m), help.splitlines())
 
 def quem(sock, xmpp, mo=None):
     sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
@@ -123,7 +125,7 @@ def adicionar(sock, xmpp, mo):
         xmpp.send_presence_subscription(pto=user_jid, ptype='subscribe')
         sendmessage(sock, u"Adicionei contato: %s" % user_jid)
     else:
-        sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 def remover(sock, xmpp, mo):
     email_mo = email_regexp.match(mo.group(1))
@@ -133,7 +135,7 @@ def remover(sock, xmpp, mo):
         # ... ou talvez usar xmpp.del_roster_item(user_jid)
         sendmessage(sock, u"Removi contato: %s" % user_jid)
     else:
-        sendmessage(sock, u"Usuário inválido: %s\nExemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 
 # Utilitários -----------------------------------------------------------------#
