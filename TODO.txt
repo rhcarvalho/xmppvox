@@ -18,6 +18,8 @@ Vai facilitar o desenvolvimento:
 
 #-------------------------------------------------------------------------------
 
+* ajuda: "/?" é sintetizado como "barra (som)", não fica explícito "interrogação"
+
 * listar caracteres em grupos pra evitar leitura de longas listas:
     - por letra do alfabeto
     - de 5 em 5
