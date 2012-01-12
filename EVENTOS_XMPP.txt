@@ -23,6 +23,8 @@ Contatos
                 'attention'                          - v1.1
                 'changed_status'                     - v1.1
                 'changed_subscription'               ?
+                'got_offline'                        +
+                'got_online'                         +
                 'presence_%s'                        ?
                 'presence_form'                      -
                 'roster_received'                    ?
@@ -50,8 +52,6 @@ Outros
                 'disco_items'                        -
                 'gmail_messages'                     - v1.1
                 'gmail_notify'                       - v1.1
-                'got_offline'                        +
-                'got_online'                         +
                 'jabber_rpc_error'                   -
                 'jabber_rpc_method_call'             -
                 'jabber_rpc_method_fault'            -
