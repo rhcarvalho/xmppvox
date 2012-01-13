@@ -25,7 +25,7 @@ Contatos
                 'changed_subscription'               ?
                 'got_offline'                        +
                 'got_online'                         +
-                'presence_%s'                        ?
+                'presence_%s'                        -
                 'presence_form'                      -
                 'roster_received'                    ?
                 'roster_subscription_authorized'     ?

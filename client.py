@@ -55,12 +55,9 @@ class GenericBot(sleekxmpp.ClientXMPP):
         # MUC messages and error messages.
         self.add_event_handler("message", self.message)
         
-        
+        # Outros eventos interessantes
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
-        self.add_event_handler('changed_status', self.changed_status)
-        self.add_event_handler('presence_available', self.presence_available)
-        self.add_event_handler('presence_unavailable', self.presence_unavailable)
         
         if func_receive_msg is None:
             def func_receive_msg(msg):
@@ -112,15 +109,6 @@ class GenericBot(sleekxmpp.ClientXMPP):
     
     def got_offline(self, presence):
         log.debug("Got offline: %s" % presence['from'])
-    
-    def changed_status(self, presence):
-        log.debug("Changed status: %s" % ', '.join('%s: %s' % (i, presence[i]) for i in sorted(presence.interfaces)))
-    
-    def presence_available(self, presence):
-        log.debug("Available: %s" % presence['from'])
-    
-    def presence_unavailable(self, presence):
-        log.debug("Unavailable: %s" % presence['from'])
 
 
 if __name__ == '__main__':

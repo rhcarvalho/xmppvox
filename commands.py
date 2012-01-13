@@ -81,10 +81,11 @@ def lista(sock, xmpp, mo=None):
     for number, friend in enumerate_friends(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
+        availability = 'online' if xmpp.client_roster[friend].resources else 'offline'
         extra = u""
         if subscription == 'to':
             extra = u" * não estou na lista deste contato."
-        sendmessage(sock, u"%d %s%s" % (number, name, extra))
+        sendmessage(sock, u"%d %s %s%s" % (number, name, availability, extra))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
