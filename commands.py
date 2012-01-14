@@ -17,6 +17,8 @@ log = logging.getLogger(__name__)
 PREFIX = '/'
 
 # Origem: http://www.regular-expressions.info/email.html
+# Um JID não é um email, mas serve como boa aproximação para o que é
+# preciso neste módulo.
 email_regexp = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', re.I)
 
 
