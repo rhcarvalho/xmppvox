@@ -155,4 +155,6 @@ def enumerate_roster(xmpp):
     
     # Filtra todos os contatos "válidos" do meu roster.
     roster_items = [roster[jid] for jid in roster if is_contact(jid)]
+    # Ordena por JID
+    roster_items.sort(key=lambda item: item.jid)
     return enumerate(roster_items, 1)
