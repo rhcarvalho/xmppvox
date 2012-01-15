@@ -84,8 +84,8 @@ class GenericBot(sleekxmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        self.send_presence()
         self.get_roster()
+        self.send_presence()
 
     def message(self, msg):
         """
