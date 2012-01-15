@@ -9,10 +9,9 @@ Prazo: quarta-feira, 11/01/2012                                                 
     * usuário e senha (para conectar)                                                |  DONE    
     * adicionar contatos                                                             |  DONE
     * remover contatos                                                               |  DONE
-    * listar amigos online                                                           |  TODO
+    * listar amigos online                                                           |  DONE
     * listar todos os amigos                                                         |  DONE
     * definir "apelido"                                                              |  TODO
-    * alterar presença: online/ocupado                                               |  TODO
 * Escolher amigo online para falar                                                   |  DONE
 * Papovox e XMPPVOX integrados (usuário executa 1 aplicação e consegue se comunicar) | *TODO*
   ??????????????????????????????????????????????????????????????????????????         |
@@ -37,6 +36,7 @@ Trabalhos futuros / durante escrita da monografia / baseado em feedback         
     * Ver/ler status                                                                 |
     * Alterar "apelido"                                                              |
 * Dados pessoais:                                                                    |
+    * Alterar presença: online/ocupado                                               |
     * Alterar status                                                                 |
 * Chamar comandos usando parte do nome do comando                                    |
     Exemplo: /q ao invés de /quem                                                    |
