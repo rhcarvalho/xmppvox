@@ -80,7 +80,7 @@ def lista(sock, xmpp, mo=None):
     # Atualiza lista de contatos em outra thread
     async_update_roster(xmpp)
     
-    for number, friend in enumerate_friends(xmpp):
+    for number, friend in enumerate_contacts(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
         availability = 'online' if xmpp.client_roster[friend].resources else 'offline'
@@ -98,8 +98,7 @@ def lista_todos(sock, xmpp, mo=None):
     # Atualiza lista de contatos em outra thread
     async_update_roster(xmpp)
     
-    subs_type = ('to', 'from', 'both', 'none', 'remove', '')
-    for number, friend in enumerate_friends(xmpp, subscription_type=subs_type):
+    for number, friend in enumerate_contacts(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
         sendmessage(sock, u"%d %s %s" % (number, name, subscription or u"?"))
@@ -112,7 +111,7 @@ def lista_todos(sock, xmpp, mo=None):
 def para(sock, xmpp, mo):
     try:
         number = int(mo.group(1))
-        friend = dict(enumerate_friends(xmpp)).get(number, None)
+        friend = dict(enumerate_contacts(xmpp)).get(number, None)
         if friend is None:
             sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
         else:
@@ -143,15 +142,25 @@ def remover(sock, xmpp, mo):
 
 # Utilitários -----------------------------------------------------------------#
 
-def enumerate_friends(xmpp, subscription_type=('both', 'to'), start=1):
+def enumerate_contacts(xmpp):
     u"""Enumera minha lista de contatos."""
-    # Tipos comuns de subscription:
-    # 'both': eu estou na lista do outro e o outro está na minha lista
-    # 'to'  : eu *não* estou na lista do outro e o outro está na minha lista
-    # 'from': eu estou na lista do outro e o outro *não* está na minha lista
-    def is_friend(jid):
-        return xmpp.client_roster[jid]['subscription'] in subscription_type
-    return enumerate(filter(is_friend, xmpp.client_roster), start)
+    def is_contact(jid):
+        u"""Retorna True se 'jid' é meu contato, False caso contrário."""
+        # Tipos comuns de subscription:
+        # 'both': eu estou na lista do outro e o outro está na minha lista
+        # 'to'  : eu *não* estou na lista do outro e o outro está na minha lista
+        # 'from': eu estou na lista do outro e o outro *não* está na minha lista
+        # 'none': eu mesmo estou no roster com subscription none.
+        # 'remove': contato marcado para ser removido.
+        #
+        # Tipos considerados para formar a lista de contatos:
+        subscription_types = (
+            'both',
+            'to',
+            #'from',
+        )
+        return xmpp.client_roster[jid]['subscription'] in subscription_types
+    return enumerate(filter(is_contact, xmpp.client_roster), 1)
 
 def async_update_roster(xmpp):
     u"""Pede a lista de contatos sem bloquear."""
