@@ -77,9 +77,6 @@ def quem(sock, xmpp, mo=None):
     sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
 
 def lista(sock, xmpp, mo=None):
-    # Atualiza lista de contatos em outra thread
-    async_update_roster(xmpp)
-    
     for number, friend in enumerate_contacts(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
@@ -95,9 +92,6 @@ def lista(sock, xmpp, mo=None):
         sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def lista_todos(sock, xmpp, mo=None):
-    # Atualiza lista de contatos em outra thread
-    async_update_roster(xmpp)
-    
     for number, friend in enumerate_contacts(xmpp):
         name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
         subscription = xmpp.client_roster[friend]['subscription']
@@ -161,10 +155,3 @@ def enumerate_contacts(xmpp):
         )
         return xmpp.client_roster[jid]['subscription'] in subscription_types
     return enumerate(filter(is_contact, xmpp.client_roster), 1)
-
-def async_update_roster(xmpp):
-    u"""Pede a lista de contatos sem bloquear."""
-    # Ver discussão em http://groups.google.com/group/sleekxmpp-discussion/browse_thread/thread/46ed755210432403
-    def cb(payload):
-        xmpp._handle_roster(payload, request=True)
-    xmpp.get_roster(block=False, callback=cb)
