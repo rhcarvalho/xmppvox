@@ -71,48 +71,54 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind((HOST, PORT))
 s.listen(1)
-while True:
-    log.info(u"XMPPVOX servindo na porta %s" % PORT)
-    
-    # Conecta ao Papovox -----------------------------------------------#
-    try:
-        conn, addr, nickname = accept(s)
-    except socket.error:
-        log.error(u"Erro: Não foi possível conectar ao Papovox.")
-        xmpp.disconnect()
-        sys.exit(1)
-    #----------------------------------------------------------------------#
-    
-    def recv_new_msg(msg):
-        sender = msg['from'].user or REMETENTE_DESCONHECIDO
-        body = msg['body']
-        send_chat_message(conn, sender, body)
-    
-    xmpp.func_receive_msg = recv_new_msg
-    
-    try:
-        # Processa mensagens do Papovox para a rede XMPP
-        for i in count(1):
-            data = recvmessage(conn)
-            
-            # Tenta executar algum comando contido na mensagem
-            if process_command(conn, xmpp, data):
-                # Caso algum comando seja executado, sai do loop e passa para
-                # a próxima mensagem.
-                continue
-            
-            # Envia mensagem XMPP para o último remetente
-            if xmpp.last_sender_jid is not None:
-                mto = xmpp.last_sender_jid
-                xmpp.send_message(mto=mto,
-                                  mbody=data,
-                                  mtype='chat')
-                send_chat_message(conn, u"eu", data)
-            else:
-                mto = u"ninguém"
-                sendmessage(conn, u"Não estou em nenhuma conversa.")
-            log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
-    except socket.error, e:
-        log.info(e)
-    finally:
-        log.info(u"Conexão com o Papovox encerrada.")
+try:
+    while True:
+        log.info(u"XMPPVOX servindo na porta %s" % PORT)
+        
+        # Conecta ao Papovox -----------------------------------------------#
+        try:
+            conn, addr, nickname = accept(s)
+        except socket.error:
+            log.error(u"Erro: Não foi possível conectar ao Papovox.")
+            raise
+        #----------------------------------------------------------------------#
+        
+        def recv_new_msg(msg):
+            sender = msg['from'].user or REMETENTE_DESCONHECIDO
+            body = msg['body']
+            send_chat_message(conn, sender, body)
+        
+        xmpp.func_receive_msg = recv_new_msg
+        
+        try:
+            # Processa mensagens do Papovox para a rede XMPP
+            for i in count(1):
+                data = recvmessage(conn)
+                
+                # Tenta executar algum comando contido na mensagem
+                if process_command(conn, xmpp, data):
+                    # Caso algum comando seja executado, sai do loop e passa para
+                    # a próxima mensagem.
+                    continue
+                
+                # Envia mensagem XMPP para o último remetente
+                if xmpp.last_sender_jid is not None:
+                    mto = xmpp.last_sender_jid
+                    xmpp.send_message(mto=mto,
+                                      mbody=data,
+                                      mtype='chat')
+                    send_chat_message(conn, u"eu", data)
+                else:
+                    mto = u"ninguém"
+                    sendmessage(conn, u"Não estou em nenhuma conversa.")
+                log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
+        except socket.error, e:
+            log.info(e)
+        finally:
+            log.info(u"Conexão com o Papovox encerrada.")
+            break
+except:
+    sys.exit(1)
+finally:
+    xmpp.disconnect()
+    log.info(u"Fim do XMPPVOX.")

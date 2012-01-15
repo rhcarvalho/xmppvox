@@ -45,6 +45,7 @@ def accept(sock):
     Ver 'C:\winvox\Fontes\PAPOVOX\PPLIGA.PAS' e
     'C:\winvox\Fontes\SITIOVOX\SVPROC.PAS'.
     """
+    log.info(u"Aguardando Papovox conectar...")
     conn, addr = sock.accept()
     sendline(conn, u"+OK - %s:%s conectado" % addr)
     nickname = recvline(conn, TAMANHO_DO_BUFFER)
