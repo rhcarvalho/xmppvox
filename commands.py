@@ -74,28 +74,28 @@ def ajuda(sock, xmpp=None, mo=None):
     map(lambda m: sendmessage(sock, m), help.splitlines())
 
 def quem(sock, xmpp, mo=None):
-    sendmessage(sock, u"Falando com %s." % (xmpp.last_sender or u"ninguém"))
+    sendmessage(sock, u"Falando com %s." % (xmpp.last_sender_jid or u"ninguém"))
 
 def lista(sock, xmpp, mo=None):
-    for number, friend in enumerate_contacts(xmpp):
-        name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
-        subscription = xmpp.client_roster[friend]['subscription']
-        availability = 'online' if xmpp.client_roster[friend].resources else 'offline'
-        extra = u""
-        if subscription == 'to':
-            extra = u" * não estou na lista deste contato."
-        sendmessage(sock, u"%d %s %s%s" % (number, name, availability, extra))
+    u"""Lista contatos disponíveis/online."""
+    def is_online((number, roster_item)):
+        # Um contato está online se ele está conectado em algum resource.
+        return bool(roster_item.resources)
+    
+    for number, roster_item in filter(is_online, enumerate_roster(xmpp)):
+        name = roster_item['name'] or roster_item.jid
+        sendmessage(sock, u"%d %s" % (number, name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        sendmessage(sock, u"Nenhum contato na sua lista!")
+        sendmessage(sock, u"Nenhum contato disponível agora!")
 
 def lista_todos(sock, xmpp, mo=None):
-    for number, friend in enumerate_contacts(xmpp):
-        name = xmpp.client_roster[friend]['name'] or xmpp.client_roster[friend].jid
-        subscription = xmpp.client_roster[friend]['subscription']
-        sendmessage(sock, u"%d %s %s" % (number, name, subscription or u"?"))
+    u"""Lista todos os contatos (online/offline)."""
+    for number, roster_item in enumerate_roster(xmpp):
+        name = roster_item['name'] or roster_item.jid
+        sendmessage(sock, u"%d %s" % (number, name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
@@ -105,11 +105,11 @@ def lista_todos(sock, xmpp, mo=None):
 def para(sock, xmpp, mo):
     try:
         number = int(mo.group(1))
-        friend = dict(enumerate_contacts(xmpp)).get(number, None)
-        if friend is None:
+        roster_item = dict(enumerate_roster(xmpp)).get(number, None)
+        if roster_item is None:
             sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
         else:
-            xmpp.last_sender = friend
+            xmpp.last_sender_jid = roster_item.jid
     except ValueError:
         sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
     quem(sock, xmpp)
@@ -136,8 +136,10 @@ def remover(sock, xmpp, mo):
 
 # Utilitários -----------------------------------------------------------------#
 
-def enumerate_contacts(xmpp):
+def enumerate_roster(xmpp):
     u"""Enumera minha lista de contatos."""
+    roster = xmpp.client_roster
+    
     def is_contact(jid):
         u"""Retorna True se 'jid' é meu contato, False caso contrário."""
         # Tipos comuns de subscription:
@@ -148,10 +150,9 @@ def enumerate_contacts(xmpp):
         # 'remove': contato marcado para ser removido.
         #
         # Tipos considerados para formar a lista de contatos:
-        subscription_types = (
-            'both',
-            'to',
-            #'from',
-        )
-        return xmpp.client_roster[jid]['subscription'] in subscription_types
-    return enumerate(filter(is_contact, xmpp.client_roster), 1)
+        subscription_types = ('both', 'to')
+        return roster[jid]['subscription'] in subscription_types
+    
+    # Filtra todos os contatos "válidos" do meu roster.
+    roster_items = [roster[jid] for jid in roster if is_contact(jid)]
+    return enumerate(roster_items, 1)

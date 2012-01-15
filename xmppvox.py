@@ -102,8 +102,8 @@ while True:
                 continue
             
             # Envia mensagem XMPP para o último remetente
-            if xmpp.last_sender is not None:
-                mto = xmpp.last_sender
+            if xmpp.last_sender_jid is not None:
+                mto = xmpp.last_sender_jid
                 xmpp.send_message(mto=mto,
                                   mbody=data,
                                   mtype='chat')

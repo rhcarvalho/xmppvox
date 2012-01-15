@@ -69,7 +69,7 @@ class GenericBot(sleekxmpp.ClientXMPP):
                 log.debug(u"[func_receive_msg] %s", msg)
                 msg.reply(u"Você disse: %(body)s" % msg).send()
         self.func_receive_msg = func_receive_msg
-        self.last_sender = None
+        self.last_sender_jid = None
 
     def start(self, event):
         """
@@ -102,7 +102,7 @@ class GenericBot(sleekxmpp.ClientXMPP):
         if msg['type'] in ('chat', 'normal'):
             #msg.reply("Thanks for sending\n%(body)s" % msg).send()
             self.func_receive_msg(msg)
-            self.last_sender = msg['from']
+            self.last_sender_jid = msg['from']
     
     def got_online(self, presence):
         log.debug("Got online: %s" % presence['from'])
