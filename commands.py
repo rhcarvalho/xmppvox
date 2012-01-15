@@ -40,7 +40,7 @@ def process_command(sock, xmpp, data):
         (r'(\?|ajuda)\s*$', ajuda),
         (r'q(?:uem)?\s*$', quem),
         (r'l(?:ista)?\s*$', lista),
-        (r'lt\s*$', lista_todos),
+        (r't(?:odos)?\s*$', todos),
         (r'p(?:ara)?\s*(\d*)\s*$', para),
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
         (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
@@ -65,10 +65,20 @@ def process_command(sock, xmpp, data):
 
 def ajuda(sock, xmpp=None, mo=None):
     help = u"""\
-    Para ver sua lista de contatos, digite %(prefix)slista
+    Para ver sua lista de contatos disponíveis, digite %(prefix)slista
+    Para ver todos os seus contatos (inclusive indisponíveis), digite %(prefix)stodos
     Para conversar com alguém, digite %(prefix)spara, seguido do número do contato
     Para saber com quem fala agora, digite %(prefix)squem
     Para adicionar ou remover um contato, digite /adicionar ou /remover, seguido do contato
+    
+    Atalhos para os comandos:
+    /ajuda = /?
+    /lista = /l
+    /todos = /t
+    /para = /p
+    /quem = /q
+    /adicionar = /a
+    /remover = /r
     """ % dict(prefix=PREFIX)
     # Envia uma mensagem por linha/comando
     map(lambda m: sendmessage(sock, m), help.splitlines())
@@ -91,7 +101,7 @@ def lista(sock, xmpp, mo=None):
     except NameError:
         sendmessage(sock, u"Nenhum contato disponível agora!")
 
-def lista_todos(sock, xmpp, mo=None):
+def todos(sock, xmpp, mo=None):
     u"""Lista todos os contatos (online/offline)."""
     for number, roster_item in enumerate_roster(xmpp):
         name = roster_item['name'] or roster_item.jid

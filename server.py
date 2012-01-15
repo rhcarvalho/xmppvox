@@ -63,7 +63,7 @@ def accept(sock):
     
     # Envia mensagem de boas-vindas
     sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
-    sendmessage(conn, u"Digite /? para obter ajuda.")
+    sendmessage(conn, u"Digite /ajuda para obter ajuda.")
     
     return conn, addr, nickname
 
