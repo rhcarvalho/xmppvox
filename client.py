@@ -66,7 +66,13 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.nickname = u""
         self.message_handler = None
         self.last_sender_jid = None
-
+        
+        # Registra alguns plugins do SleekXMPP
+        self.register_plugin('xep_0030') # Service Discovery
+        self.register_plugin('xep_0004') # Data Forms
+        self.register_plugin('xep_0060') # PubSub
+        self.register_plugin('xep_0199') # XMPP Ping
+    
     def start(self, event):
         """
         Process the session_start event.

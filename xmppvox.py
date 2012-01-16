@@ -54,10 +54,6 @@ if opts.password is None:
     opts.password = getpass.getpass("Senha para %r: " % opts.jid)
 
 xmpp = BotXMPP(opts.jid, opts.password)
-xmpp.register_plugin('xep_0030') # Service Discovery
-xmpp.register_plugin('xep_0004') # Data Forms
-xmpp.register_plugin('xep_0060') # PubSub
-xmpp.register_plugin('xep_0199') # XMPP Ping
 
 if xmpp.connect():
     log.info(u"Conectado ao servidor XMPP")
