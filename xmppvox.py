@@ -64,8 +64,7 @@ if xmpp.connect():
     # Run XMPP client in another thread
     xmpp.process(block=False)
 
-# FIXME ouvir apenas conexões locais
-HOST = ''                 # Symbolic name meaning all available interfaces
+HOST = '127.0.0.1'        # Escuta apenas conexões locais
 PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Reuse open port
