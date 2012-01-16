@@ -29,7 +29,7 @@ else:
     raw_input = input
 
 
-class GenericBot(sleekxmpp.ClientXMPP):
+class BotXMPP(sleekxmpp.ClientXMPP):
     u"""Um robô simples para processar mensagens recebidas via XMPP.
     
     Sempre que uma mensagem do tipo 'normal' ou 'chat' for recebida, uma função
@@ -40,7 +40,7 @@ class GenericBot(sleekxmpp.ClientXMPP):
     auto_authorize = True
     auto_subscribe = True
 
-    def __init__(self, jid, password, func_receive_msg=None):
+    def __init__(self, jid, password):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # The session_start event will be triggered when
@@ -59,16 +59,11 @@ class GenericBot(sleekxmpp.ClientXMPP):
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
         
-        if func_receive_msg is None:
-            def func_receive_msg(msg):
-                u"""Função padrão ao receber mensagens.
-                
-                Esta função só é usada se nenhuma função personalizada for
-                especificada.
-                """
-                log.debug(u"[func_receive_msg] %s", msg)
-                msg.reply(u"Você disse: %(body)s" % msg).send()
-        self.func_receive_msg = func_receive_msg
+        # Eventos de integração com Papovox
+        self.add_event_handler('papovox_connected', self.papovox_connected)
+        self.add_event_handler('papovox_disconnected', self.papovox_disconnected)
+        
+        self.message_handler = None
         self.last_sender_jid = None
 
     def start(self, event):
@@ -85,8 +80,16 @@ class GenericBot(sleekxmpp.ClientXMPP):
                      data.
         """
         self.get_roster()
-        self.send_presence()
-
+    
+    def papovox_connected(self, event):
+        self.message_handler = event.get('message_handler')
+        # Envia presença em broadcast. Neste momento o usuário aparece como
+        # online para seus contatos.
+        self.send_presence(pnick=event.get('nick'))
+    
+    def papovox_disconnected(self, event):
+        self.disconnect()
+    
     def message(self, msg):
         """
         Process incoming message stanzas. Be aware that this also
@@ -99,9 +102,11 @@ class GenericBot(sleekxmpp.ClientXMPP):
                    for stanza objects and the Message stanza to see
                    how it may be used.
         """
-        if msg['type'] in ('chat', 'normal'):
-            #msg.reply("Thanks for sending\n%(body)s" % msg).send()
-            self.func_receive_msg(msg)
+        # Só processa mensagens depois que 'message_handler' for definido.
+        # Ignora mensagens que não sejam 'chat' ou 'normal', por exemplo
+        # mensagens de erro.
+        if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
+            self.message_handler(msg)
             self.last_sender_jid = msg['from']
     
     def got_online(self, presence):

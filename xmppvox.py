@@ -14,7 +14,7 @@ from itertools import count
 from optparse import OptionParser
 import getpass
 
-from client import GenericBot
+from client import BotXMPP
 from server import *
 from commands import process_command
 
@@ -53,7 +53,7 @@ if opts.jid is None:
 if opts.password is None:
     opts.password = getpass.getpass("Senha para %r: " % opts.jid)
 
-xmpp = GenericBot(opts.jid, opts.password)
+xmpp = BotXMPP(opts.jid, opts.password)
 xmpp.register_plugin('xep_0030') # Service Discovery
 xmpp.register_plugin('xep_0004') # Data Forms
 xmpp.register_plugin('xep_0060') # PubSub
@@ -64,6 +64,7 @@ if xmpp.connect():
     # Run XMPP client in another thread
     xmpp.process(block=False)
 
+# FIXME ouvir apenas conexões locais
 HOST = ''                 # Symbolic name meaning all available interfaces
 PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,12 +84,14 @@ try:
             raise
         #----------------------------------------------------------------------#
         
-        def recv_new_msg(msg):
+        def message_handler(msg):
+            # FIXME tentar usar primeiro nome amigável do remente.
             sender = msg['from'].user or REMETENTE_DESCONHECIDO
             body = msg['body']
             send_chat_message(conn, sender, body)
         
-        xmpp.func_receive_msg = recv_new_msg
+        xmpp.event('papovox_connected',
+                   {'nick': nickname, 'message_handler': message_handler})
         
         try:
             # Processa mensagens do Papovox para a rede XMPP
@@ -113,12 +116,12 @@ try:
                     sendmessage(conn, u"Não estou em nenhuma conversa.")
                 log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
         except socket.error, e:
-            log.info(e)
+            log.info(e.message)
         finally:
             log.info(u"Conexão com o Papovox encerrada.")
             break
-except:
+except socket.error:
     sys.exit(1)
 finally:
-    xmpp.disconnect()
+    xmpp.event('papovox_disconnected')
     log.info(u"Fim do XMPPVOX.")
