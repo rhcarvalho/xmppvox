@@ -128,7 +128,9 @@ def adicionar(sock, xmpp, mo):
     email_mo = email_regexp.match(mo.group(1))
     if email_mo is not None:
         user_jid = email_mo.group(0)
-        xmpp.send_presence_subscription(pto=user_jid, ptype='subscribe')
+        xmpp.send_presence_subscription(pto=user_jid,
+                                        ptype='subscribe',
+                                        pnick=xmpp.nickname)
         sendmessage(sock, u"Adicionei contato: %s" % user_jid)
     else:
         sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))

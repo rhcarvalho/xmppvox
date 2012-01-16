@@ -63,6 +63,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('papovox_connected', self.papovox_connected)
         self.add_event_handler('papovox_disconnected', self.papovox_disconnected)
         
+        self.nickname = u""
         self.message_handler = None
         self.last_sender_jid = None
 
@@ -82,10 +83,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.get_roster()
     
     def papovox_connected(self, event):
+        self.nickname = event.get('nick')
         self.message_handler = event.get('message_handler')
         # Envia presença em broadcast. Neste momento o usuário aparece como
         # online para seus contatos.
-        self.send_presence(pnick=event.get('nick'))
+        self.send_presence(pnick=self.nickname)
     
     def papovox_disconnected(self, event):
         self.disconnect()
