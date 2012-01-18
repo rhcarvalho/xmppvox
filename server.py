@@ -103,12 +103,22 @@ def sendmessage(sock, msg):
     # Envia uma ou mais mensagens pelo socket
     map(sendmsg, chunks)
 
-def send_chat_message(sock, sender, body):
+def send_chat_message(sock, sender, body, _state={}):
     u"""Formata e envia uma mensagem de bate-papo via socket.
     
     Use esta função para enviar uma mensagem para o Papovox sintetizar.
     """
-    sendmessage(sock, u"%(sender)s disse: %(body)s" % locals())
+    last_sender = _state.get('last_sender')
+    timed_out = False # FIXME não implementado
+    
+    if sender == last_sender and not timed_out:
+        msg = u"%(body)s"
+    else:
+        msg = u"%(sender)s disse: %(body)s"
+    sendmessage(sock, msg % locals())
+    
+    # Guarda estado para ser usado na próxima execução.
+    _state['last_sender'] = sender
 
 
 # Funções de recebimento de dados do Papovox ----------------------------------#
