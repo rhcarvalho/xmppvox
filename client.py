@@ -66,7 +66,9 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         
         self.nickname = u""
         self.message_handler = None
-        self.last_sender_jid = None
+        
+        # Com quem estou conversando
+        self.talking_to = None
         
         # Registra alguns plugins do SleekXMPP
         self.register_plugin('xep_0030') # Service Discovery
@@ -116,7 +118,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # mensagens de erro.
         if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
             self.message_handler(msg)
-            self.last_sender_jid = msg['from']
+            self.talking_to = msg['from']
     
     def got_online(self, presence):
         log.debug(u"Entrou: %s" % presence['from'])
@@ -140,6 +142,38 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             # Guarda o nome localmente, mas não salva no servidor XMPP.
             # Se fosse desejável salvar, usar método self.update_roster.
             self.client_roster[jid]['name'] = nick
+    
+    def get_chatty_name(self, jid_obj_or_string):
+        u"""Retorna nome de usuário para ser usado numa conversa."""
+        bare_jid = self.get_bare_jid(jid_obj_or_string)
+        roster = self.client_roster
+        # Tenta usar um nome amigável se possível.
+        if bare_jid in roster and roster[bare_jid]['name']:
+            name = roster[bare_jid]['name']
+        # Senão usa o nome de usuário do JID. Por exemplo, fulano quando JID
+        # for fulano@gmail.com.
+        elif jid_obj_or_string:
+            try:
+                # sleekxmpp.roster.jid.JID
+                name = jid_obj_or_string.user
+            except AttributeError:
+                # string
+                name = jid_obj_or_string.split('@', 1)[0]
+        # Este caso não deveria ocorrer normalmente.
+        else:
+            name = u"desconhecido"
+        return name
+    
+    @staticmethod
+    def get_bare_jid(jid_obj_or_string):
+        u"""Retorna o JID sem o resource."""
+        try:
+            # Se for uma instância de sleekxmpp.roster.jid.JID, chama seu método:
+            bare_jid = jid_obj_or_string.bare
+        except AttributeError:
+            # Ou, se for uma string, remove resource (tudo depois da /, inclusive):
+            bare_jid = jid_obj_or_string.split('/', 1)[0]
+        return bare_jid
 
 
 if __name__ == '__main__':

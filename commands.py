@@ -84,17 +84,13 @@ def ajuda(sock, xmpp=None, mo=None):
     map(lambda m: sendmessage(sock, m), help.splitlines())
 
 def quem(sock, xmpp, mo=None):
-    if xmpp.last_sender_jid is None:
+    warning = u""
+    if xmpp.talking_to is None:
         # Caso 1: nenhuma conversa iniciada.
         who =  u"ninguém"
     else:
         # O bare_jid é algo do tipo fulano@gmail.com.
-        try:
-            # Se for uma instância de sleekxmpp.roster.jid.JID:
-            bare_jid = xmpp.last_sender_jid.bare
-        except AttributeError:
-            # Ou, se for uma string:
-            bare_jid = xmpp.last_sender_jid.split('/', 1)[0]
+        bare_jid = xmpp.get_bare_jid(xmpp.talking_to)
         roster = xmpp.client_roster
         if bare_jid in roster and roster[bare_jid]['name']:
             # Caso 2: contato no meu roster e com nome.
@@ -104,7 +100,15 @@ def quem(sock, xmpp, mo=None):
             # Caso 3: contato não está no meu roster ou está sem nome.
             # Usa o bare JID (fulano@gmail.com)
             who = bare_jid
-    sendmessage(sock, u"Falando com %s." % who)
+        # Verifica se algum aviso adicional deve ser dado.
+        if bare_jid not in roster:
+            warning = u"não está na minha lista de contatos"
+        elif not roster[bare_jid].resources:
+            warning = u"não está disponível agora"
+    if not warning:
+        sendmessage(sock, u"Falando com %s." % who)
+    else:
+        sendmessage(sock, u"Falando com %s (%s)." % (who, warning))
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""
@@ -139,7 +143,7 @@ def para(sock, xmpp, mo):
         if roster_item is None:
             sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
         else:
-            xmpp.last_sender_jid = roster_item.jid
+            xmpp.talking_to = roster_item.jid
     except ValueError:
         sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
     quem(sock, xmpp)

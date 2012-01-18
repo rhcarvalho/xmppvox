@@ -33,8 +33,6 @@ TAMANHO_DO_BUFFER = 4096 # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
 
 TAMANHO_MAXIMO_MSG = 255
 
-REMETENTE_DESCONHECIDO = u"remetente desconhecido"
-
 #------------------------------------------------------------------------------#
 
 def accept(sock):

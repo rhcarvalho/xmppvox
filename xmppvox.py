@@ -81,20 +81,7 @@ try:
         
         def message_handler(msg):
             u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
-            bare_jid = msg['from'].bare
-            roster = xmpp.client_roster
-            
-            # Tenta usar um nome amigável se possível
-            if bare_jid in roster and roster[bare_jid]['name']:
-                sender = roster[bare_jid]['name']
-            # Senão usa o nome de usuário do JID. Por exemplo, fulano quando JID
-            # for fulano@gmail.com
-            elif msg['from'].user:
-                sender = msg['from'].user
-            # Este caso não deveria ocorrer, pois toda mensagem que chega
-            # deveria ter um remetente.
-            else:
-                sender = REMETENTE_DESCONHECIDO
+            sender = xmpp.get_chatty_name(msg['from'])
             body = msg['body']
             send_chat_message(conn, sender, body)
         
@@ -102,23 +89,31 @@ try:
                    {'nick': nickname, 'message_handler': message_handler})
         
         try:
-            # Processa mensagens do Papovox para a rede XMPP
+            # Processa mensagens do Papovox para a rede XMPP.
             for i in count(1):
                 data = recvmessage(conn)
                 
-                # Tenta executar algum comando contido na mensagem
+                # Tenta executar algum comando contido na mensagem.
                 if process_command(conn, xmpp, data):
                     # Caso algum comando seja executado, sai do loop e passa
                     # para a próxima mensagem.
                     continue
                 
-                # Envia mensagem XMPP para o último remetente
-                if xmpp.last_sender_jid is not None:
-                    mto = xmpp.last_sender_jid
+                # Envia mensagem XMPP para quem está conversando comigo.
+                if xmpp.talking_to is not None:
+                    mto = xmpp.talking_to
                     xmpp.send_message(mto=mto,
                                       mbody=data,
                                       mtype='chat')
                     send_chat_message(conn, u"eu", data)
+                    
+                    # Avisa se o contato estiver offline.
+                    bare_jid = xmpp.get_bare_jid(mto)
+                    roster = xmpp.client_roster
+                    if bare_jid in roster and not roster[bare_jid].resources:
+                        warning = (u"* %s está indisponível agora. "
+                                   u"Talvez a mensagem não tenha sido recebida.")
+                        sendmessage(conn, warning % xmpp.get_chatty_name(mto))
                 else:
                     mto = u"ninguém"
                     sendmessage(conn, u"Não estou em nenhuma conversa.")
