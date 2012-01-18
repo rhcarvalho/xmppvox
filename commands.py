@@ -84,7 +84,27 @@ def ajuda(sock, xmpp=None, mo=None):
     map(lambda m: sendmessage(sock, m), help.splitlines())
 
 def quem(sock, xmpp, mo=None):
-    sendmessage(sock, u"Falando com %s." % (xmpp.last_sender_jid or u"ninguém"))
+    if xmpp.last_sender_jid is None:
+        # Caso 1: nenhuma conversa iniciada.
+        who =  u"ninguém"
+    else:
+        # O bare_jid é algo do tipo fulano@gmail.com.
+        try:
+            # Se for uma instância de sleekxmpp.roster.jid.JID:
+            bare_jid = xmpp.last_sender_jid.bare
+        except AttributeError:
+            # Ou, se for uma string:
+            bare_jid = xmpp.last_sender_jid.split('/', 1)[0]
+        roster = xmpp.client_roster
+        if bare_jid in roster and roster[bare_jid]['name']:
+            # Caso 2: contato no meu roster e com nome.
+            # Fulano da Silva (fulano@gmail.com)
+            who = u"%s (%s)" % (roster[bare_jid]['name'], bare_jid)
+        else:
+            # Caso 3: contato não está no meu roster ou está sem nome.
+            # Usa o bare JID (fulano@gmail.com)
+            who = bare_jid
+    sendmessage(sock, u"Falando com %s." % who)
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""
