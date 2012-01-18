@@ -108,8 +108,16 @@ def send_chat_message(sock, sender, body, _state={}):
     
     Use esta função para enviar uma mensagem para o Papovox sintetizar.
     """
+    # Tempo máximo entre duas mensagens para considerar que fazem parte da mesma
+    # conversa, em segundos.
+    TIMEOUT = 90
+    
+    # Recupera estado.
     last_sender = _state.get('last_sender')
-    timed_out = False # FIXME não implementado
+    last_timestamp = _state.get('last_timestamp', 0) # em segundos
+    
+    timestamp = time.time()
+    timed_out = (time.time() - last_timestamp) > TIMEOUT
     
     if sender == last_sender and not timed_out:
         msg = u"%(body)s"
@@ -119,6 +127,7 @@ def send_chat_message(sock, sender, body, _state={}):
     
     # Guarda estado para ser usado na próxima execução.
     _state['last_sender'] = sender
+    _state['last_timestamp'] = timestamp
 
 
 # Funções de recebimento de dados do Papovox ----------------------------------#
