@@ -1,40 +1,14 @@
 ﻿XMPPVOX
 
-#--------- Para segunda-feira, 02/01/2012 --------------------------------------
-
-* Configurar XMPPVOX no HP Mini (para demonstrar na terça)                         [OK]
-
-Para facilitar o entendimento:
-    * renomear scripts                                                             [OK]
-    * documentar funções                                                           [OK]
-
-Vai facilitar o desenvolvimento:
-    * Possibilidade de fechar a XMPPVOX a qualquer momento (ex.: Ctrl+C)           [IGNORE: already working]
-        - Para tal, thread principal do XMPPVOX não pode bloquear em I/O.
-        - Pode existir um comando via Papovox, ex.: "?sair"
-    * opção de linha de comando --no-internet para testes                          [Not Implemented Yet, probabily to be ignored... it's easier to install a XMPP server locally]
-        = janela para enviar e receber mensagens sem usar XMPP
-    * lembrar configuração xmpp                                                    [IGNORE: I can use command-line parameters]
-
-#-------------------------------------------------------------------------------
-
-* ajuda: "/?" é sintetizado como "barra (som)", não fica explícito "interrogação"
-
-* listar caracteres em grupos pra evitar leitura de longas listas:
-    - por letra do alfabeto
-    - de 5 em 5
-    - etc
+* Adicionar termos de licença (GPL)
 
 * remover contato usando seu número na lista de contatos (opcional)
 
-* adicionar comando ajuda ("?")
 * usar sempre str.{de,en}code(errors='replace' ou 'ignore')
 
 * mover código que não pertence ao xmppvox.py para server.py
 
 * except KeyboardInterrupt: sys.exit(0) // os._exit(0)
-
-* reimplementar comandos da forma correta.
 
 * unicode_first :: http://farmdev.com/talks/unicode/
     >>> def to_unicode_or_bust(
@@ -44,60 +18,14 @@ Vai facilitar o desenvolvimento:
     ...             obj = unicode(obj, encoding)
     ...     return obj
 
-* sys.getfilesystemencoding() ou sys.std{in,out}.encoding ao invés de 'cp1252' hardcoded (talvez... é preciso testar)
+* sys.getfilesystemencoding() ou sys.std{in,out}.encoding ao invés de 'cp1252'
+  hardcoded (talvez... é preciso testar)
 
 * separar xmpp / papovox em processos
 
 * Escrever testes automatizados
 
-
-* Suporte para tarefas administrativas do usuário XMPP:
-    Ver https://github.com/fritzy/SleekXMPP/wiki/Roster-Management
-    e https://github.com/fritzy/SleekXMPP/wiki/Stanzas:-Presence
-    - Adicionar/remover/listar contatos
-        = Usar comandos similares ao Sítiovox (?, ?quem, ?quantos, +apelido, ...)
-    - Dos contatos:
-        - Ver/ler presença (online/ocupado/invisível/etc)
-        - Ver/ler status                                            (v1.1+)
-        - Ver/ler "apelido"
-        - Alterar "apelido"                                         (v1.1+)
-    - Dados pessoais:
-        - Alterar presença (online/ocupado/invisível/etc)
-        - Alterar status                                            (v1.1+)
-        - Alterar "apelido"
-
-* Usar Python Keyring para guardar login/senha XMPP            (dropped feature)
-
-* Interface com o usuário Papovox:
-    - Quem me enviou mensagem?
-        = Posso fazer como nos clientes existentes: ao receber a primeira
-          mensagem de um contato, digo [HH:MM FULANO] mensagem1, e as mensagens
-          seguintes de FULANO vão se acumulando naturalmente.
-          Quando CICLANO fala, então [HH:MM CICLANO] mensagemA.
-          Depois de um timeout (digamos, 3 minutos) voltamos a exibir
-          [HH:MM QUEM] independente de quem fale.
-          Para descobrir quem enviou a mensagem anterior, posso sempre enviar um
-          comando "?quem".
-          Adicionalmente, "?quem -2" fala quem mandou a penúltima mensagem.
-          "?quem" e "?quem -1" são equivalmentes.
-    - Para quem estou enviando a mensagem atual?
-        = Por padrão, a mensagem é enviada para o último remetente (a última
-          pessoa que falou comigo).
-          É possível especificar/forçar um destinatário usando
-          "+ID_DO_FULANO msg_pro_fulano".
-    - Ajuda:
-        = "?" exibe os comando disponíveis.
-
-* Adicionar termos de licença (GPL)
-
-* Sintetizar perguntas de usuário e senha ao iniciar servidor
-
-* Carregar XMPPVOX e Papovox com um comando único
-
-* Congelar dependências: adicionar ao projeto todas as dependências                 [é feito quando gero executável distribuível]
-
 * Coletar dados de uso do XMPPVOX (?)
-
 
 *** Lembrar de desativar logging
 
@@ -136,6 +64,67 @@ Casos "críticos":
         = Mensagem de erro "Porta do XMPPVOX ocupada, verifique se outra
         = instância do XMPPVOX está em execução, ou Sítiovox"
 
+#-------------------------------------------------------------------------------
+Depende de alterações no Papovox:
+
+* Sintetizar perguntas de usuário e senha ao iniciar servidor
+
+* Carregar XMPPVOX e Papovox com um comando único
+
+#-------------------------------------------------------------------------------
+
+* Possibilidade de fechar a XMPPVOX a qualquer momento (ex.: Ctrl+C)             [IGNORE: already working]
+    - Para tal, thread principal do XMPPVOX não pode bloquear em I/O.
+    - Pode existir um comando via Papovox, ex.: "?sair"                          [Sair normalmente do Papovox com ESCAPE encerra o XMPPVOX]
+* opção de linha de comando --no-internet para testes                            [Not Implemented Yet, probabily to be ignored... it's easier to install a XMPP server locally]
+    = janela para enviar e receber mensagens sem usar XMPP
+* lembrar configuração xmpp                                                      [IGNORE: I can use command-line parameters]
+
+* listar contatos em grupos pra evitar leitura de longas listas:                     (v1.1+)
+    - por letra do alfabeto
+    - de 5 em 5
+    - etc
+    - /l [start=1] how_many
+
+* Suporte para tarefas administrativas do usuário XMPP:
+    Ver https://github.com/fritzy/SleekXMPP/wiki/Roster-Management
+    e https://github.com/fritzy/SleekXMPP/wiki/Stanzas:-Presence
+    - Adicionar/remover/listar contatos
+        = Usar comandos similares ao Sítiovox (?, ?quem, ?quantos, +apelido, ...)
+    - Dos contatos:
+        - Ver/ler presença (online/ocupado/invisível/etc)                             (v1.1+)
+        - Ver/ler status                                                              (v1.1+)
+        - Ver/ler "apelido"                                                           (done / sem suporte a vCard)
+        - Alterar "apelido"                                                           (v1.1+)
+    - Dados pessoais:
+        - Alterar presença (online/ocupado/invisível/etc)                             (v1.1+)
+        - Alterar status                                                              (v1.1+)
+        - Alterar "apelido"                                                           (done)
+
+* Usar Python Keyring para guardar login/senha XMPP            (dropped feature)
+
+* Interface com o usuário Papovox:
+    - Quem me enviou mensagem?
+        = Posso fazer como nos clientes existentes: ao receber a primeira
+          mensagem de um contato, digo [HH:MM FULANO] mensagem1, e as mensagens
+          seguintes de FULANO vão se acumulando naturalmente.
+          Quando CICLANO fala, então [HH:MM CICLANO] mensagemA.
+          Depois de um timeout (digamos, 3 minutos) voltamos a exibir
+          [HH:MM QUEM] independente de quem fale.                                     (done)
+          Para descobrir quem enviou a mensagem anterior, posso sempre enviar um
+          comando "?quem".                                                            (done)
+          Adicionalmente, "?quem -2" fala quem mandou a penúltima mensagem.           (v1.1+)
+          "?quem" e "?quem -1" são equivalmentes.
+    - Para quem estou enviando a mensagem atual?
+        = Por padrão, a mensagem é enviada para o último remetente (a última
+          pessoa que falou comigo).
+          É possível especificar/forçar um destinatário usando
+          "+ID_DO_FULANO msg_pro_fulano".                                             (v1.1+)
+    - Ajuda:
+        = "?" exibe os comando disponíveis.                                           (done)
+
+* Congelar dependências: adicionar ao projeto todas as dependências                 [é feito quando gero executável distribuível]
+
 ________________________________________________________________________________
 -**------------------------------  DONE  ------------------------------------**-
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -170,3 +159,13 @@ ________________________________________________________________________________
 * adicionar contatos
 * remover contatos
 * quebrar mensagens grandes em várias
+
+* reimplementar comandos da forma correta.
+* adicionar comando ajuda ("?")
+* ajuda: "/?" é sintetizado como "barra (som)", não fica explícito "interrogação"
+
+* definir "apelido"
+* ler apelido do contato a partir da presença (bom para contatos que usam XMPPVOX)
+* mostrar apelido na conversa
+
+* interação "fulano disse:" apenas em mensagem nova ou após time out

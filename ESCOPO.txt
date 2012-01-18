@@ -4,14 +4,14 @@ Prazo: quarta-feira, 11/01/2012                                                 
 -------------------------------------------------------------------------------------|
 * Sistema empacotado com todas as dependências                                       |  DONE
 * Possibilidade de usar Google Talk, Facebook Chat, Jabber ou outro                  |  DONE
-* Bate papo 1-pra-1 com vários contatos simultaneamente                              |  PART (falta melhorar UI)
+* Bate papo 1-pra-1 com vários contatos simultaneamente                              |  DONE
 * Gerenciamento de conta:                                                            |  ----
     * usuário e senha (para conectar)                                                |  DONE    
     * adicionar contatos                                                             |  DONE
     * remover contatos                                                               |  DONE
     * listar amigos online                                                           |  DONE
     * listar todos os amigos                                                         |  DONE
-    * definir "apelido"                                                              |  TODO
+    * definir "apelido"                                                              |  DONE
 * Escolher amigo online para falar                                                   |  DONE
 * Papovox e XMPPVOX integrados (usuário executa 1 aplicação e consegue se comunicar) | *TODO*
   ??????????????????????????????????????????????????????????????????????????         |

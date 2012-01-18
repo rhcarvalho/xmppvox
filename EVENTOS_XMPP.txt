@@ -5,34 +5,34 @@ são de interesse do XMPPVOX.
 Categoria       Eventos possíveis                    Tratados (- não, + sim, ? talvez)
 
 Rede
-                'connected'                          +
-                'disconnected'                       +
+                'connected'                          ?
+                'disconnected'                       ?
                 'failed_auth'                        ?
                 'message'                            +
                 'message_form'                       -
                 'message_xform'                      -
                 'no_auth'                            -
-                'proxy_error'                        -
-                'sent_presence'                      ?
-                'session_end'                        ?
+                'proxy_error'                        ?
+                'sent_presence'                      -
+                'session_end'                        -
                 'session_start'                      +
                 'socket_error'                       ?
                 'stream_error'                       ?
 
 Contatos
                 'attention'                          - v1.1
-                'changed_status'                     - v1.1
-                'changed_subscription'               ?
+                'changed_status'                     + (apenas pegar apelido) v1.1 ler outros dados de status
+                'changed_subscription'               -
                 'got_offline'                        +
                 'got_online'                         +
                 'presence_%s'                        -
                 'presence_form'                      -
-                'roster_received'                    ?
-                'roster_subscription_authorized'     ?
-                'roster_subscription_remove'         ?
-                'roster_subscription_removed'        ?
-                'roster_subscription_request'        ?
-                'roster_update'                      ?
+                'roster_received'                    -
+                'roster_subscription_authorized'     -
+                'roster_subscription_remove'         -
+                'roster_subscription_removed'        -
+                'roster_subscription_request'        -
+                'roster_update'                      -
 
 Chat em grupo
                 'groupchat_direct_invite'            -
@@ -46,8 +46,8 @@ Chat em grupo
                 'muc::%s::presence'                  -
 
 Outros
-                'chatstate_%s'                       ? v1.1+ "fulano está digitando"
-                'command_%s'                         ?
+                'chatstate_%s'                       - v1.1+ "fulano está digitando"
+                'command_%s'                         -
                 'disco_info'                         -
                 'disco_items'                        -
                 'gmail_messages'                     - v1.1
