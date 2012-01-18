@@ -71,7 +71,7 @@ try:
     while True:
         log.info(u"XMPPVOX servindo na porta %s" % PORT)
         
-        # Conecta ao Papovox -----------------------------------------------#
+        # Conecta ao Papovox --------------------------------------------------#
         try:
             conn, addr, nickname = accept(s)
         except socket.error:
@@ -80,8 +80,21 @@ try:
         #----------------------------------------------------------------------#
         
         def message_handler(msg):
-            # FIXME tentar usar primeiro nome amigável do remente.
-            sender = msg['from'].user or REMETENTE_DESCONHECIDO
+            u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
+            bare_jid = msg['from'].bare
+            roster = xmpp.client_roster
+            
+            # Tenta usar um nome amigável se possível
+            if bare_jid in roster and roster[bare_jid]['name']:
+                sender = roster[bare_jid]['name']
+            # Senão usa o nome de usuário do JID. Por exemplo, fulano quando JID
+            # for fulano@gmail.com
+            elif msg['from'].user:
+                sender = msg['from'].user
+            # Este caso não deveria ocorrer, pois toda mensagem que chega
+            # deveria ter um remetente.
+            else:
+                sender = REMETENTE_DESCONHECIDO
             body = msg['body']
             send_chat_message(conn, sender, body)
         
@@ -95,8 +108,8 @@ try:
                 
                 # Tenta executar algum comando contido na mensagem
                 if process_command(conn, xmpp, data):
-                    # Caso algum comando seja executado, sai do loop e passa para
-                    # a próxima mensagem.
+                    # Caso algum comando seja executado, sai do loop e passa
+                    # para a próxima mensagem.
                     continue
                 
                 # Envia mensagem XMPP para o último remetente
