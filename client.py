@@ -58,6 +58,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # Outros eventos interessantes
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
+        self.add_event_handler('changed_status', self.changed_status)
         
         # Eventos de integração com Papovox
         self.add_event_handler('papovox_connected', self.papovox_connected)
@@ -118,10 +119,27 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             self.last_sender_jid = msg['from']
     
     def got_online(self, presence):
-        log.debug("Got online: %s" % presence['from'])
+        log.debug(u"Entrou: %s" % presence['from'])
     
     def got_offline(self, presence):
-        log.debug("Got offline: %s" % presence['from'])
+        log.debug(u"Saiu: %s" % presence['from'])
+    
+    def changed_status(self, presence):
+        # A presença pode ou não incluir um elemento 'nick'.
+        # Em ambos os casos o comando abaixo executa corretamente, retornando
+        # None caso 'nick' não esteja presente.
+        nick = presence['nick'].get_nick()
+        jid = presence['from'].bare
+        
+        # Se o contato está no meu roster e ainda não tem um nome, vamos usar
+        # temporariamente o nick como nome.
+        # Este é o caso quando dois usuários do XMPPVOX falam entre si, pois o
+        # XMPPVOX envia o apelido do usuário quando ele se conecta à rede XMPP.
+        if jid in self.client_roster and not self.client_roster[jid]['name'] and nick:
+            log.debug(u"Novo apelido: %s (%s)" % (nick, jid))
+            # Guarda o nome localmente, mas não salva no servidor XMPP.
+            # Se fosse desejável salvar, usar método self.update_roster.
+            self.client_roster[jid]['name'] = nick
 
 
 if __name__ == '__main__':
