@@ -41,7 +41,7 @@ def process_command(sock, xmpp, data):
         (r'q(?:uem)?\s*$', quem),
         (r'l(?:ista)?\s*$', lista),
         (r't(?:odos)?\s*$', todos),
-        (r'p(?:ara)?\s*(\d*)\s*$', para),
+        (r'(?:p(?:ara)?)?\s*(\d*)\s*$', para),
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
         (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
     )
@@ -75,7 +75,7 @@ def ajuda(sock, xmpp=None, mo=None):
     /ajuda = /?
     /lista = /l
     /todos = /t
-    /para = /p
+    /para = /p ou / seguido de um número
     /quem = /q
     /adicionar = /a
     /remover = /r
