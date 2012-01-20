@@ -1,5 +1,24 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+#    XMPPVOX: XMPP client for DOSVOX.
+#    Copyright (C) 2012  Rodolfo Henrique Carvalho
+#
+#    This file is part of XMPPVOX.
+#
+#    XMPPVOX is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 u"""
 XMPPVOX - módulo cliente
 
@@ -31,7 +50,7 @@ else:
 
 class BotXMPP(sleekxmpp.ClientXMPP):
     u"""Um robô simples para processar mensagens recebidas via XMPP.
-    
+
     Sempre que uma mensagem do tipo 'normal' ou 'chat' for recebida, uma função
     é chamada e a mensagem é passada como argumento.
     É possível fornecer sua própria função para tratar mensagens.
@@ -54,28 +73,28 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # stanza is received. Be aware that that includes
         # MUC messages and error messages.
         self.add_event_handler("message", self.message)
-        
+
         # Outros eventos interessantes
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
         self.add_event_handler('changed_status', self.changed_status)
-        
+
         # Eventos de integração com Papovox
         self.add_event_handler('papovox_connected', self.papovox_connected)
         self.add_event_handler('papovox_disconnected', self.papovox_disconnected)
-        
+
         self.nickname = u""
         self.message_handler = None
-        
+
         # Com quem estou conversando
         self.talking_to = None
-        
+
         # Registra alguns plugins do SleekXMPP
         self.register_plugin('xep_0030') # Service Discovery
         self.register_plugin('xep_0004') # Data Forms
         self.register_plugin('xep_0060') # PubSub
         self.register_plugin('xep_0199') # XMPP Ping
-    
+
     def start(self, event):
         """
         Process the session_start event.
@@ -90,17 +109,17 @@ class BotXMPP(sleekxmpp.ClientXMPP):
                      data.
         """
         self.get_roster()
-    
+
     def papovox_connected(self, event):
         self.nickname = event.get('nick')
         self.message_handler = event.get('message_handler')
         # Envia presença em broadcast. Neste momento o usuário aparece como
         # online para seus contatos.
         self.send_presence(pnick=self.nickname)
-    
+
     def papovox_disconnected(self, event):
         self.disconnect()
-    
+
     def message(self, msg):
         """
         Process incoming message stanzas. Be aware that this also
@@ -119,20 +138,20 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
             self.message_handler(msg)
             self.talking_to = msg['from']
-    
+
     def got_online(self, presence):
         log.debug(u"Entrou: %s" % presence['from'])
-    
+
     def got_offline(self, presence):
         log.debug(u"Saiu: %s" % presence['from'])
-    
+
     def changed_status(self, presence):
         # A presença pode ou não incluir um elemento 'nick'.
         # Em ambos os casos o comando abaixo executa corretamente, retornando
         # None caso 'nick' não esteja presente.
         nick = presence['nick'].get_nick()
         jid = presence['from'].bare
-        
+
         # Se o contato está no meu roster e ainda não tem um nome, vamos usar
         # temporariamente o nick como nome.
         # Este é o caso quando dois usuários do XMPPVOX falam entre si, pois o
@@ -142,7 +161,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             # Guarda o nome localmente, mas não salva no servidor XMPP.
             # Se fosse desejável salvar, usar método self.update_roster.
             self.client_roster[jid]['name'] = nick
-    
+
     def get_chatty_name(self, jid_obj_or_string):
         u"""Retorna nome de usuário para ser usado numa conversa."""
         bare_jid = self.get_bare_jid(jid_obj_or_string)
@@ -163,7 +182,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         else:
             name = u"desconhecido"
         return name
-    
+
     @staticmethod
     def get_bare_jid(jid_obj_or_string):
         u"""Retorna o JID sem o resource."""

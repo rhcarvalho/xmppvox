@@ -1,4 +1,23 @@
 ﻿# -*- coding: utf-8 -*-
+
+#    XMPPVOX: XMPP client for DOSVOX.
+#    Copyright (C) 2012  Rodolfo Henrique Carvalho
+#
+#    This file is part of XMPPVOX.
+#
+#    XMPPVOX is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 u"""
 XMPPVOX - módulo comandos
 
@@ -24,14 +43,14 @@ email_regexp = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', re.I)
 
 def process_command(sock, xmpp, data):
     u"""Tenta processar algum comando contido em 'data'.
-    
+
     Retorna um booleano indicando se algum comando foi executado.
     """
     if not data.startswith(PREFIX):
         return False
     # Remove prefixo
     cmd = data[len(PREFIX):]
-    
+
     # Comandos disponíveis. Cada comando é uma tupla:
     #   (expressão regular, função)
     # As expressões regulares são testadas em ordem e o primeiro comando que der
@@ -45,7 +64,7 @@ def process_command(sock, xmpp, data):
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
         (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
     )
-    
+
     # Tenta encontrar um comando dentre os existentes
     for cmd_re, cmd_func in commands:
         mo = re.match(cmd_re, cmd)
@@ -70,7 +89,7 @@ def ajuda(sock, xmpp=None, mo=None):
     Para conversar com alguém, digite %(prefix)spara, seguido do número do contato
     Para saber com quem fala agora, digite %(prefix)squem
     Para adicionar ou remover um contato, digite /adicionar ou /remover, seguido do contato
-    
+
     Atalhos para os comandos:
     /ajuda = /?
     /lista = /l
@@ -115,7 +134,7 @@ def lista(sock, xmpp, mo=None):
     def is_online((number, roster_item)):
         # Um contato está online se ele está conectado em algum resource.
         return bool(roster_item.resources)
-    
+
     for number, roster_item in filter(is_online, enumerate_roster(xmpp)):
         name = roster_item['name'] or roster_item.jid
         sendmessage(sock, u"%d %s" % (number, name))
@@ -175,7 +194,7 @@ def remover(sock, xmpp, mo):
 def enumerate_roster(xmpp):
     u"""Enumera minha lista de contatos."""
     roster = xmpp.client_roster
-    
+
     def is_contact(jid):
         u"""Retorna True se 'jid' é meu contato, False caso contrário."""
         # Tipos comuns de subscription:
@@ -188,7 +207,7 @@ def enumerate_roster(xmpp):
         # Tipos considerados para formar a lista de contatos:
         subscription_types = ('both', 'to')
         return roster[jid]['subscription'] in subscription_types
-    
+
     # Filtra todos os contatos "válidos" do meu roster.
     roster_items = [roster[jid] for jid in roster if is_contact(jid)]
     # Ordena por JID

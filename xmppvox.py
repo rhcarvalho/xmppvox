@@ -1,5 +1,24 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+#    XMPPVOX: XMPP client for DOSVOX.
+#    Copyright (C) 2012  Rodolfo Henrique Carvalho
+#
+#    This file is part of XMPPVOX.
+#
+#    XMPPVOX is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 u"""
 XMPPVOX - módulo principal
 
@@ -70,7 +89,7 @@ s.listen(1)
 try:
     while True:
         log.info(u"XMPPVOX servindo na porta %s" % PORT)
-        
+
         # Conecta ao Papovox --------------------------------------------------#
         try:
             conn, addr, nickname = accept(s)
@@ -78,27 +97,27 @@ try:
             log.error(u"Erro: Não foi possível conectar ao Papovox.")
             raise
         #----------------------------------------------------------------------#
-        
+
         def message_handler(msg):
             u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
             sender = xmpp.get_chatty_name(msg['from'])
             body = msg['body']
             send_chat_message(conn, sender, body)
-        
+
         xmpp.event('papovox_connected',
                    {'nick': nickname, 'message_handler': message_handler})
-        
+
         try:
             # Processa mensagens do Papovox para a rede XMPP.
             for i in count(1):
                 data = recvmessage(conn)
-                
+
                 # Tenta executar algum comando contido na mensagem.
                 if process_command(conn, xmpp, data):
                     # Caso algum comando seja executado, sai do loop e passa
                     # para a próxima mensagem.
                     continue
-                
+
                 # Envia mensagem XMPP para quem está conversando comigo.
                 if xmpp.talking_to is not None:
                     mto = xmpp.talking_to
@@ -106,7 +125,7 @@ try:
                                       mbody=data,
                                       mtype='chat')
                     send_chat_message(conn, u"eu", data)
-                    
+
                     # Avisa se o contato estiver offline.
                     bare_jid = xmpp.get_bare_jid(mto)
                     roster = xmpp.client_roster
