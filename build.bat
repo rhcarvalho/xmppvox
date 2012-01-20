@@ -42,6 +42,11 @@ REM          pip zip dns
 REM          pip zip sleekxmpp
 REM
 
+REM Remove arquivos antigos se existirem
+IF EXIST dist (
+    RMDIR /Q /S dist
+)
+
 REM Executa o pyinstaller.py se existir ou exibe mensagem e termina.
 IF EXIST c:\pyinstaller\pyinstaller.py (
     c:\pyinstaller\pyinstaller.py --onefile --version-file=version xmppvox.py
@@ -49,6 +54,9 @@ IF EXIST c:\pyinstaller\pyinstaller.py (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     GOTO END
 )
+
+REM Copia c¢digo-fonte para ser distribu°do:
+bzr export dist/xmppvox-src
 
 REM Verifica se o upx.exe est† no PATH e avisa caso contr†rio.
 FOR %%G IN ("%path:;=" "%") DO IF EXIST %%G\upx.exe GOTO END
