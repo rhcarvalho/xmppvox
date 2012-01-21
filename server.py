@@ -1,5 +1,4 @@
-﻿#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 #    XMPPVOX: XMPP client for DOSVOX.
 #    Copyright (C) 2012  Rodolfo Henrique Carvalho
@@ -216,7 +215,3 @@ def recvmessage(sock):
         data = recvall(sock, datalen)
         data = data.decode(SYSTEM_ENCODING)
         return data
-
-
-if __name__ == '__main__':
-    print "Execute 'python xmppvox.py'"
