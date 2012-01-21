@@ -33,9 +33,8 @@ from itertools import count
 from optparse import OptionParser
 import getpass
 
-from client import BotXMPP
-from server import *
-from commands import process_command
+import client
+import server
 
 import logging
 log = logging.getLogger(__name__)
@@ -72,78 +71,11 @@ if opts.jid is None:
 if opts.password is None:
     opts.password = getpass.getpass("Senha para %r: " % opts.jid)
 
-xmpp = BotXMPP(opts.jid, opts.password)
+xmpp = client.BotXMPP(opts.jid, opts.password)
 
 if xmpp.connect():
     log.info(u"Conectado ao servidor XMPP")
     # Run XMPP client in another thread
     xmpp.process(block=False)
 
-HOST = '127.0.0.1'        # Escuta apenas conexões locais
-PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Reuse open port
-#s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind((HOST, PORT))
-s.listen(1)
-try:
-    while True:
-        log.info(u"XMPPVOX servindo na porta %s" % PORT)
-
-        # Conecta ao Papovox --------------------------------------------------#
-        try:
-            conn, addr, nickname = accept(s)
-        except socket.error:
-            log.error(u"Erro: Não foi possível conectar ao Papovox.")
-            raise
-        #----------------------------------------------------------------------#
-
-        def message_handler(msg):
-            u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
-            sender = xmpp.get_chatty_name(msg['from'])
-            body = msg['body']
-            send_chat_message(conn, sender, body)
-
-        xmpp.event('papovox_connected',
-                   {'nick': nickname, 'message_handler': message_handler})
-
-        try:
-            # Processa mensagens do Papovox para a rede XMPP.
-            for i in count(1):
-                data = recvmessage(conn)
-
-                # Tenta executar algum comando contido na mensagem.
-                if process_command(conn, xmpp, data):
-                    # Caso algum comando seja executado, sai do loop e passa
-                    # para a próxima mensagem.
-                    continue
-
-                # Envia mensagem XMPP para quem está conversando comigo.
-                if xmpp.talking_to is not None:
-                    mto = xmpp.talking_to
-                    xmpp.send_message(mto=mto,
-                                      mbody=data,
-                                      mtype='chat')
-                    send_chat_message(conn, u"eu", data)
-
-                    # Avisa se o contato estiver offline.
-                    bare_jid = xmpp.get_bare_jid(mto)
-                    roster = xmpp.client_roster
-                    if bare_jid in roster and not roster[bare_jid].resources:
-                        warning = (u"* %s está indisponível agora. "
-                                   u"Talvez a mensagem não tenha sido recebida.")
-                        sendmessage(conn, warning % xmpp.get_chatty_name(mto))
-                else:
-                    mto = u"ninguém"
-                    sendmessage(conn, u"Não estou em nenhuma conversa.")
-                log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
-        except socket.error, e:
-            log.info(e.message)
-        finally:
-            log.info(u"Conexão com o Papovox encerrada.")
-            break
-except socket.error:
-    sys.exit(1)
-finally:
-    xmpp.event('papovox_disconnected')
-    log.info(u"Fim do XMPPVOX.")
+server.run()

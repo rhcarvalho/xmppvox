@@ -26,7 +26,7 @@ Este módulo implementa comandos que o servidor reconhece.
 
 import re
 
-from server import sendmessage
+import server
 
 import logging
 log = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ def process_command(sock, xmpp, data):
             break
     else:
         # Nenhum comando foi executado no loop
-        sendmessage(sock, u"Comando desconhecido: %s" % cmd)
+        server.sendmessage(sock, u"Comando desconhecido: %s" % cmd)
     return True
 
 
@@ -100,7 +100,7 @@ def ajuda(sock, xmpp=None, mo=None):
     /remover = /r
     """ % dict(prefix=PREFIX)
     # Envia uma mensagem por linha/comando
-    map(lambda m: sendmessage(sock, m), help.splitlines())
+    map(lambda m: server.sendmessage(sock, m), help.splitlines())
 
 def quem(sock, xmpp, mo=None):
     warning = u""
@@ -125,9 +125,9 @@ def quem(sock, xmpp, mo=None):
         elif not roster[bare_jid].resources:
             warning = u"não está disponível agora"
     if not warning:
-        sendmessage(sock, u"Falando com %s." % who)
+        server.sendmessage(sock, u"Falando com %s." % who)
     else:
-        sendmessage(sock, u"Falando com %s (%s)." % (who, warning))
+        server.sendmessage(sock, u"Falando com %s (%s)." % (who, warning))
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""
@@ -137,34 +137,34 @@ def lista(sock, xmpp, mo=None):
 
     for number, roster_item in filter(is_online, enumerate_roster(xmpp)):
         name = roster_item['name'] or roster_item.jid
-        sendmessage(sock, u"%d %s" % (number, name))
+        server.sendmessage(sock, u"%d %s" % (number, name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        sendmessage(sock, u"Nenhum contato disponível agora!")
+        server.sendmessage(sock, u"Nenhum contato disponível agora!")
 
 def todos(sock, xmpp, mo=None):
     u"""Lista todos os contatos (online/offline)."""
     for number, roster_item in enumerate_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        sendmessage(sock, u"%d %s" % (number, name))
+        server.sendmessage(sock, u"%d %s" % (number, name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        sendmessage(sock, u"Nenhum contato na sua lista!")
+        server.sendmessage(sock, u"Nenhum contato na sua lista!")
 
 def para(sock, xmpp, mo):
     try:
         number = int(mo.group(1))
         roster_item = dict(enumerate_roster(xmpp)).get(number, None)
         if roster_item is None:
-            sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
+            server.sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
         else:
             xmpp.talking_to = roster_item.jid
     except ValueError:
-        sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
+        server.sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
     quem(sock, xmpp)
 
 def adicionar(sock, xmpp, mo):
@@ -174,9 +174,9 @@ def adicionar(sock, xmpp, mo):
         xmpp.send_presence_subscription(pto=user_jid,
                                         ptype='subscribe',
                                         pnick=xmpp.nickname)
-        sendmessage(sock, u"Adicionei contato: %s" % user_jid)
+        server.sendmessage(sock, u"Adicionei contato: %s" % user_jid)
     else:
-        sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        server.sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 def remover(sock, xmpp, mo):
     email_mo = email_regexp.match(mo.group(1))
@@ -184,9 +184,9 @@ def remover(sock, xmpp, mo):
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
         # ... ou talvez usar xmpp.del_roster_item(user_jid)
-        sendmessage(sock, u"Removi contato: %s" % user_jid)
+        server.sendmessage(sock, u"Removi contato: %s" % user_jid)
     else:
-        sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        server.sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
 
 
 # Utilitários -----------------------------------------------------------------#
