@@ -29,6 +29,7 @@ import socket
 import struct
 import sys
 from itertools import count
+from threading import Event
 
 from optparse import OptionParser
 import getpass
@@ -71,11 +72,18 @@ if opts.jid is None:
 if opts.password is None:
     opts.password = getpass.getpass("Senha para %r: " % opts.jid)
 
-xmpp = client.BotXMPP(opts.jid, opts.password)
+
+stop = Event()
+
+def do_stop():
+    log.debug(u"Interrompendo a conexão com o Papovox...")
+    stop.set()
+
+xmpp = client.BotXMPP(opts.jid, opts.password, do_stop)
 
 if xmpp.connect():
     log.info(u"Conectado ao servidor XMPP")
     # Run XMPP client in another thread
     xmpp.process(block=False)
 
-server.run(xmpp)
+server.run(xmpp, stop)
