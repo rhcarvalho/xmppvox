@@ -78,4 +78,4 @@ if xmpp.connect():
     # Run XMPP client in another thread
     xmpp.process(block=False)
 
-server.run()
+server.run(xmpp)

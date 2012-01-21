@@ -56,7 +56,7 @@ TAMANHO_MAXIMO_MSG = 255
 
 #------------------------------------------------------------------------------#
 
-def run():
+def run(xmpp):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Reutilizar porta já aberta
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
