@@ -56,7 +56,27 @@ IF EXIST c:\pyinstaller\pyinstaller.py (
 )
 
 REM Copia c¢digo-fonte para ser distribu°do:
-bzr export dist/xmppvox-src
+bzr export dist\xmppvox-src
+
+REM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+REM Abaixo seguem dois mÇtodos diferentes para descobrir se um execut†vel
+REM est† no PATH. A princ°pio um Ç t∆o bom quanto o outro, e os dois s∆o
+REM usados s¢ para demonstrar as duas possibilidades.
+REM Se um for definitivamente melhor que o outro, podemos passar a us†-lo
+REM sempre que necess†rio.
+REM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+for %%G in (zip.exe) do (set FOUND=%%~$PATH:G)
+IF DEFINED FOUND (
+    REM Compacta todos os arquivos em um zip.
+    PUSHD dist
+    zip -v -9 -r xmpp.zip *
+    POPD
+) ELSE (
+    ECHO.
+    ECHO.
+    ECHO Atená∆o: zip n∆o encontrado!
+)
 
 REM Verifica se o upx.exe est† no PATH e avisa caso contr†rio.
 FOR %%G IN ("%path:;=" "%") DO IF EXIST %%G\upx.exe GOTO END
