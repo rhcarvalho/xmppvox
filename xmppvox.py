@@ -41,49 +41,61 @@ import logging
 log = logging.getLogger(__name__)
 
 
-# Setup the command line arguments.
-optp = OptionParser()
+def main():
+    u"""Executa o cliente XMPP e o servidor compatível com Papovox.
 
-# Output verbosity options.
-optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                action='store_const', dest='loglevel',
-                const=logging.ERROR, default=logging.INFO)
-optp.add_option('-d', '--debug', help='set logging to DEBUG',
-                action='store_const', dest='loglevel',
-                const=logging.DEBUG, default=logging.INFO)
+    Esta função é o ponto de partida da execução do XMPPVOX."""
+    # Configuração.
+    opts, args = parse_command_line()
+    configure_logging(opts)
+    jid, password = get_jid_and_password(opts)
 
-# JID and password options.
-optp.add_option("-j", "--jid", dest="jid",
-                help="JID to use")
-optp.add_option("-p", "--password", dest="password",
-                help="password to use")
+    # Mecanismo para interromper o servidor quando necessário
+    stop = Event()
+    def do_stop():
+        log.debug(u"Interrompendo a conexão com o Papovox...")
+        stop.set()
 
-opts, args = optp.parse_args()
+    # Inicia cliente XMPP.
+    xmpp = client.BotXMPP(jid, password, do_stop)
+    if xmpp.connect():
+        log.info(u"Conectado ao servidor XMPP")
+        # Executa cliente XMPP em outra thread.
+        xmpp.process(block=False)
 
-# Configura logging.
-logging.basicConfig(level=opts.loglevel,
-                    format='%(levelname)-8s %(asctime)s %(message)s',
-                    datefmt='%H:%M')
-# Não mostrar mensagens de DEBUG do SleekXMPP.
-logging.getLogger('sleekxmpp').setLevel(max(logging.INFO, opts.loglevel))
-
-if opts.jid is None:
-    opts.jid = raw_input("Conta (ex.: fulano@gmail.com): ")
-if opts.password is None:
-    opts.password = getpass.getpass("Senha para %r: " % opts.jid)
+    # Bloqueia executando o servidor para o Papovox.
+    server.run(xmpp, stop)
 
 
-stop = Event()
+def parse_command_line():
+    u"""Processa opções de linha de comando passadas para o XMPPVOX."""
+    optp = OptionParser()
+    # Configuração de verbosidade.
+    optp.add_option('-q', '--quiet', help=u"exibe apenas erros",
+                    action='store_const', dest='loglevel',
+                    const=logging.ERROR, default=logging.INFO)
+    optp.add_option('-d', '--debug', help=u"exibe mensagens de depuração",
+                    action='store_const', dest='loglevel',
+                    const=logging.DEBUG, default=logging.INFO)
+    # JID e senha
+    optp.add_option("-j", "--jid", dest="jid",
+                    help="identificador do usuário")
+    optp.add_option("-p", "--password", dest="password",
+                    help="senha")
+    return optp.parse_args()
 
-def do_stop():
-    log.debug(u"Interrompendo a conexão com o Papovox...")
-    stop.set()
+def configure_logging(opts):
+    # Configura logging.
+    logging.basicConfig(level=opts.loglevel,
+                        format='%(levelname)-8s %(asctime)s %(message)s',
+                        datefmt='%H:%M')
+    # Não mostrar mensagens de DEBUG do SleekXMPP.
+    logging.getLogger('sleekxmpp').setLevel(max(logging.INFO, opts.loglevel))
 
-xmpp = client.BotXMPP(opts.jid, opts.password, do_stop)
+def get_jid_and_password(opts):
+    jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
+    password = opts.password or getpass.getpass("Senha para %r: " % jid)
+    return jid, password
 
-if xmpp.connect():
-    log.info(u"Conectado ao servidor XMPP")
-    # Run XMPP client in another thread
-    xmpp.process(block=False)
 
-server.run(xmpp, stop)
+main()
