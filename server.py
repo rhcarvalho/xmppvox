@@ -43,37 +43,36 @@ log = logging.getLogger(__name__)
 # codificação padrão do Windows.
 SYSTEM_ENCODING = 'cp1252'
 
+HOST = '127.0.0.1'        # Escuta apenas conexões locais
 PORTA_PAPOVOX = 1963
 #PORTA_URGENTE = 1964
 #PORTA_NOMES = 1956
 
-DADOTECLADO = 1   # texto da mensagem (sem tab, nem lf nem cr ao final)
+DADOTECLADO = 1           # texto da mensagem (sem tab, nem lf nem cr ao final)
 
-TAMANHO_DO_BUFFER = 4096 # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
+TAMANHO_DO_BUFFER = 4096  # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
 
 TAMANHO_MAXIMO_MSG = 255
 
 #------------------------------------------------------------------------------#
 
 def run():
-    HOST = '127.0.0.1'        # Escuta apenas conexões locais
-    PORT = PORTA_PAPOVOX      # Arbitrary non-privileged port
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Reuse open port
+    # Reutilizar porta já aberta
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((HOST, PORT))
+    s.bind((HOST, PORTA_PAPOVOX))
     s.listen(1)
     try:
         while True:
-            log.info(u"XMPPVOX servindo na porta %s" % PORT)
+            log.info(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
 
-            # Conecta ao Papovox --------------------------------------------------#
+            # Conecta ao Papovox ----------------------------------------------#
             try:
                 conn, addr, nickname = accept(s)
             except socket.error:
                 log.error(u"Erro: Não foi possível conectar ao Papovox.")
                 raise
-            #----------------------------------------------------------------------#
+            #------------------------------------------------------------------#
 
             def message_handler(msg):
                 u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
