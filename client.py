@@ -27,8 +27,6 @@ Google Talk, Facebook chat e Jabber.
 """
 
 import sys
-import getpass
-from optparse import OptionParser
 
 import sleekxmpp
 

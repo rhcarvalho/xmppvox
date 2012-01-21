@@ -29,7 +29,9 @@ import socket
 import struct
 import textwrap
 import time
+import sys
 from cStringIO import StringIO
+from itertools import count
 
 import commands
 

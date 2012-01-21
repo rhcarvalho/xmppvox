@@ -25,10 +25,6 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
-import socket
-import struct
-import sys
-from itertools import count
 from threading import Event
 
 from optparse import OptionParser
