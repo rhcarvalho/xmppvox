@@ -84,40 +84,8 @@ def run(xmpp):
         xmpp.event('papovox_connected',
                    {'nick': nickname, 'message_handler': message_handler})
 
-        try:
-            # Processa mensagens do Papovox para a rede XMPP.
-            for i in count(1):
-                data = recvmessage(conn)
-
-                # Tenta executar algum comando contido na mensagem.
-                if commands.process_command(conn, xmpp, data):
-                    # Caso algum comando seja executado, sai do loop e passa
-                    # para a próxima mensagem.
-                    continue
-
-                # Envia mensagem XMPP para quem está conversando comigo.
-                if xmpp.talking_to is not None:
-                    mto = xmpp.talking_to
-                    xmpp.send_message(mto=mto,
-                                      mbody=data,
-                                      mtype='chat')
-                    send_chat_message(conn, u"eu", data)
-
-                    # Avisa se o contato estiver offline.
-                    bare_jid = xmpp.get_bare_jid(mto)
-                    roster = xmpp.client_roster
-                    if bare_jid in roster and not roster[bare_jid].resources:
-                        warning = (u"* %s está indisponível agora. "
-                                   u"Talvez a mensagem não tenha sido recebida.")
-                        sendmessage(conn, warning % xmpp.get_chatty_name(mto))
-                else:
-                    mto = u"ninguém"
-                    sendmessage(conn, u"Não estou em nenhuma conversa.")
-                log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
-        except socket.error, e:
-            log.info(e.message)
-        finally:
-            log.info(u"Conexão com o Papovox encerrada.")
+        # Bloqueia processando mensagens do Papovox.
+        process_messages(conn, xmpp)
     except socket.error, e:
         log.error(e.message)
         sys.exit(1)
@@ -156,6 +124,48 @@ def accept(sock):
     sendmessage(conn, u"Digite /ajuda para obter ajuda.")
 
     return conn, addr, nickname
+
+
+def process_messages(sock, xmpp):
+    u"""Processa mensagens do Papovox para a rede XMPP.
+
+    Mensagens podem conter comandos para o XMPPVOX.
+    Nota: esta função só termina caso ocorra algum erro ou a conexão com o
+          Papovox seja perdida.
+    """
+    try:
+        for i in count(1):
+            data = recvmessage(sock)
+
+            # Tenta executar algum comando contido na mensagem.
+            if commands.process_command(sock, xmpp, data):
+                # Caso algum comando seja executado, sai do loop e passa
+                # para a próxima mensagem.
+                continue
+
+            # Envia mensagem XMPP para quem está conversando comigo.
+            if xmpp.talking_to is not None:
+                mto = xmpp.talking_to
+                xmpp.send_message(mto=mto,
+                                  mbody=data,
+                                  mtype='chat')
+                send_chat_message(sock, u"eu", data)
+
+                # Avisa se o contato estiver offline.
+                bare_jid = xmpp.get_bare_jid(mto)
+                roster = xmpp.client_roster
+                if bare_jid in roster and not roster[bare_jid].resources:
+                    warning = (u"* %s está indisponível agora. "
+                               u"Talvez a mensagem não tenha sido recebida.")
+                    sendmessage(sock, warning % xmpp.get_chatty_name(mto))
+            else:
+                mto = u"ninguém"
+                sendmessage(sock, u"Não estou em nenhuma conversa.")
+            log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
+    except socket.error, e:
+        log.info(e.message)
+    finally:
+        log.info(u"Conexão com o Papovox encerrada.")
 
 
 # Funções de envio de dados para o Papovox ------------------------------------#
