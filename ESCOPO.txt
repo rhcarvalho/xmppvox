@@ -21,9 +21,9 @@ Prazo: quarta-feira, 11/01/2012                                                 
   ? O usuário executa o XMPPVOX e este inicia o Papovox, passando um parâmetro       |
   ? que indique a utilização no "modo" XMPPVOX.                                      |
   //////////////////////////////////////////////////////////////////////////         |
-* Ajuda na tela e breve manual de utilização TXT                                     |  PART (falta atualizar)
-* Algum nível de tratamento dos casos "críticos" estabelecidos                       |  PART
-* Funcionamento correto com caracteres acentuados                                    |  PART (verificar)
+* Ajuda na tela e breve manual de utilização TXT                                     |  DONE
+* Algum nível de tratamento dos casos "críticos" estabelecidos                       |  DONE
+* Funcionamento correto com caracteres acentuados                                    |  DONE (verificar)
 * Testes automatizados                                                               |  PART (fazer mais)
 ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 
