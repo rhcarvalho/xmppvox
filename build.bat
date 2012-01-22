@@ -47,13 +47,28 @@ IF EXIST dist (
     RMDIR /Q /S dist
 )
 
+SETLOCAL
+SET DNSPYTHON_ZIP=%CD%\thirdparty\dnspython-master-d5dc023.zip
+SET SLEEKXMPP_ZIP=%CD%\thirdparty\sleekxmpp-develop-25f8760.zip
+
+IF NOT EXIST "%DNSPYTHON_ZIP%" (
+    ECHO Atená∆o: falta dependància -- dnspython
+    EXIT 2
+)
+IF NOT EXIST "%SLEEKXMPP_ZIP%" (
+    ECHO Atená∆o: falta dependància -- sleekxmpp
+    EXIT 3
+)
+
 REM Executa o pyinstaller.py se existir ou exibe mensagem e termina.
 IF EXIST c:\pyinstaller\pyinstaller.py (
-    c:\pyinstaller\pyinstaller.py --onefile --version-file=version xmppvox.py
+    c:\pyinstaller\pyinstaller.py --onefile --version-file=version ^
+        --paths="%DNSPYTHON_ZIP%;%SLEEKXMPP_ZIP%" xmppvox.py
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
-    GOTO END
+    EXIT 1
 )
+ENDLOCAL
 
 REM Copia c¢digo-fonte para ser distribu°do:
 bzr export dist\xmppvox-src
@@ -79,12 +94,7 @@ IF DEFINED FOUND (
 )
 
 REM Verifica se o upx.exe est† no PATH e avisa caso contr†rio.
-FOR %%G IN ("%path:;=" "%") DO IF EXIST %%G\upx.exe GOTO END
+FOR %%G IN ("%path:;=" "%") DO IF EXIST %%G\upx.exe GOTO:EOF
 ECHO.
 ECHO.
 ECHO Atená∆o: UPX n∆o encontrado! Verifique se foi instalado corretamente.
-:END
-
-REM TODO:
-REM   * Remover m¢dulos n∆o usados, gerar .exe menor que 5.85 MB
-REM   * Manter apenas *.pyc dentro dos eggs

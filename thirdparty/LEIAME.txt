@@ -1,0 +1,18 @@
+﻿Este diretório contém as dependências do XMPPVOX em formato zip.
+
+Cada dependência / arquivo zip será embutido no executável gerado
+pelo PyInstaller usando o script build.bat.
+
+Para baixar as dependências de seus repositórios na Internet, é preciso
+ter o git instalado. Use o script thirdparty_clone.py para baixar o
+código-fonte de cada projeto.
+
+Instale cada dependência no sistema, de preferência usando o pip.
+
+Para gerar executáveis distribuíveis, use o script thirdparty_pack.py para
+compilar e compactar em um zip cada um dos projetos.
+
+Os zips devem ficar neste diretório.
+
+Se a versão algum projeto for alterada, será preciso alterar o script
+build.bat para usar as versões corretas.
