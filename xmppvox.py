@@ -61,10 +61,8 @@ def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
     optp = OptionParser()
     # Configuração de verbosidade.
-    optp.add_option('-q', '--quiet', help=u"exibe apenas erros",
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option('-d', '--debug', help=u"exibe mensagens de depuração",
+    optp.add_option('-d', '--debug',
+                    help=u"exibe mais detalhes sobre a execução",
                     action='store_const', dest='loglevel',
                     const=logging.DEBUG, default=logging.INFO)
     # JID e senha
@@ -80,7 +78,10 @@ def configure_logging(opts):
                         format='%(levelname)-8s %(asctime)s %(message)s',
                         datefmt='%H:%M')
     # Não mostrar mensagens de DEBUG do SleekXMPP.
-    logging.getLogger('sleekxmpp').setLevel(max(logging.INFO, opts.loglevel))
+    if opts.loglevel == logging.DEBUG:
+        logging.getLogger('sleekxmpp').setLevel(logging.INFO)
+    else:
+        logging.getLogger('sleekxmpp').setLevel(logging.WARNING)
 
 def get_jid_and_password(opts):
     jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
