@@ -31,7 +31,6 @@ import textwrap
 import time
 import sys
 from cStringIO import StringIO
-from itertools import count
 
 import commands
 
@@ -134,38 +133,41 @@ def process_messages(sock, xmpp):
           Papovox seja perdida.
     """
     try:
-        for i in count(1):
+        while True:
             data = recvmessage(sock)
-
             # Tenta executar algum comando contido na mensagem.
             if commands.process_command(sock, xmpp, data):
                 # Caso algum comando seja executado, sai do loop e passa
                 # para a próxima mensagem.
                 continue
-
-            # Envia mensagem XMPP para quem está conversando comigo.
-            if xmpp.talking_to is not None:
-                mto = xmpp.talking_to
-                xmpp.send_message(mto=mto,
-                                  mbody=data,
-                                  mtype='chat')
-                send_chat_message(sock, u"eu", data)
-
-                # Avisa se o contato estiver offline.
-                bare_jid = xmpp.get_bare_jid(mto)
-                roster = xmpp.client_roster
-                if bare_jid in roster and not roster[bare_jid].resources:
-                    warning = (u"* %s está indisponível agora. "
-                               u"Talvez a mensagem não tenha sido recebida.")
-                    sendmessage(sock, warning % xmpp.get_chatty_name(mto))
             else:
-                mto = u"ninguém"
-                sendmessage(sock, u"Não estou em nenhuma conversa.")
-            log.debug(u"#%(i)03d. Eu disse para %(mto)s: %(data)s", locals())
+                # Caso contrário, envia a mensagem para a rede XMPP.
+                send_xmpp_message(sock, xmpp, data)
     except socket.error, e:
         log.info(e.message)
     finally:
         log.info(u"Conexão com o Papovox encerrada.")
+
+def send_xmpp_message(sock, xmpp, mbody):
+    u"""Envia mensagem XMPP para quem está conversando comigo."""
+    if xmpp.talking_to is not None:
+        mto = xmpp.talking_to
+        # Envia mensagem XMPP.
+        xmpp.send_message(mto=mto, mbody=mbody, mtype='chat')
+        # Repete a mensagem que estou enviando para ser falada pelo Papovox.
+        send_chat_message(sock, u"eu", mbody)
+
+        # Avisa se o contato estiver offline.
+        bare_jid = xmpp.get_bare_jid(mto)
+        roster = xmpp.client_roster
+        if bare_jid in roster and not roster[bare_jid].resources:
+            warning = (u"* %s está indisponível agora. "
+                       u"Talvez a mensagem não tenha sido recebida.")
+            sendmessage(sock, warning % xmpp.get_chatty_name(mto))
+    else:
+        mto = u"ninguém"
+        sendmessage(sock, u"Não estou em nenhuma conversa.")
+    log.debug(u"[send_xmpp_message] para %(mto)s: %(mbody)s", locals())
 
 
 # Funções de envio de dados para o Papovox ------------------------------------#
