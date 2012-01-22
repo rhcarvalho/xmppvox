@@ -27,6 +27,7 @@ Google Talk, Facebook chat e Jabber.
 """
 
 import sys
+import threading
 
 import sleekxmpp
 
@@ -94,8 +95,10 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         """
         self.get_roster()
 
-        # Bloqueia executando o servidor para o Papovox.
-        self.papovox_server.run(self)
+        # Executa o servidor para o Papovox em outra thread.
+        def run():
+            self.papovox_server.run(self)
+        threading.Thread(target=run).start()
 
     def papovox_connected(self, event):
         u"""Processa evento de conexão com o Papovox.
@@ -108,6 +111,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.message_handler = event.get('message_handler')
         # Envia presença em broadcast. Neste momento o usuário aparece como
         # online para seus contatos.
+        log.debug(u"Enviando presença inicial...")
         self.send_presence(pnick=self.nickname)
 
     def papovox_disconnected(self, event):
