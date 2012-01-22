@@ -1,12 +1,8 @@
 ﻿XMPPVOX
 
-* Adicionar termos de licença (GPL)
-
 * remover contato usando seu número na lista de contatos (opcional)
 
 * usar sempre str.{de,en}code(errors='replace' ou 'ignore')
-
-* mover código que não pertence ao xmppvox.py para server.py
 
 * except KeyboardInterrupt: sys.exit(0) // os._exit(0)
 
@@ -46,8 +42,8 @@ Casos "críticos":
         = "rede XMMP online"
     - usuário sai do Papovox?
         - Como terminar o XMPPVOX corretamente?
-            = ?? Thread que fica verificando se o Papovox está rodando, e caso
-            = ele pare de rodar o XMPPVOX é automaticamente fechado.
+            = quando a conexão via socket é perdida,
+            = XMPPVOX é automaticamente fechado.
     - recebe uma mensagem via XMPP muito grande (maior que os buffers do Papovox)?
         = quebrar a mensagem em várias
     - receber muitas mensagens:
@@ -169,3 +165,8 @@ ________________________________________________________________________________
 * mostrar apelido na conversa
 
 * interação "fulano disse:" apenas em mensagem nova ou após time out
+
+* Adicionar termos de licença (GPL)
+* mover código que não pertence ao xmppvox.py para server.py
+* se a autenticação falhar, não aguarda conexão com Papovox
+* valida JID
