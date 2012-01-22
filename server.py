@@ -58,6 +58,7 @@ TAMANHO_MAXIMO_MSG = 255
 #------------------------------------------------------------------------------#
 
 def run(xmpp):
+    u"""Inicia socket para conectar ao Papovox e processar interações."""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Reutilizar porta já aberta
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -66,22 +67,17 @@ def run(xmpp):
     try:
         log.info(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
 
-        # Conecta ao Papovox ----------------------------------------------#
+        # Conecta ao Papovox --------------------------------------------------#
         try:
             conn, addr, nickname = accept(s)
         except socket.error:
             log.error(u"Erro: Não foi possível conectar ao Papovox.")
             raise
-        #------------------------------------------------------------------#
-
-        def message_handler(msg):
-            u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
-            sender = xmpp.get_chatty_name(msg['from'])
-            body = msg['body']
-            send_chat_message(conn, sender, body)
 
         xmpp.event('papovox_connected',
-                   {'nick': nickname, 'message_handler': message_handler})
+                   {'nick': nickname,
+                    'message_handler': new_message_handler(conn, xmpp)})
+        #----------------------------------------------------------------------#
 
         # Bloqueia processando mensagens do Papovox.
         process_messages(conn, xmpp)
@@ -123,6 +119,16 @@ def accept(sock):
     sendmessage(conn, u"Digite /ajuda para obter ajuda.")
 
     return conn, addr, nickname
+
+
+def new_message_handler(sock, xmpp):
+    u"""Cria uma função para processar mensagens recebidas da rede XMPP."""
+    def message_handler(msg):
+        u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
+        sender = xmpp.get_chatty_name(msg['from'])
+        body = msg['body']
+        send_chat_message(sock, sender, body)
+    return message_handler
 
 
 def process_messages(sock, xmpp):
