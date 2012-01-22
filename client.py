@@ -69,6 +69,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('got_offline', self.got_offline)
         self.add_event_handler('changed_status', self.changed_status)
         self.add_event_handler('failed_auth', self.failed_auth)
+        self.add_event_handler('socket_error', self.socket_error)
 
         # Eventos de integração com Papovox
         self.add_event_handler('papovox_connected', self.papovox_connected)
@@ -166,6 +167,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def failed_auth(self, stanza):
         log.error(u"Falha na autenticação: usuário ou senha incorretos.")
+
+    def socket_error(self, error):
+        raise SystemExit(
+            (u"Não foi possível conectar ao servidor '%s'.\n"
+             u"Verifique sua conexão com a Internet.") % self.boundjid.host)
 
     def get_chatty_name(self, jid_obj_or_string):
         u"""Retorna nome de usuário para ser usado numa conversa."""
