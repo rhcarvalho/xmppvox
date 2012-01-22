@@ -48,8 +48,10 @@ def main():
     xmpp = client.BotXMPP(jid, password, server)
     if xmpp.connect():
         log.info(u"Conectado ao servidor XMPP")
-        # Executa cliente XMPP em outra thread.
-        xmpp.process(block=False)
+        # Executa cliente XMPP e bloqueia.
+        # Sem o bloqueio, a thread principal termina e o executável
+        # gerado pelo PyInstaller termina prematuramente.
+        xmpp.process(block=True)
 
 
 def parse_command_line():
