@@ -68,6 +68,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
         self.add_event_handler('changed_status', self.changed_status)
+        self.add_event_handler('failed_auth', self.failed_auth)
 
         # Eventos de integração com Papovox
         self.add_event_handler('papovox_connected', self.papovox_connected)
@@ -162,6 +163,9 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             # Guarda o nome localmente, mas não salva no servidor XMPP.
             # Se fosse desejável salvar, usar método self.update_roster.
             self.client_roster[jid]['name'] = nick
+
+    def failed_auth(self, stanza):
+        log.error(u"Falha na autenticação: usuário ou senha incorretos.")
 
     def get_chatty_name(self, jid_obj_or_string):
         u"""Retorna nome de usuário para ser usado numa conversa."""
