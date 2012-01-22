@@ -25,8 +25,6 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
-from threading import Event
-
 from optparse import OptionParser
 import getpass
 
@@ -46,21 +44,12 @@ def main():
     configure_logging(opts)
     jid, password = get_jid_and_password(opts)
 
-    # Mecanismo para interromper o servidor quando necessário
-    stop = Event()
-    def do_stop():
-        log.debug(u"Interrompendo a conexão com o Papovox...")
-        stop.set()
-
     # Inicia cliente XMPP.
-    xmpp = client.BotXMPP(jid, password, do_stop)
+    xmpp = client.BotXMPP(jid, password, server)
     if xmpp.connect():
         log.info(u"Conectado ao servidor XMPP")
         # Executa cliente XMPP em outra thread.
         xmpp.process(block=False)
-
-    # Bloqueia executando o servidor para o Papovox.
-    server.run(xmpp, stop)
 
 
 def parse_command_line():

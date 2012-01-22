@@ -58,35 +58,22 @@ TAMANHO_MAXIMO_MSG = 255
 
 #------------------------------------------------------------------------------#
 
-def run(xmpp, stop):
+def run(xmpp):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Reutilizar porta já aberta
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORTA_PAPOVOX))
     s.listen(1)
     try:
-        while not stop.is_set():
+        while True:
             log.info(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
 
             # Conecta ao Papovox ----------------------------------------------#
-            # Ativa modo de timeout do socket, para podermos verificar o
-            # evento stop de tempos em tempos.
-            s.settimeout(1.0)
-            while not stop.is_set():
-                try:
-                    conn, addr, nickname = accept(s)
-                    break
-                except socket.timeout:
-                    continue
-                except socket.error, e:
-                    log.error(u"Erro: Não foi possível conectar ao Papovox.")
-                    log.error(e)
-                    raise
-            else:
-                # stop é True, interrompe o loop principal:
-                break
-            # Desativa o modo timeout (volta ao modo blocking).
-            #s.settimeout(None)
+            try:
+                conn, addr, nickname = accept(s)
+            except socket.error:
+                log.error(u"Erro: Não foi possível conectar ao Papovox.")
+                raise
             #------------------------------------------------------------------#
 
             def message_handler(msg):
@@ -133,7 +120,8 @@ def run(xmpp, stop):
             finally:
                 log.info(u"Conexão com o Papovox encerrada.")
                 break
-    except socket.error:
+    except socket.error, e:
+        log.error(e.message)
         sys.exit(1)
     finally:
         xmpp.event('papovox_disconnected')

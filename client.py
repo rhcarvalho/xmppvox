@@ -56,11 +56,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     auto_authorize = True
     auto_subscribe = True
 
-    def __init__(self, jid, password, stop_handler):
+    def __init__(self, jid, password, server):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
-        # Função chamada caso a conexão XMPP seja encerrada
-        self.stop_handler = stop_handler
+        # Referência para o servidor compatível com o Papovox
+        self.papovox_server = server
 
         # Eventos do SleekXMPP que serão tratados
         self.add_event_handler("session_start", self.start)
@@ -68,8 +68,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('got_online', self.got_online)
         self.add_event_handler('got_offline', self.got_offline)
         self.add_event_handler('changed_status', self.changed_status)
-        self.add_event_handler('failed_auth', self.failed_auth)
-        #self.add_event_handler('disconnected', self.stop_handler)
 
         # Eventos de integração com Papovox
         self.add_event_handler('papovox_connected', self.papovox_connected)
@@ -93,6 +91,9 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         Quando uma conexão é estabelecida, a lista de contatos é solicitada.
         """
         self.get_roster()
+
+        # Bloqueia executando o servidor para o Papovox.
+        self.papovox_server.run(self)
 
     def papovox_connected(self, event):
         u"""Processa evento de conexão com o Papovox.
@@ -161,9 +162,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             # Guarda o nome localmente, mas não salva no servidor XMPP.
             # Se fosse desejável salvar, usar método self.update_roster.
             self.client_roster[jid]['name'] = nick
-
-    def failed_auth(self, stanza):
-        self.stop_handler()
 
     def get_chatty_name(self, jid_obj_or_string):
         u"""Retorna nome de usuário para ser usado numa conversa."""
