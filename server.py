@@ -78,8 +78,9 @@ def run(xmpp, stop):
                     break
                 except socket.timeout:
                     continue
-                except socket.error:
+                except socket.error, e:
                     log.error(u"Erro: Não foi possível conectar ao Papovox.")
+                    log.error(e)
                     raise
             else:
                 # stop é True, interrompe o loop principal:
