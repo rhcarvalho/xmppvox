@@ -93,7 +93,7 @@ def run(xmpp):
                                       number_of_online_contacts)
                 sendmessage(conn, u"Digite /n para falar com o contato número n.")
             commands.lista(conn, xmpp)
-        Timer(10, show_online_contacts, ()).start()
+        Timer(5, show_online_contacts, ()).start()
 
         # Bloqueia processando mensagens do Papovox.
         process_messages(conn, xmpp)
