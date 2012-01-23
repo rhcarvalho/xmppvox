@@ -147,6 +147,14 @@ def quem(sock, xmpp, mo=None):
             # Caso 3: contato não está no meu roster ou está sem nome.
             # Usa o bare JID (fulano@gmail.com)
             who = bare_jid
+
+        # Adiciona número do contato se ele está no roster
+        if bare_jid in roster:
+            jid2number = dict([ri.jid, n] for n, ri in enumerate_roster(xmpp))
+            number = jid2number.get(bare_jid)
+            if number:
+                who = u"%d %s" % (number, who)
+
         # Verifica se algum aviso adicional deve ser dado.
         if bare_jid not in roster:
             warning = u"não está na minha lista de contatos"
