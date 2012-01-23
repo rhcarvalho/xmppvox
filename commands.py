@@ -25,6 +25,7 @@ Este módulo implementa comandos que o servidor reconhece.
 """
 
 import re
+import textwrap
 
 import server
 
@@ -84,25 +85,49 @@ def process_command(sock, xmpp, data):
 # Comandos --------------------------------------------------------------------#
 
 def ajuda(sock, xmpp=None, mo=None):
-    help = u"""\
-    Para ver sua lista de contatos disponíveis, digite %(prefix)slista.
-    Para ver todos os seus contatos (inclusive indisponíveis), digite %(prefix)stodos
-    Para conversar com alguém, digite %(prefix)spara, seguido do número do contato
-    Para falar com a última pessoa que enviou mensagem para você, digite %(prefix)sresponder
-    Para saber com quem fala agora, digite %(prefix)squem
-    Para adicionar ou remover um contato, digite %(prefix)sadicionar ou %(prefix)sremover, seguido do contato
+    # Ajuda dividida em blocos para facilitar a leitura.
+    help = (
+    u"""\
 
+    Ajuda do XMPPVOX:
+
+    Tecle normalmente termine suas frases com ENTER.
+    Cada frase é enviada para apenas um contato.
+
+    """,
+    u"""\
+    Para saber quais são os contatos disponíveis tecle %(prefix)slista.
+    Para saber todos os contatos (inclusive indisponíveis) tecle %(prefix)stodos.
+    Para conversar com alguém tecle %(prefix)spara seguido do número do contato.
+    """,
+    u"""\
+    Para falar com a última pessoa que enviou mensagem para você, tecle %(prefix)sresponder.
+    Para saber com quem fala agora tecle %(prefix)squem.
+    Para adicionar ou remover um contato tecle %(prefix)sadicionar ou %(prefix)sremover seguido do contato.
+
+    """,
+    u"""\
     Atalhos para os comandos:
-    %(prefix)sajuda = %(prefix)s?
-    %(prefix)slista = %(prefix)sl
-    %(prefix)stodos = %(prefix)st
-    %(prefix)spara = %(prefix)sp ou %(prefix)s seguido de um número
-    %(prefix)sresponder = %(prefix)sr
-    %(prefix)squem = %(prefix)sq
-    %(prefix)sadicionar = %(prefix)sa
-    """ % dict(prefix=PREFIX)
-    # Envia uma mensagem por linha/comando
-    map(lambda m: server.sendmessage(sock, m), help.splitlines())
+    %(prefix)sajuda = %(prefix)s? .
+    %(prefix)slista = %(prefix)sl .
+    %(prefix)stodos = %(prefix)st .
+    %(prefix)spara = %(prefix)sp ou %(prefix)s seguido de um número.
+    %(prefix)sresponder = %(prefix)sr .
+    %(prefix)squem = %(prefix)sq .
+    %(prefix)sadicionar = %(prefix)sa .
+
+    """,
+    )
+    def send_help(help):
+        # Completa string com o prefixo de comando.
+        help = help % dict(prefix=PREFIX)
+        # Adiciona espaço em branco no fim das linhas para que o Papovox leia
+        # corretamente. Sem espaço ele lê "ponto".
+        help = u" \n".join(textwrap.dedent(help).splitlines())
+        # Envia uma única mensagem. Sua leitura pode ser interrompida no
+        # Papovox usando Backspace.
+        server.sendmessage(sock, help)
+    map(send_help, help)
 
 def quem(sock, xmpp, mo=None):
     warning = u""

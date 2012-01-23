@@ -91,7 +91,7 @@ def run(xmpp):
             if number_of_online_contacts > 0:
                 msg = (u"%(amount)d %(contacts)s. \n"
                        u"/l para listar. \n"
-                       u"/n para falar com o contato número n.")
+                       u"/n para falar com o contato número n. \n")
                 if number_of_online_contacts == 1:
                     contacts = u"contato disponível"
                 else:
@@ -136,8 +136,11 @@ def accept(sock):
     log.info(u"Apelido: %s", nickname)
 
     # Envia mensagem de boas-vindas
-    sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
-    sendmessage(conn, u"Digite /ajuda para obter ajuda. \n")
+    sendmessage(conn, (u"Olá %(nick)s, bem-vindo ao XMPPVOX %(version)s! \n"
+                       u"Tecle /ajuda para obter ajuda. \n") %
+                       dict(nick=nickname,
+                            # FIXME controlar versão noutro lugar
+                            version="1.0"))
 
     return conn, addr, nickname
 
