@@ -57,6 +57,8 @@ TAMANHO_DO_BUFFER = 4096  # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
 TAMANHO_MAXIMO_MSG = 255
 
 #------------------------------------------------------------------------------#
+# FIXME Uso temporário de variável global (quick'n'dirty hack).
+_SOCK = None
 
 def run(xmpp):
     u"""Inicia socket para conectar ao Papovox e processar interações."""
@@ -71,6 +73,8 @@ def run(xmpp):
         # Conecta ao Papovox --------------------------------------------------#
         try:
             conn, addr, nickname = accept(s)
+            global _SOCK
+            _SOCK = conn
         except socket.error:
             log.error(u"Erro: Não foi possível conectar ao Papovox.")
             raise

@@ -81,6 +81,8 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
         # Com quem estou conversando
         self.talking_to = None
+        # Último que me mandou mensagem
+        self.last_sender = None
 
         # Registra alguns plugins do SleekXMPP
         self.register_plugin('xep_0030') # Service Discovery
@@ -133,7 +135,15 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # mensagens de erro.
         if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
             self.message_handler(msg)
-            self.talking_to = msg['from']
+            # Lembra da última pessoa que falou comigo. Útil para usar comando
+            # /responder.
+            if self.last_sender is None:
+                # Ensina o comando /responder na primeira vez.
+                sendmessage = self.papovox_server.sendmessage
+                sock = self.papovox_server._SOCK
+                name = self.get_chatty_name(msg['from'])
+                sendmessage(sock, u"/r para falar com %s" % name)
+            self.last_sender = msg['from']
 
     def got_online(self, presence):
         u"""Registra que um contato apareceu online."""

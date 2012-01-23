@@ -61,8 +61,9 @@ def process_command(sock, xmpp, data):
         (r'l(?:ista)?\s*$', lista),
         (r't(?:odos)?\s*$', todos),
         (r'(?:p(?:ara)?)?\s*(\d*)\s*$', para),
+        (r'r(?:esponder)?\s*$', responder),
         (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
-        (r'r(?:emover)?\s*([^\s*]*)\s*$', remover),
+        (r'remover\s*([^\s*]*)\s*$', remover),
     )
 
     # Tenta encontrar um comando dentre os existentes
@@ -84,20 +85,21 @@ def process_command(sock, xmpp, data):
 
 def ajuda(sock, xmpp=None, mo=None):
     help = u"""\
-    Para ver sua lista de contatos disponíveis, digite %(prefix)slista
+    Para ver sua lista de contatos disponíveis, digite %(prefix)slista.
     Para ver todos os seus contatos (inclusive indisponíveis), digite %(prefix)stodos
     Para conversar com alguém, digite %(prefix)spara, seguido do número do contato
+    Para falar com a última pessoa que enviou mensagem para você, digite %(prefix)sresponder
     Para saber com quem fala agora, digite %(prefix)squem
-    Para adicionar ou remover um contato, digite /adicionar ou /remover, seguido do contato
+    Para adicionar ou remover um contato, digite %(prefix)sadicionar ou %(prefix)sremover, seguido do contato
 
     Atalhos para os comandos:
-    /ajuda = /?
-    /lista = /l
-    /todos = /t
-    /para = /p ou / seguido de um número
-    /quem = /q
-    /adicionar = /a
-    /remover = /r
+    %(prefix)sajuda = %(prefix)s?
+    %(prefix)slista = %(prefix)sl
+    %(prefix)stodos = %(prefix)st
+    %(prefix)spara = %(prefix)sp ou %(prefix)s seguido de um número
+    %(prefix)sresponder = %(prefix)sr
+    %(prefix)squem = %(prefix)sq
+    %(prefix)sadicionar = %(prefix)sa
     """ % dict(prefix=PREFIX)
     # Envia uma mensagem por linha/comando
     map(lambda m: server.sendmessage(sock, m), help.splitlines())
@@ -161,6 +163,11 @@ def para(sock, xmpp, mo):
             xmpp.talking_to = roster_item.jid
     except ValueError:
         server.sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
+    quem(sock, xmpp)
+
+def responder(sock, xmpp, mo=None):
+    if xmpp.last_sender is not None:
+        xmpp.talking_to = xmpp.last_sender
     quem(sock, xmpp)
 
 def adicionar(sock, xmpp, mo):
