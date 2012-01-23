@@ -89,14 +89,15 @@ def run(xmpp):
         def show_online_contacts():
             number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
             if number_of_online_contacts > 0:
+                msg = (u"%(amount)d %(contacts)s. \n"
+                       u"/l para listar. \n"
+                       u"/n para falar com o contato número n.")
                 if number_of_online_contacts == 1:
-                    sendmessage(conn, u"%d contato disponível:" %
-                                      number_of_online_contacts)
+                    contacts = u"contato disponível"
                 else:
-                    sendmessage(conn, u"%d contatos disponíveis:" %
-                                      number_of_online_contacts)
-                sendmessage(conn, u"Digite /n para falar com o contato número n.")
-            commands.lista(conn, xmpp)
+                    contacts = u"contatos disponíveis"
+                sendmessage(conn, msg % dict(amount=number_of_online_contacts,
+                                             contacts=contacts))
         Timer(5, show_online_contacts, ()).start()
 
         # Bloqueia processando mensagens do Papovox.
