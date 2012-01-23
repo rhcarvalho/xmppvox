@@ -31,6 +31,7 @@ import textwrap
 import time
 import sys
 from cStringIO import StringIO
+from threading import Timer
 
 import commands
 
@@ -78,6 +79,21 @@ def run(xmpp):
                    {'nick': nickname,
                     'message_handler': new_message_handler(conn, xmpp)})
         #----------------------------------------------------------------------#
+
+        # Exibe lista de contatos online alguns segundos depois de iniciar.
+        # É necessário esperar um tempo para receber presenças dos contatos.
+        def show_online_contacts():
+            number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
+            if number_of_online_contacts > 0:
+                if number_of_online_contacts == 1:
+                    sendmessage(conn, u"%d contato disponível:" %
+                                      number_of_online_contacts)
+                else:
+                    sendmessage(conn, u"%d contatos disponíveis:" %
+                                      number_of_online_contacts)
+                sendmessage(conn, u"Digite /n para falar com o contato número n.")
+            commands.lista(conn, xmpp)
+        Timer(10, show_online_contacts, ()).start()
 
         # Bloqueia processando mensagens do Papovox.
         process_messages(conn, xmpp)

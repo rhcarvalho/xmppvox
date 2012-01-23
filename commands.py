@@ -131,11 +131,7 @@ def quem(sock, xmpp, mo=None):
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""
-    def is_online((number, roster_item)):
-        # Um contato está online se ele está conectado em algum resource.
-        return bool(roster_item.resources)
-
-    for number, roster_item in filter(is_online, enumerate_roster(xmpp)):
+    for number, roster_item in enumerate_online_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
         server.sendmessage(sock, u"%d %s" % (number, name))
     # Se 'number' não está definido, então nenhum contato foi listado.
@@ -213,3 +209,10 @@ def enumerate_roster(xmpp):
     # Ordena por JID
     roster_items.sort(key=lambda item: item.jid)
     return enumerate(roster_items, 1)
+
+def enumerate_online_roster(xmpp):
+    u"""Enumera minha lista de contatos que estão online."""
+    def is_online((number, roster_item)):
+        # Um contato está online se ele está conectado em algum resource.
+        return bool(roster_item.resources)
+    return filter(is_online, enumerate_roster(xmpp))
