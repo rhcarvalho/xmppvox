@@ -203,13 +203,13 @@ def sendline(sock, line):
     para transmitir dados brutos de comunicação.
     """
     log.debug(u"[sendline] %s", line)
-    line = line.encode(SYSTEM_ENCODING)
+    line = line.encode(SYSTEM_ENCODING, 'replace')
     sock.sendall("%s\r\n" % (line,))
 
 def sendmessage(sock, msg):
     u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
     log.debug(u"[sendmessage] %s", msg)
-    msg = msg.encode(SYSTEM_ENCODING)
+    msg = msg.encode(SYSTEM_ENCODING, 'replace')
 
     # Apesar de teoricamente o protocolo do Papovox suportar mensagens com até
     # 65535 (2^16 - 1) caracteres, na prática apenas os 255 primeiros são
