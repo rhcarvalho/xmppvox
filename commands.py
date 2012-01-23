@@ -163,7 +163,7 @@ def quem(sock, xmpp, mo=None):
     if not warning:
         server.sendmessage(sock, u"Falando com %s." % who)
     else:
-        server.sendmessage(sock, u"Falando com %s (%s)." % (who, warning))
+        server.sendmessage(sock, u"Falando com ¬ %s (%s)." % (who, warning))
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""
