@@ -56,6 +56,7 @@ def process_command(sock, xmpp, data):
     #   (expressão regular, função)
     # As expressões regulares são testadas em ordem e o primeiro comando que der
     # match é executado. Os comandos posteriores não são testados.
+    # Não é feita distinção entre maiúsculas e minúsculas.
     commands = (
         (r'(\?|ajuda)\s*$', ajuda),
         (r'q(?:uem)?\s*$', quem),
@@ -69,7 +70,7 @@ def process_command(sock, xmpp, data):
 
     # Tenta encontrar um comando dentre os existentes
     for cmd_re, cmd_func in commands:
-        mo = re.match(cmd_re, cmd)
+        mo = re.match(cmd_re, cmd, re.I)
         # Se o comando for encontrado...
         if mo is not None:
             log.debug("[comando %s]" % cmd_func.__name__)
