@@ -196,7 +196,10 @@ def send_xmpp_message(sock, xmpp, mbody):
             sendmessage(sock, warning % xmpp.get_chatty_name(mto))
     else:
         mto = u"ninguém"
-        sendmessage(sock, u"Não estou em nenhuma conversa.")
+        sendmessage(sock, u"Mensagem não enviada. "
+                          u"Com quem deseja falar? \n"
+                          u"Tecle /para seguido do número do contato. \n"
+                          u"Se não souber o número tecle /lista ou /todos.")
     log.debug(u"[send_xmpp_message] para %(mto)s: %(mbody)s", locals())
 
 
@@ -330,3 +333,5 @@ def recvmessage(sock):
         data = recvall(sock, datalen)
         data = data.decode(SYSTEM_ENCODING)
         return data
+
+# FIXME Remover referências hard-coded para comandos e o prefixo de comando.
