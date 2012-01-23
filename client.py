@@ -135,14 +135,17 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # mensagens de erro.
         if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
             self.message_handler(msg)
-            # Lembra da última pessoa que falou comigo. Útil para usar comando
-            # /responder.
-            if self.last_sender is None:
-                # Ensina o comando /responder na primeira vez.
+            # Ensina o comando /responder na primeira vez que alguém me mandar
+            # mensagem, se eu ainda não estiver falando com este alguém.
+            talking_to_bare = self.get_bare_jid(self.talking_to)
+            from_bare = self.get_bare_jid(msg['from'])
+            if self.last_sender is None and talking_to_bare != from_bare:
                 sendmessage = self.papovox_server.sendmessage
                 sock = self.papovox_server._SOCK
                 name = self.get_chatty_name(msg['from'])
-                sendmessage(sock, u"/r para falar com %s" % name)
+                sendmessage(sock, u". \nDica: tecle /r para falar com %s" % name)
+            # Lembra da última pessoa que falou comigo. Útil para usar comando
+            # /responder.
             self.last_sender = msg['from']
 
     def got_online(self, presence):
