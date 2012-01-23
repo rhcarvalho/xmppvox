@@ -49,8 +49,9 @@ def main():
 
     # Inicia cliente XMPP.
     xmpp = client.BotXMPP(jid, password, server)
+    log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
     if xmpp.connect():
-        log.info(u"Conectado ao servidor XMPP")
+        log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
         # Executa cliente XMPP e bloqueia.
         # Sem o bloqueio, a thread principal termina e o executável
         # gerado pelo PyInstaller termina prematuramente.

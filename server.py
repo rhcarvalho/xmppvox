@@ -65,7 +65,7 @@ def run(xmpp):
     s.bind((HOST, PORTA_PAPOVOX))
     s.listen(1)
     try:
-        log.info(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
+        log.debug(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
 
         # Conecta ao Papovox --------------------------------------------------#
         try:
@@ -86,7 +86,7 @@ def run(xmpp):
         sys.exit(1)
     finally:
         xmpp.event('papovox_disconnected')
-        log.info(u"Fim do XMPPVOX.")
+        log.info(u"Fim do XMPPVOX")
 
 
 def accept(sock):
@@ -111,12 +111,12 @@ def accept(sock):
     # O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
     time.sleep(0.1)
 
-    log.info(u"Conectado ao Papovox em %s:%s", *addr)
+    log.info(u"Conectado ao Papovox")
     log.info(u"Apelido: %s", nickname)
 
     # Envia mensagem de boas-vindas
     sendmessage(conn, u"Olá %s, bem-vindo ao XMPPVOX!" % nickname)
-    sendmessage(conn, u"Digite /ajuda para obter ajuda.")
+    sendmessage(conn, u"Digite /ajuda para obter ajuda. \n")
 
     return conn, addr, nickname
 
@@ -150,9 +150,9 @@ def process_messages(sock, xmpp):
                 # Caso contrário, envia a mensagem para a rede XMPP.
                 send_xmpp_message(sock, xmpp, data)
     except socket.error, e:
-        log.info(e.message)
+        log.debug(e.message)
     finally:
-        log.info(u"Conexão com o Papovox encerrada.")
+        log.info(u"Conexão com o Papovox encerrada")
 
 def send_xmpp_message(sock, xmpp, mbody):
     u"""Envia mensagem XMPP para quem está conversando comigo."""
