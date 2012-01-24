@@ -62,12 +62,13 @@ _SOCK = None
 
 def run(xmpp):
     u"""Inicia socket para conectar ao Papovox e processar interações."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Reutilizar porta já aberta
-    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((HOST, PORTA_PAPOVOX))
-    s.listen(1)
     try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Reutilizar porta já aberta
+        #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((HOST, PORTA_PAPOVOX))
+        s.listen(1)
+
         log.debug(u"XMPPVOX servindo na porta %s" % PORTA_PAPOVOX)
 
         # Conecta ao Papovox --------------------------------------------------#
@@ -103,7 +104,7 @@ def run(xmpp):
         # Bloqueia processando mensagens do Papovox.
         process_messages(conn, xmpp)
     except socket.error, e:
-        log.error(e.message)
+        log.error(e.message or u" ".join(map(unicode, e.args)))
         sys.exit(1)
     finally:
         xmpp.event('papovox_disconnected')
