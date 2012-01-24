@@ -25,6 +25,8 @@ REM
 REM
 REM  Para distribuir o projeto usando o PyInstaller:
 REM
+REM  0. Instalar pywin32
+REM     http://sourceforge.net/projects/pywin32/files/pywin32/Build216/
 REM  1. Baixar o PyInstaller:
 REM     http://www.pyinstaller.org/changeset/latest/trunk?old_path=%2F&format=zip
 REM     (testado com pyinstalller-trunk-1899.zip)
@@ -69,6 +71,11 @@ IF EXIST c:\pyinstaller\pyinstaller.py (
     EXIT 1
 )
 ENDLOCAL
+
+IF NOT EXIST dist (
+    ECHO Aten‡Æo: PyInstaller falhou!
+    GOTO:EOF
+)
 
 REM Copia c¢digo-fonte para ser distribu¡do:
 bzr export dist\xmppvox-src
