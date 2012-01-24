@@ -47,6 +47,10 @@ def main():
     configure_logging(opts)
     jid, password = get_jid_and_password(opts)
 
+    # FIXME Não deveria alterar constante global...
+    if opts.port:
+        server.PORTA_PAPOVOX = opts.port
+
     # Inicia cliente XMPP.
     xmpp = client.BotXMPP(jid, password, server)
     log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
@@ -69,8 +73,10 @@ def parse_command_line():
     # JID e senha
     optp.add_option("-j", "--jid", dest="jid",
                     help="identificador do usuário")
-    optp.add_option("-p", "--password", dest="password",
+    optp.add_option("-s", "--senha", dest="password",
                     help="senha")
+    optp.add_option("-p", "--porta", dest="port",
+                    help="porta de escuta")
     return optp.parse_args()
 
 def configure_logging(opts):
