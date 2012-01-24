@@ -75,7 +75,7 @@ def parse_command_line():
                     help="identificador do usuário")
     optp.add_option("-s", "--senha", dest="password",
                     help="senha")
-    optp.add_option("-p", "--porta", dest="port",
+    optp.add_option("-p", "--porta", type="int", dest="port",
                     help="porta de escuta")
     return optp.parse_args()
 
