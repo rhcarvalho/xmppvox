@@ -34,6 +34,7 @@ from cStringIO import StringIO
 from threading import Timer
 
 import commands
+import strings as S
 
 import logging
 log = logging.getLogger(__name__)
@@ -147,9 +148,6 @@ def new_message_handler(sock, xmpp):
 def show_online_contacts(sock, xmpp, sendmessage=None):
     u"""Envia para o Papovox informação sobre contatos disponíveis."""
     number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
-    msg = (u"%(amount)s %(contacts)s. \n"
-           u"/l para listar. \n"
-           u"/n para falar com o contato número n. \n")
     if number_of_online_contacts == 0:
         number_of_online_contacts = "nenhum"
         contacts = u"contato disponível"
@@ -158,8 +156,9 @@ def show_online_contacts(sock, xmpp, sendmessage=None):
     else:
         contacts = u"contatos disponíveis"
     sendmessage = sendmessage or globals()['sendmessage']
-    sendmessage(sock, msg % dict(amount=number_of_online_contacts,
-                                 contacts=contacts))
+    sendmessage(sock,
+                S.ONLINE_CONTACTS_INFO.format(amount=number_of_online_contacts,
+                                              contacts=contacts))
 
 
 def process_messages(sock, xmpp):

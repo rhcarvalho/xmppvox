@@ -25,3 +25,6 @@ Este módulo contém strings transmitidas para o Papovox.
 """
 
 FIRST_INCOME_MSG_HELP = u". \nDica: tecle /r para falar com {name}"
+ONLINE_CONTACTS_INFO = (u"{amount} {contacts}. \n"
+                        u"/l para listar. \n"
+                        u"/n para falar com o contato número n. \n")
