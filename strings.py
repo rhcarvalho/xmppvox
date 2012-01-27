@@ -97,3 +97,7 @@ CMD_TO_MISSING_NUMBER = u"Faltou número do contato! Use %slista." % CMD_PREFIX
 CMD_ADD_OK = u"Adicionei contato: {jid}"
 CMD_ADD_FAIL = (u"Não entendi: {invalid_jid}. "
                 u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+
+CMD_DEL_OK = u"Removi contato: {jid}"
+CMD_DEL_FAIL = (u"Não entendi: {invalid_jid}. "
+                  u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
