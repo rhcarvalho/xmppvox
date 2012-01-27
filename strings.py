@@ -24,12 +24,16 @@ XMPPVOX - módulo de strings
 Este módulo contém strings transmitidas para o Papovox.
 """
 
-FIRST_INCOME_MSG_HELP = u". \nDica: tecle /r para falar com {name}"
+WELCOME = (u"Olá {nick}, bem-vindo ao XMPPVOX {version}! \n"
+           u"Tecle /ajuda para obter ajuda. \n")
 ONLINE_CONTACTS_INFO = (u"{amount} {contacts}. \n"
                         u"/l para listar. \n"
                         u"/n para falar com o contato número n. \n")
-WELCOME = (u"Olá {nick}, bem-vindo ao XMPPVOX {version}! \n"
-           u"Tecle /ajuda para obter ajuda. \n")
+
+MSG = u"{body}"
+MSG_FROM = u"{sender} disse: {body}"
+
+FIRST_INCOME_MSG_HELP = u". \nDica: tecle /r para falar com {name}"
 
 WARN_MSG_TO_OFFLINE_USER = (u"* {name} está indisponível agora. "
                             u"Talvez a mensagem não tenha sido recebida.")
@@ -37,6 +41,3 @@ WARN_MSG_TO_NOBODY = (u"Mensagem não enviada. "
                       u"Com quem deseja falar? \n"
                       u"Tecle /para seguido do número do contato. \n"
                       u"Se não souber o número tecle /lista ou /todos.")
-
-MSG = u"{body}"
-MSG_FROM = u"{sender} disse: {body}"
