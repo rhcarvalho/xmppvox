@@ -2,11 +2,11 @@
 
 Para finalizar v1.0:
 
-* encoding padrão = latin1 (verificar código do DOSVOX)
-* separar strings num módulo separado
 * iniciar strings que originam no XMPPVOX com "%xx", onde xx é um código de 2 dígitos
+    - inclusive "eu disse"
 * Sempre iniciar o Papovox e notificar caso senha esteja incorreta (ou mensagem +OK, ou -FALHOU)
-* "eu disse" => colocar codigo na frente (de tudo)
+* Permitir user@server.tld/resource
+* encoding padrão = latin1 (verificar código do DOSVOX)
 * organizar em diretórios
 * revisar documentação
 * atualizar versão do SleekXMPP
@@ -188,3 +188,5 @@ ________________________________________________________________________________
 * usar sempre str.{de,en}code(errors='replace' ou 'ignore')
 
 * separar xmpp / papovox em processos
+
+* separar strings num módulo próprios
