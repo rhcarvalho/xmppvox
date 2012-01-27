@@ -42,6 +42,11 @@ WARN_MSG_TO_NOBODY = (u"Mensagem não enviada. "
                       u"Tecle /para seguido do número do contato. \n"
                       u"Se não souber o número tecle /lista ou /todos.")
 
+# Comandos
+
+# Prefixo que ativa o modo de comando
+CMD_PREFIX = '/'
+
 CMD_UNKNOWN = u"Comando desconhecido: {cmd}"
 
 CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
@@ -85,3 +90,6 @@ CMD_LIST_ALL_OFFLINE = u"Nenhum contato disponível agora!"
 
 CMD_ALL_ITEM = u"{number} {name}"
 CMD_ALL_NOBODY = u"Nenhum contato na sua lista!"
+
+CMD_TO_WRONG_NUMBER = u"Número de contato inexistente! Use %slista." % CMD_PREFIX
+CMD_TO_MISSING_NUMBER = u"Faltou número do contato! Use %slista." % CMD_PREFIX

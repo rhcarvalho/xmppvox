@@ -34,9 +34,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-# Prefixo que ativa o modo de comando
-PREFIX = '/'
-
 # Origem: http://www.regular-expressions.info/email.html
 # Um JID não é um email, mas serve como boa aproximação para o que é
 # preciso neste módulo.
@@ -48,10 +45,10 @@ def process_command(sock, xmpp, data):
 
     Retorna um booleano indicando se algum comando foi executado.
     """
-    if not data.startswith(PREFIX):
+    if not data.startswith(S.CMD_PREFIX):
         return False
     # Remove prefixo
-    cmd = data[len(PREFIX):]
+    cmd = data[len(S.CMD_PREFIX):]
 
     # Comandos disponíveis. Cada comando é uma tupla:
     #   (expressão regular, função)
@@ -91,7 +88,7 @@ def ajuda(sock, xmpp=None, mo=None):
     help = (S.CMD_HELP1, S.CMD_HELP2, S.CMD_HELP3, S.CMD_HELP4)
     def send_help(help):
         # Completa string com o prefixo de comando.
-        help = help % dict(prefix=PREFIX)
+        help = help % dict(prefix=S.CMD_PREFIX)
         # Adiciona espaço em branco no fim das linhas para que o Papovox leia
         # corretamente. Sem espaço ele lê "ponto".
         help = u" \n".join(textwrap.dedent(help).splitlines())
@@ -165,11 +162,11 @@ def para(sock, xmpp, mo):
         number = int(mo.group(1))
         roster_item = dict(enumerate_roster(xmpp)).get(number, None)
         if roster_item is None:
-            server.sendmessage(sock, u"Número de contato inexistente! Use %slista." % PREFIX)
+            server.sendmessage(sock, S.CMD_TO_WRONG_NUMBER)
         else:
             xmpp.talking_to = roster_item.jid
     except ValueError:
-        server.sendmessage(sock, u"Faltou número do contato! Use %slista." % PREFIX)
+        server.sendmessage(sock, S.CMD_TO_MISSING_NUMBER)
     quem(sock, xmpp)
 
 def responder(sock, xmpp, mo=None):
