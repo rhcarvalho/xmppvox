@@ -195,15 +195,11 @@ def send_xmpp_message(sock, xmpp, mbody):
         bare_jid = xmpp.get_bare_jid(mto)
         roster = xmpp.client_roster
         if bare_jid in roster and not roster[bare_jid].resources:
-            warning = (u"* %s está indisponível agora. "
-                       u"Talvez a mensagem não tenha sido recebida.")
-            sendmessage(sock, warning % xmpp.get_chatty_name(mto))
+            name = xmpp.get_chatty_name(mto)
+            sendmessage(sock, S.WARN_MSG_TO_OFFLINE_USER.format(name=name))
     else:
         mto = u"ninguém"
-        sendmessage(sock, u"Mensagem não enviada. "
-                          u"Com quem deseja falar? \n"
-                          u"Tecle /para seguido do número do contato. \n"
-                          u"Se não souber o número tecle /lista ou /todos.")
+        sendmessage(sock, S.WARN_MSG_TO_NOBODY)
     log.debug(u"[send_xmpp_message] para %(mto)s: %(mbody)s", locals())
 
 
