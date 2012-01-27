@@ -131,9 +131,10 @@ def quem(sock, xmpp, mo=None):
         elif not roster[bare_jid].resources:
             warning = u"não está disponível agora"
     if not warning:
-        server.sendmessage(sock, u"Falando com %s." % who)
+        server.sendmessage(sock, S.CMD_WHO.format(who=who))
     else:
-        server.sendmessage(sock, u"Falando com ¬ %s (%s)." % (who, warning))
+        server.sendmessage(sock, S.CMD_WHO_WARN.format(who=who,
+                                                       warning=warning))
 
 def lista(sock, xmpp, mo=None):
     u"""Lista contatos disponíveis/online."""

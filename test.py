@@ -200,7 +200,7 @@ class TestCommands(unittest.TestCase):
         commands.process_command(self.sock, None, '/bogus command')
         self.assertEqual(len(self.sysbox), 1, u"Aviso comando desconhecido")
 
-    def test_help(self):
+    def test_ajuda(self):
         self.assertEqual(len(self.sysbox), 0, u"vazio")
         commands.ajuda(self.sock)
         self.assertEqual(len(self.sysbox), 4, u"Ajuda enviada em 4 partes")
