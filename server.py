@@ -87,19 +87,7 @@ def run(xmpp):
 
         # Exibe lista de contatos online alguns segundos depois de iniciar.
         # É necessário esperar um tempo para receber presenças dos contatos.
-        def show_online_contacts():
-            number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
-            if number_of_online_contacts > 0:
-                msg = (u"%(amount)d %(contacts)s. \n"
-                       u"/l para listar. \n"
-                       u"/n para falar com o contato número n. \n")
-                if number_of_online_contacts == 1:
-                    contacts = u"contato disponível"
-                else:
-                    contacts = u"contatos disponíveis"
-                sendmessage(conn, msg % dict(amount=number_of_online_contacts,
-                                             contacts=contacts))
-        Timer(5, show_online_contacts, ()).start()
+        Timer(5, show_online_contacts, (conn, xmpp)).start()
 
         # Bloqueia processando mensagens do Papovox.
         process_messages(conn, xmpp)
@@ -154,6 +142,24 @@ def new_message_handler(sock, xmpp):
         body = msg['body']
         send_chat_message(sock, sender, body)
     return message_handler
+
+
+def show_online_contacts(sock, xmpp, sendmessage=None):
+    u"""Envia para o Papovox informação sobre contatos disponíveis."""
+    number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
+    msg = (u"%(amount)s %(contacts)s. \n"
+           u"/l para listar. \n"
+           u"/n para falar com o contato número n. \n")
+    if number_of_online_contacts == 0:
+        number_of_online_contacts = "nenhum"
+        contacts = u"contato disponível"
+    elif number_of_online_contacts == 1:
+        contacts = u"contato disponível"
+    else:
+        contacts = u"contatos disponíveis"
+    sendmessage = sendmessage or globals()['sendmessage']
+    sendmessage(sock, msg % dict(amount=number_of_online_contacts,
+                                 contacts=contacts))
 
 
 def process_messages(sock, xmpp):

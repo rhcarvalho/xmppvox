@@ -28,7 +28,7 @@ import unittest
 import socket
 import sys
 
-from server import recv, recvall, accept, SYSTEM_ENCODING
+from server import recv, recvall, accept, SYSTEM_ENCODING, show_online_contacts
 from client import BotXMPP
 
 
@@ -135,7 +135,8 @@ class TestAccept(unittest.TestCase):
         self.assertEqual(accept(s), (s, self.addr, nickname))
 
 
-class TestClient(unittest.TestCase):
+class TestCaseXMPP(unittest.TestCase):
+    u"""Classe para casos de teste que envolvam interação com o cliente XMPP."""
     def setUp(self):
         # Caixa de saída de mensagens Papovox
         self.outbox = []
@@ -155,6 +156,8 @@ class TestClient(unittest.TestCase):
         self.xmpp = BotXMPP('', '', server)
         self.xmpp.message_handler = message_handler
 
+
+class TestClient(TestCaseXMPP):
     def test_receive_message(self):
         m = self.xmpp.make_message(mto='nobody', mtype='chat', mbody='testing')
         self.assertEqual(self.inbox, [], u"Caixa de entrada começa vazia")
@@ -171,6 +174,14 @@ class TestClient(unittest.TestCase):
         self.assertEqual(len(self.outbox), 1, u"Envia ajuda sobre comando /r")
         self.xmpp.message(m)
         self.assertEqual(len(self.outbox), 1, u"Envia ajuda apenas uma vez")
+
+
+class TestServerClientInteraction(TestCaseXMPP):
+    def test_show_no_online_contacts(self):
+        self.assertEqual(len(self.outbox), 0, u"Caixa de saída começa vazia")
+        show_online_contacts(None, self.xmpp,
+                             sendmessage=self.xmpp.papovox_server.sendmessage)
+        self.assertEqual(len(self.outbox), 1, u"Aviso não há contatos online")
 
 
 if __name__ == '__main__':
