@@ -145,18 +145,17 @@ def new_message_handler(sock, xmpp):
 
 def show_online_contacts(sock, xmpp, sendmessage=None):
     u"""Envia para o Papovox informação sobre contatos disponíveis."""
-    number_of_online_contacts = len(commands.enumerate_online_roster(xmpp))
-    if number_of_online_contacts == 0:
-        number_of_online_contacts = "nenhum"
+    online_contacts_count = len(commands.enumerate_online_roster(xmpp))
+    if online_contacts_count == 0:
+        online_contacts_count = "nenhum"
         contacts = u"contato disponível"
-    elif number_of_online_contacts == 1:
+    elif online_contacts_count == 1:
         contacts = u"contato disponível"
     else:
         contacts = u"contatos disponíveis"
     sendmessage = sendmessage or globals()['sendmessage']
-    sendmessage(sock,
-                S.ONLINE_CONTACTS_INFO.format(amount=number_of_online_contacts,
-                                              contacts=contacts))
+    sendmessage(sock, S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
+                                                    contacts=contacts))
 
 
 def process_messages(sock, xmpp):
@@ -256,10 +255,10 @@ def send_chat_message(sock, sender, body, _state={}):
     timed_out = (time.time() - last_timestamp) > TIMEOUT
 
     if sender == last_sender and not timed_out:
-        msg = u"%(body)s"
+        msg = S.MSG
     else:
-        msg = u"%(sender)s disse: %(body)s"
-    sendmessage(sock, msg % locals())
+        msg = S.MSG_FROM
+    sendmessage(sock, msg.format(**locals()))
 
     # Guarda estado para ser usado na próxima execução.
     _state['last_sender'] = sender
