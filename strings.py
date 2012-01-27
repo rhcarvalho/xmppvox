@@ -41,3 +41,38 @@ WARN_MSG_TO_NOBODY = (u"Mensagem não enviada. "
                       u"Com quem deseja falar? \n"
                       u"Tecle /para seguido do número do contato. \n"
                       u"Se não souber o número tecle /lista ou /todos.")
+
+CMD_UNKNOWN = u"Comando desconhecido: {cmd}"
+
+CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
+    u"""\
+
+    Ajuda do XMPPVOX:
+
+    Tecle normalmente termine suas frases com ENTER.
+    Cada frase é enviada para apenas um contato.
+
+    """,
+    u"""\
+    Para saber quais são os contatos disponíveis tecle %(prefix)slista.
+    Para saber todos os contatos (inclusive indisponíveis) tecle %(prefix)stodos.
+    Para conversar com alguém tecle %(prefix)spara seguido do número do contato.
+    """,
+    u"""\
+    Para falar com a última pessoa que enviou mensagem para você, tecle %(prefix)sresponder.
+    Para saber com quem fala agora tecle %(prefix)squem.
+    Para adicionar ou remover um contato tecle %(prefix)sadicionar ou %(prefix)sremover seguido do contato.
+
+    """,
+    u"""\
+    Atalhos para os comandos:
+    %(prefix)sajuda = %(prefix)s? .
+    %(prefix)slista = %(prefix)sl .
+    %(prefix)stodos = %(prefix)st .
+    %(prefix)spara = %(prefix)sp ou %(prefix)s seguido de um número.
+    %(prefix)sresponder = %(prefix)sr .
+    %(prefix)squem = %(prefix)sq .
+    %(prefix)sadicionar = %(prefix)sa .
+
+    """,
+    )

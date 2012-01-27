@@ -30,6 +30,7 @@ import sys
 
 from server import recv, recvall, accept, SYSTEM_ENCODING, show_online_contacts
 from client import BotXMPP
+import commands
 
 
 # Necessário para corrigir bug no unittest.
@@ -182,6 +183,27 @@ class TestServerClientInteraction(TestCaseXMPP):
         show_online_contacts(None, self.xmpp,
                              sendmessage=self.xmpp.papovox_server.sendmessage)
         self.assertEqual(len(self.outbox), 1, u"Aviso não há contatos online")
+
+
+class TestCommands(unittest.TestCase):
+    def setUp(self):
+        # Caixa de mensagens de sistema
+        self.sysbox = []
+        class FakeSocket(object):
+            @staticmethod
+            def sendall(data):
+                self.sysbox.append(data)
+        self.sock = FakeSocket()
+
+    def test_unknown(self):
+        self.assertEqual(len(self.sysbox), 0, u"vazio")
+        commands.process_command(self.sock, None, '/bogus command')
+        self.assertEqual(len(self.sysbox), 1, u"Aviso comando desconhecido")
+
+    def test_help(self):
+        self.assertEqual(len(self.sysbox), 0, u"vazio")
+        commands.ajuda(self.sock)
+        self.assertEqual(len(self.sysbox), 4, u"Ajuda enviada em 4 partes")
 
 
 if __name__ == '__main__':
