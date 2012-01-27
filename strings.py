@@ -24,80 +24,98 @@ XMPPVOX - módulo de strings
 Este módulo contém strings transmitidas para o Papovox.
 """
 
-WELCOME = (u"Olá {nick}, bem-vindo ao XMPPVOX {version}! \n"
-           u"Tecle /ajuda para obter ajuda. \n")
-ONLINE_CONTACTS_INFO = (u"{amount} {contacts}. \n"
-                        u"/l para listar. \n"
-                        u"/n para falar com o contato número n. \n")
+class get_string(object):
+    u"""Retorna uma string marcada para ser interpretada pelo Papovox."""
+    def __getattr__(self, attr):
+        # Suporte à sintaxe get_string.SOME_STRING
+        s = globals()[attr]
+        if isinstance(s, tuple):
+            return u"%{:03d}{}".format(*s)
+        elif isinstance(s, str):
+            return s
+        else:
+            raise AttributeError
 
-MSG = u"{body}"
-MSG_FROM = u"{sender} disse: {body}"
+    # Suporte à sintaxe get_string(SOME_STRING)
+    __call__ = __getattr__
 
-FIRST_INCOME_MSG_HELP = u". \nDica: tecle /r para falar com {name}"
+# get_string pode ser usando como função ou objeto com atributos
+get_string = get_string()
 
-WARN_MSG_TO_OFFLINE_USER = (u"* {name} está indisponível agora. "
-                            u"Talvez a mensagem não tenha sido recebida.")
-WARN_MSG_TO_NOBODY = (u"Mensagem não enviada. "
-                      u"Com quem deseja falar? \n"
-                      u"Tecle /para seguido do número do contato. \n"
-                      u"Se não souber o número tecle /lista ou /todos.")
+WELCOME = (0, u"Olá {nick}, bem-vindo ao XMPPVOX {version}! \n"
+              u"Tecle /ajuda para obter ajuda. \n")
+ONLINE_CONTACTS_INFO = (1, u"{amount} {contacts}. \n"
+                           u"/l para listar. \n"
+                           u"/n para falar com o contato número n. \n")
+
+FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}")
+
+MSG = (10, u"{body}")
+MSG_FROM = (11, u"{sender} disse: {body}")
+
+WARN_MSG_TO_OFFLINE_USER = (30, u"* {name} está indisponível agora. "
+                                u"Talvez a mensagem não tenha sido recebida.")
+WARN_MSG_TO_NOBODY = (31, u"Mensagem não enviada. "
+                          u"Com quem deseja falar? \n"
+                          u"Tecle /para seguido do número do contato. \n"
+                          u"Se não souber o número tecle /lista ou /todos.")
 
 # Comandos
 
 # Prefixo que ativa o modo de comando
 CMD_PREFIX = '/'
 
-CMD_UNKNOWN = u"Comando desconhecido: {cmd}"
+CMD_UNKNOWN = (100, u"Comando desconhecido: {cmd}")
 
 CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
-    u"""\
+    (111, u"""\
 
     Ajuda do XMPPVOX:
 
     Tecle normalmente termine suas frases com ENTER.
     Cada frase é enviada para apenas um contato.
 
-    """,
-    u"""\
-    Para saber quais são os contatos disponíveis tecle %(prefix)slista.
-    Para saber todos os contatos (inclusive indisponíveis) tecle %(prefix)stodos.
-    Para conversar com alguém tecle %(prefix)spara seguido do número do contato.
-    """,
-    u"""\
-    Para falar com a última pessoa que enviou mensagem para você, tecle %(prefix)sresponder.
-    Para saber com quem fala agora tecle %(prefix)squem.
-    Para adicionar ou remover um contato tecle %(prefix)sadicionar ou %(prefix)sremover seguido do contato.
+    """),
+    (112, u"""\
+    Para saber quais são os contatos disponíveis tecle {prefix}lista.
+    Para saber todos os contatos (inclusive indisponíveis) tecle {prefix}todos.
+    Para conversar com alguém tecle {prefix}para seguido do número do contato.
+    """),
+    (113, u"""\
+    Para falar com a última pessoa que enviou mensagem para você, tecle {prefix}responder.
+    Para saber com quem fala agora tecle {prefix}quem.
+    Para adicionar ou remover um contato tecle {prefix}adicionar ou {prefix}remover seguido do contato.
 
-    """,
-    u"""\
+    """),
+    (114, u"""\
     Atalhos para os comandos:
-    %(prefix)sajuda = %(prefix)s? .
-    %(prefix)slista = %(prefix)sl .
-    %(prefix)stodos = %(prefix)st .
-    %(prefix)spara = %(prefix)sp ou %(prefix)s seguido de um número.
-    %(prefix)sresponder = %(prefix)sr .
-    %(prefix)squem = %(prefix)sq .
-    %(prefix)sadicionar = %(prefix)sa .
+    {prefix}ajuda = {prefix}? .
+    {prefix}lista = {prefix}l .
+    {prefix}todos = {prefix}t .
+    {prefix}para = {prefix}p ou {prefix} seguido de um número.
+    {prefix}responder = {prefix}r .
+    {prefix}quem = {prefix}q .
+    {prefix}adicionar = {prefix}a .
 
-    """,
+    """),
     )
 
-CMD_WHO = u"Falando com {who}."
-CMD_WHO_WARN = u"Falando com ¬ {who} ({warning})."
+CMD_WHO = (120, u"Falando com {who}.")
+CMD_WHO_WARN = (121, u"Falando com ¬ {who} ({warning}).")
 
-CMD_LIST_ITEM = u"{number} {name}"
-CMD_LIST_ALL_OFFLINE = u"Nenhum contato disponível agora!"
+CMD_LIST_ITEM = (130, u"{number} {name}")
+CMD_LIST_ALL_OFFLINE = (131, u"Nenhum contato disponível agora!")
 
-CMD_ALL_ITEM = u"{number} {name}"
-CMD_ALL_NOBODY = u"Nenhum contato na sua lista!"
+CMD_ALL_ITEM = (140, u"{number} {name}")
+CMD_ALL_NOBODY = (141, u"Nenhum contato na sua lista!")
 
-CMD_TO_WRONG_NUMBER = u"Número de contato inexistente! Use %slista." % CMD_PREFIX
-CMD_TO_MISSING_NUMBER = u"Faltou número do contato! Use %slista." % CMD_PREFIX
+CMD_TO_WRONG_NUMBER = (150, u"Número de contato inexistente! Use %slista." % CMD_PREFIX)
+CMD_TO_MISSING_NUMBER = (151, u"Faltou número do contato! Use %slista." % CMD_PREFIX)
 
-CMD_ADD_OK = u"Adicionei contato: {jid}"
-CMD_ADD_FAIL = (u"Não entendi: {invalid_jid}. "
-                u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+CMD_ADD_OK = (160, u"Adicionei contato: {jid}")
+CMD_ADD_FAIL = (161, u"Não entendi: {invalid_jid}. "
+                     u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
 
-CMD_DEL_OK = u"Removi contato: {jid}"
-CMD_DEL_FAIL = (u"Não entendi: {invalid_jid}. "
-                  u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+CMD_DEL_OK = (170, u"Removi contato: {jid}")
+CMD_DEL_FAIL = (171, u"Não entendi: {invalid_jid}. "
+                     u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")

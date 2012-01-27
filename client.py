@@ -31,7 +31,7 @@ import threading
 
 import sleekxmpp
 
-import strings as S
+from strings import get_string as S
 
 import logging
 log = logging.getLogger(__name__)

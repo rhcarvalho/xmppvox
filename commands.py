@@ -28,7 +28,7 @@ import re
 import textwrap
 
 import server
-import strings as S
+from strings import get_string as S
 
 import logging
 log = logging.getLogger(__name__)
@@ -88,7 +88,7 @@ def ajuda(sock, xmpp=None, mo=None):
     help = (S.CMD_HELP1, S.CMD_HELP2, S.CMD_HELP3, S.CMD_HELP4)
     def send_help(help):
         # Completa string com o prefixo de comando.
-        help = help % dict(prefix=S.CMD_PREFIX)
+        help = help.format(prefix=S.CMD_PREFIX)
         # Adiciona espaço em branco no fim das linhas para que o Papovox leia
         # corretamente. Sem espaço ele lê "ponto".
         help = u" \n".join(textwrap.dedent(help).splitlines())

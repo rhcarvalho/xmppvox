@@ -34,7 +34,7 @@ from cStringIO import StringIO
 from threading import Timer
 
 import commands
-import strings as S
+from strings import get_string as S
 
 import logging
 log = logging.getLogger(__name__)
