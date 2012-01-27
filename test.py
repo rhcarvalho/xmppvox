@@ -27,7 +27,10 @@ Este módulo implementa testes automatizados para o XMPPVOX.
 import unittest
 import socket
 import sys
+
 from server import recv, recvall, accept, SYSTEM_ENCODING
+from client import BotXMPP
+
 
 # Necessário para corrigir bug no unittest.
 # A versão da biblioteca presente no Python 2.7
@@ -116,6 +119,7 @@ class PapovoxSocketMock(object):
             return self.nickname + "\r\n"
         raise socket.error
 
+
 class TestAccept(unittest.TestCase):
     addr = ('127.9.9.9', 9999)
 
@@ -129,6 +133,26 @@ class TestAccept(unittest.TestCase):
         s = PapovoxSocketMock(self.addr, nickname)
         #accept(s)
         self.assertEqual(accept(s), (s, self.addr, nickname))
+
+
+class TestClient(unittest.TestCase):
+    def test_receive_message(self):
+        class FakeServer(object):
+            pass
+        inbox = []
+        def message_handler(msg):
+            inbox.append(msg)
+        server = FakeServer()
+        xmpp = BotXMPP('', '', server)
+        xmpp.message_handler = message_handler
+
+        m = xmpp.make_message(mto='nobody', mtype='chat', mbody='Test msg')
+        xmpp.message(m)
+
+        self.assertEqual(inbox, [m])
+
+    def _test_send_first_incoming_message_help(self):
+        pass
 
 
 if __name__ == '__main__':
