@@ -31,6 +31,8 @@ import threading
 
 import sleekxmpp
 
+import strings as S
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -146,7 +148,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
                 sendmessage = self.papovox_server.sendmessage
                 sock = self.papovox_server._SOCK
                 name = self.get_chatty_name(msg['from'])
-                sendmessage(sock, u". \nDica: tecle /r para falar com {name}".format(name=name))
+                sendmessage(sock, S.FIRST_INCOME_MSG_HELP.format(name=name))
             # Lembra da última pessoa que falou comigo. Útil para usar comando
             # /responder.
             self.last_sender = msg['from']
