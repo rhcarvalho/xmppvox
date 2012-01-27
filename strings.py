@@ -79,3 +79,6 @@ CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
 
 CMD_WHO = u"Falando com {who}."
 CMD_WHO_WARN = u"Falando com ¬ {who} ({warning})."
+
+CMD_LIST_ITEM = u"{number} {name}"
+CMD_LIST_ALL_OFFLINE = u"Nenhum contato disponível agora!"
