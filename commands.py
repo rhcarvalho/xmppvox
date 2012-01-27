@@ -152,12 +152,13 @@ def todos(sock, xmpp, mo=None):
     u"""Lista todos os contatos (online/offline)."""
     for number, roster_item in enumerate_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        server.sendmessage(sock, u"%d %s" % (number, name))
+        server.sendmessage(sock, S.CMD_ALL_ITEM.format(number=number,
+                                                       name=name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        server.sendmessage(sock, u"Nenhum contato na sua lista!")
+        server.sendmessage(sock, S.CMD_ALL_NOBODY)
 
 def para(sock, xmpp, mo):
     try:

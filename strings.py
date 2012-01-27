@@ -82,3 +82,6 @@ CMD_WHO_WARN = u"Falando com ¬ {who} ({warning})."
 
 CMD_LIST_ITEM = u"{number} {name}"
 CMD_LIST_ALL_OFFLINE = u"Nenhum contato disponível agora!"
+
+CMD_ALL_ITEM = u"{number} {name}"
+CMD_ALL_NOBODY = u"Nenhum contato na sua lista!"
