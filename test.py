@@ -136,23 +136,41 @@ class TestAccept(unittest.TestCase):
 
 
 class TestClient(unittest.TestCase):
-    def test_receive_message(self):
+    def setUp(self):
+        # Caixa de saída de mensagens Papovox
+        self.outbox = []
+        # Caixa de entrada de mensagens XMPP
+        self.inbox = []
+
         class FakeServer(object):
-            pass
-        inbox = []
-        def message_handler(msg):
-            inbox.append(msg)
+            _SOCK = None
+            @staticmethod
+            def sendmessage(sock, msg):
+                self.outbox.append(msg)
         server = FakeServer()
-        xmpp = BotXMPP('', '', server)
-        xmpp.message_handler = message_handler
 
-        m = xmpp.make_message(mto='nobody', mtype='chat', mbody='Test msg')
-        xmpp.message(m)
+        def message_handler(msg):
+            self.inbox.append(msg)
 
-        self.assertEqual(inbox, [m])
+        self.xmpp = BotXMPP('', '', server)
+        self.xmpp.message_handler = message_handler
 
-    def _test_send_first_incoming_message_help(self):
-        pass
+    def test_receive_message(self):
+        m = self.xmpp.make_message(mto='nobody', mtype='chat', mbody='testing')
+        self.assertEqual(self.inbox, [], u"Caixa de entrada começa vazia")
+        # Recebe uma mensagem XMPP
+        self.xmpp.message(m)
+        self.assertEqual(self.inbox, [m], u"Mensagem recebida")
+
+    def test_send_first_incoming_message_help(self):
+        m = self.xmpp.make_message(mfrom='tester',
+                                   mto='nobody', mtype='chat', mbody='testing')
+        self.assertEqual(len(self.outbox), 0, u"Caixa de saída começa vazia")
+        # Recebe uma mensagem XMPP
+        self.xmpp.message(m)
+        self.assertEqual(len(self.outbox), 1, u"Envia ajuda sobre comando /r")
+        self.xmpp.message(m)
+        self.assertEqual(len(self.outbox), 1, u"Envia ajuda apenas uma vez")
 
 
 if __name__ == '__main__':

@@ -137,7 +137,10 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             self.message_handler(msg)
             # Ensina o comando /responder na primeira vez que alguém me mandar
             # mensagem, se eu ainda não estiver falando com este alguém.
-            talking_to_bare = self.get_bare_jid(self.talking_to)
+            if self.talking_to:
+                talking_to_bare = self.get_bare_jid(self.talking_to)
+            else:
+                talking_to_bare = None
             from_bare = self.get_bare_jid(msg['from'])
             if self.last_sender is None and talking_to_bare != from_bare:
                 sendmessage = self.papovox_server.sendmessage
