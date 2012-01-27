@@ -33,6 +33,7 @@ import getpass
 import client
 import server
 import commands
+import strings
 
 import logging
 log = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ def main():
     # Configuração.
     opts, args = parse_command_line()
     configure_logging(opts)
+    strings.get_string.show_code = opts.show_code
     jid, password = get_jid_and_password(opts)
 
     # FIXME Não deveria alterar constante global...
@@ -70,6 +72,10 @@ def parse_command_line():
                     help=u"exibe mais detalhes sobre a execução",
                     action='store_const', dest='loglevel',
                     const=logging.DEBUG, default=logging.INFO)
+    # Configuração de strings.
+    optp.add_option('-c', '--codificar',
+                    help=u"mostra mensagens codificadas para o Papovox",
+                    action='store_true', dest='show_code', default=False)
     # JID e senha
     optp.add_option("-j", "--jid", dest="jid",
                     help="identificador do usuário")

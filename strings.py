@@ -26,12 +26,24 @@ Este módulo contém strings transmitidas para o Papovox.
 
 class get_string(object):
     u"""Retorna uma string marcada para ser interpretada pelo Papovox."""
+    _show_code = False
+
+    @property
+    def show_code(self):
+        return self._show_code
+    @show_code.setter
+    def show_code(self, value):
+        self._show_code = bool(value)
+
     def __getattr__(self, attr):
         # Suporte à sintaxe get_string.SOME_STRING
         s = globals()[attr]
         if isinstance(s, tuple):
-            return u"%{:03d}{}".format(*s)
-        elif isinstance(s, str):
+            if self.show_code:
+                return u"%{:03d}{}".format(*s)
+            else:
+                return s[1]
+        elif isinstance(s, basestring):
             return s
         else:
             raise AttributeError
