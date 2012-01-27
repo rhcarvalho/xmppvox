@@ -9,8 +9,8 @@ Prazo: quarta-feira, 11/01/2012                                                 
     * usuário e senha (para conectar)                                                |  DONE    
     * adicionar contatos                                                             |  DONE
     * remover contatos                                                               |  DONE
-    * listar amigos online                                                           |  DONE
-    * listar todos os amigos                                                         |  DONE
+    * listar contatos online                                                         |  DONE
+    * listar todos os contatos                                                       |  DONE
     * definir "apelido"                                                              |  DONE
 * Escolher amigo online para falar                                                   |  DONE
 * Papovox e XMPPVOX integrados (usuário executa 1 aplicação e consegue se comunicar) | *TODO*

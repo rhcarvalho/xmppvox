@@ -1,10 +1,26 @@
 ﻿XMPPVOX
 
-* remover contato usando seu número na lista de contatos (opcional)
+Para finalizar v1.0:
 
-* usar sempre str.{de,en}code(errors='replace' ou 'ignore')
+* encoding padrão = latin1 (verificar código do DOSVOX)
+* separar strings num módulo separado
+* iniciar strings que originam no XMPPVOX com "%xx", onde xx é um código de 2 dígitos
+* Sempre iniciar o Papovox e notificar caso senha esteja incorreta (ou mensagem +OK, ou -FALHOU)
+* "eu disse" => colocar codigo na frente (de tudo)
+* organizar em diretórios
+* revisar documentação
+* atualizar versão do SleekXMPP
+
+--------------------------------------------------------------------------------
+
+* remover contato usando seu número na lista de contatos (não implementar)
+    => apresenta um problema de interface com o usuário, mas por outro lado
+       dificulta a remoção acidental de um usuário errado.
 
 * except KeyboardInterrupt: sys.exit(0) // os._exit(0)
+    => sys.exit não funciona como esperando com múltiplas threads (o que é o
+       caso), e ainda por cima SystemExit é interceptado pelo SleekXMPP.
+       os._exit é muito extremo, não serve como solução.
 
 * unicode_first :: http://farmdev.com/talks/unicode/
     >>> def to_unicode_or_bust(
@@ -16,8 +32,6 @@
 
 * sys.getfilesystemencoding() ou sys.std{in,out}.encoding ao invés de 'cp1252'
   hardcoded (talvez... é preciso testar)
-
-* separar xmpp / papovox em processos
 
 * Escrever testes automatizados
 
@@ -170,3 +184,7 @@ ________________________________________________________________________________
 * mover código que não pertence ao xmppvox.py para server.py
 * se a autenticação falhar, não aguarda conexão com Papovox
 * valida JID
+
+* usar sempre str.{de,en}code(errors='replace' ou 'ignore')
+
+* separar xmpp / papovox em processos
