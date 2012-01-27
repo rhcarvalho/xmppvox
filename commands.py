@@ -175,15 +175,16 @@ def responder(sock, xmpp, mo=None):
     quem(sock, xmpp)
 
 def adicionar(sock, xmpp, mo):
-    email_mo = email_regexp.match(mo.group(1))
+    maybe_jid = mo.group(1)
+    email_mo = email_regexp.match(maybe_jid)
     if email_mo is not None:
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid,
                                         ptype='subscribe',
                                         pnick=xmpp.nickname)
-        server.sendmessage(sock, u"Adicionei contato: %s" % user_jid)
+        server.sendmessage(sock, S.CMD_ADD_OK.format(jid=user_jid))
     else:
-        server.sendmessage(sock, u"Não entendi: %s. Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com" % mo.group(1))
+        server.sendmessage(sock, S.CMD_ADD_FAIL.format(invalid_jid=maybe_jid))
 
 def remover(sock, xmpp, mo):
     email_mo = email_regexp.match(mo.group(1))

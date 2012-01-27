@@ -93,3 +93,7 @@ CMD_ALL_NOBODY = u"Nenhum contato na sua lista!"
 
 CMD_TO_WRONG_NUMBER = u"Número de contato inexistente! Use %slista." % CMD_PREFIX
 CMD_TO_MISSING_NUMBER = u"Faltou número do contato! Use %slista." % CMD_PREFIX
+
+CMD_ADD_OK = u"Adicionei contato: {jid}"
+CMD_ADD_FAIL = (u"Não entendi: {invalid_jid}. "
+                u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
