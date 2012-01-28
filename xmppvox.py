@@ -26,6 +26,7 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
 import sys
+import threading
 
 from optparse import OptionParser
 import getpass
@@ -55,6 +56,10 @@ def main():
 
     # Inicia cliente XMPP.
     xmpp = client.BotXMPP(jid, password, server)
+
+    # Executa o servidor para o Papovox em outra thread.
+    threading.Thread(target=server.run, args=(xmpp,)).start()
+
     log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
     if xmpp.connect():
         log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)

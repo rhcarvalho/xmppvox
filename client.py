@@ -27,7 +27,6 @@ Google Talk, Facebook chat e Jabber.
 """
 
 import sys
-import threading
 
 import sleekxmpp
 
@@ -81,6 +80,9 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.nickname = u""
         self.message_handler = None
 
+        # Indica se a conexão com o Papovox já foi estabelecida
+        self.papovox_is_connected = False
+
         # Com quem estou conversando
         self.talking_to = None
         # Último que me mandou mensagem
@@ -98,11 +100,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         Quando uma conexão é estabelecida, a lista de contatos é solicitada.
         """
         self.get_roster()
-
-        # Executa o servidor para o Papovox em outra thread.
-        def run():
-            self.papovox_server.run(self)
-        threading.Thread(target=run).start()
+        self.send_initial_presence()
 
     def papovox_connected(self, event):
         u"""Processa evento de conexão com o Papovox.
@@ -111,12 +109,20 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         inicial para o servidor e passa a estar efetivamente online para
         seus contatos.
         """
+        self.papovox_is_connected = True
         self.nickname = event.get('nick')
         self.message_handler = event.get('message_handler')
-        # Envia presença em broadcast. Neste momento o usuário aparece como
-        # online para seus contatos.
-        log.debug(u"Enviando presença inicial...")
-        self.send_presence(pnick=self.nickname)
+        self.send_initial_presence()
+
+    def send_initial_presence(self):
+        u"""Envia presença inicial em broadcast.
+
+        Neste momento o usuário aparece como online para seus contatos.
+        Pode ser chamado mais de uma vez, mas apenas uma presença será enviada.
+        """
+        if not self.sentpresence and self.sessionstarted and self.papovox_is_connected:
+            log.debug(u"Enviando presença inicial...")
+            self.send_presence(pnick=self.nickname)
 
     def papovox_disconnected(self, event):
         u"""Processa evento de desconexão do Papovox.
@@ -124,6 +130,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         Quando o Papovox se desconecta do XMPPVOX, a conexão com o servidor
         XMPP é encerrada.
         """
+        self.papovox_is_connected = False
         self.disconnect()
 
     def message(self, msg):
