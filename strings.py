@@ -51,9 +51,14 @@ class get_string(object):
     # Suporte à sintaxe get_string(SOME_STRING)
     __call__ = __getattr__
 
-# get_string pode ser usando como função ou objeto com atributos
+# get_string é um objeto especial para ser usado como função ou para acessar
+# seus atributos. As duas sintaxes tem o mesmo efeito.
 get_string = get_string()
 
+#------------------------------------------------------------------------------#
+# As strings aqui definidas devem ser usadas através do 'get_string'.
+
+# Mensagens gerais ------------------------------------------------------------#
 WELCOME = (0, u"Olá {nick}, bem-vindo ao XMPPVOX {version}! \n"
               u"Tecle /ajuda para obter ajuda. \n")
 ONLINE_CONTACTS_INFO = (1, u"{amount} {contacts}. \n"
@@ -62,9 +67,11 @@ ONLINE_CONTACTS_INFO = (1, u"{amount} {contacts}. \n"
 
 FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}")
 
+# Conversação -----------------------------------------------------------------#
 MSG = (10, u"{body}")
 MSG_FROM = (11, u"{sender} disse: {body}")
 
+# Avisos ----------------------------------------------------------------------#
 WARN_MSG_TO_OFFLINE_USER = (30, u"* {name} está indisponível agora. "
                                 u"Talvez a mensagem não tenha sido recebida.")
 WARN_MSG_TO_NOBODY = (31, u"Mensagem não enviada. "
@@ -72,7 +79,7 @@ WARN_MSG_TO_NOBODY = (31, u"Mensagem não enviada. "
                           u"Tecle /para seguido do número do contato. \n"
                           u"Se não souber o número tecle /lista ou /todos.")
 
-# Comandos
+# Comandos --------------------------------------------------------------------#
 
 # Prefixo que ativa o modo de comando
 CMD_PREFIX = '/'
