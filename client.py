@@ -32,6 +32,7 @@ from threading import Timer
 import sleekxmpp
 
 from strings import get_string as S
+from version import __version__
 
 import logging
 log = logging.getLogger(__name__)
@@ -132,8 +133,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         if presence['from'].bare == self.boundjid.bare:
             # Envia mensagem de boas-vindas
             self.papovox.sendmessage(S.WELCOME.format(nick=self.nickname,
-                                                      # FIXME controlar versão noutro lugar
-                                                      version="1.0"))
+                                                      version=__version__))
 
             # Exibe lista de contatos online alguns segundos após eu ficar
             # online. É necessário esperar um tempo para receber presenças dos
