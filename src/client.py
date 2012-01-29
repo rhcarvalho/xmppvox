@@ -31,6 +31,7 @@ from threading import Timer
 
 import sleekxmpp
 
+import commands
 from strings import get_string as S
 from version import __version__
 
@@ -61,6 +62,13 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     auto_subscribe = True
 
     def __init__(self, jid, password, papovox):
+        # Valida JID.
+        if not commands.jid_regexp.match(jid):
+            log.error(u"Usuário inválido '%s'.\n"
+                      u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
+                      u"regina@jabber.org", jid)
+            # FIXME avisa e encerra Papovox
+            raise ValueError
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # Referência para o servidor compatível com o Papovox

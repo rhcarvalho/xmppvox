@@ -25,14 +25,11 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
-import sys
-
 from optparse import OptionParser
 import getpass
 
 import client
 import server
-import commands
 import strings
 
 import logging
@@ -112,11 +109,6 @@ def configure_logging(opts):
 def get_jid_and_password(opts):
     jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
     password = opts.password or getpass.getpass("Senha para %r: " % jid)
-    if commands.jid_regexp.match(jid) is None:
-        log.error(u"Usuário inválido '%s'.\n"
-                  u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
-                  u"regina@jabber.org", jid)
-        sys.exit(1)
     return jid, password
 
 
