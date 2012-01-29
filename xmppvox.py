@@ -112,7 +112,7 @@ def configure_logging(opts):
 def get_jid_and_password(opts):
     jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
     password = opts.password or getpass.getpass("Senha para %r: " % jid)
-    if commands.email_regexp.match(jid) is None:
+    if commands.jid_regexp.match(jid) is None:
         log.error(u"Usuário inválido '%s'.\n"
                   u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
                   u"regina@jabber.org", jid)

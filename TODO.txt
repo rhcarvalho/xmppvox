@@ -3,7 +3,6 @@
 Para finalizar v1.0:
 
 * Sempre iniciar o Papovox e notificar caso senha esteja incorreta (ou mensagem +OK, ou -FALHOU)
-* Permitir user@server.tld/resource
 * encoding padrão = latin1 (verificar código do DOSVOX)
 * organizar em diretórios
 * revisar documentação
@@ -190,3 +189,4 @@ ________________________________________________________________________________
 * separar strings num módulo próprios
 * iniciar strings que originam no XMPPVOX com "%xxx", um código de 3 dígitos
   (precisa passar -c na linha de comando)
+* Permitir user@server.tld/resource

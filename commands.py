@@ -33,10 +33,12 @@ import logging
 log = logging.getLogger(__name__)
 
 
-# Origem: http://www.regular-expressions.info/email.html
+# Baseado em http://www.regular-expressions.info/email.html
 # Um JID não é um email, mas serve como boa aproximação para o que é
-# preciso neste módulo.
-email_regexp = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', re.I)
+# preciso neste módulo. Além da parte do email, é possível especificar
+# o resource (opcional).
+jid_regexp = re.compile(r'^([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4})(/.*)?$',
+                          re.I)
 
 
 def process_command(xmpp, data, papovox_server):
@@ -175,24 +177,24 @@ def responder(xmpp, mo=None, papovox_server=None):
 
 def adicionar(xmpp, mo, papovox_server=None):
     maybe_jid = mo.group(1)
-    email_mo = email_regexp.match(maybe_jid)
-    if email_mo is not None:
-        user_jid = email_mo.group(0)
-        xmpp.send_presence_subscription(pto=user_jid,
+    jid_mo = jid_regexp.match(maybe_jid)
+    if jid_mo is not None:
+        user_bare_jid = jid_mo.group(1)
+        xmpp.send_presence_subscription(pto=user_bare_jid,
                                         ptype='subscribe',
                                         pnick=xmpp.nickname)
-        papovox_server.sendmessage(S.CMD_ADD_OK.format(jid=user_jid))
+        papovox_server.sendmessage(S.CMD_ADD_OK.format(jid=user_bare_jid))
     else:
         papovox_server.sendmessage(S.CMD_ADD_FAIL.format(invalid_jid=maybe_jid))
 
 def remover(xmpp, mo, papovox_server=None):
     maybe_jid = mo.group(1)
-    email_mo = email_regexp.match(maybe_jid)
-    if email_mo is not None:
-        user_jid = email_mo.group(0)
-        xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
-        # ... ou talvez usar xmpp.del_roster_item(user_jid)
-        papovox_server.sendmessage(S.CMD_DEL_OK.format(jid=user_jid))
+    jid_mo = jid_regexp.match(maybe_jid)
+    if jid_mo is not None:
+        user_bare_jid = jid_mo.group(1)
+        xmpp.send_presence_subscription(pto=user_bare_jid, ptype='unsubscribe')
+        # ... ou talvez usar xmpp.del_roster_item(user_bare_jid)
+        papovox_server.sendmessage(S.CMD_DEL_OK.format(jid=user_bare_jid))
     else:
         papovox_server.sendmessage(S.CMD_DEL_FAIL.format(invalid_jid=maybe_jid))
 
