@@ -54,24 +54,24 @@ class TestRecv(unittest.TestCase):
         self.s = PapovoxLikeServer()
 
     def test_exact_amount(self):
-        sock = SocketMock()
-        self.assertEqual(len(self.s.recv(sock, 23)), 23)
+        self.s.sock = SocketMock()
+        self.assertEqual(len(self.s.recv(23)), 23)
 
     def test_less_data(self):
-        sock = SocketMock(recv_size=2)
-        self.assertEqual(len(self.s.recv(sock, 23)), 2)
+        self.s.sock = SocketMock(recv_size=2)
+        self.assertEqual(len(self.s.recv(23)), 2)
 
     def test_nothing_is_an_error(self):
-        sock = SocketMock(recv_size=0)
-        self.assertRaises(socket.error, self.s.recv, sock, 23)
+        self.s.sock = SocketMock(recv_size=0)
+        self.assertRaises(socket.error, self.s.recv, 23)
 
     def test_nothing_is_not_an_error_when_asked_for_nothing(self):
-        sock = SocketMock(recv_size=0)
-        self.assertEqual(len(self.s.recv(sock, 0)), 0)
+        self.s.sock = SocketMock(recv_size=0)
+        self.assertEqual(len(self.s.recv(0)), 0)
 
     def test_no_more_than_asked(self):
-        sock = SocketMock(recv_size=42)
-        self.assertEqual(len(self.s.recv(sock, 23)), 23)
+        self.s.sock = SocketMock(recv_size=42)
+        self.assertEqual(len(self.s.recv(23)), 23)
 
 
 class TestRecvAll(unittest.TestCase):
@@ -79,28 +79,28 @@ class TestRecvAll(unittest.TestCase):
         self.s = PapovoxLikeServer()
 
     def test_single_try(self):
-        sock = SocketMock()
-        self.assertEqual(len(self.s.recvall(sock, 23)), 23)
+        self.s.sock = SocketMock()
+        self.assertEqual(len(self.s.recvall(23)), 23)
 
     def test_multiple_tries(self):
-        sock = SocketMock(recv_size=2)
-        self.assertEqual(len(self.s.recvall(sock, 23)), 23)
+        self.s.sock = SocketMock(recv_size=2)
+        self.assertEqual(len(self.s.recvall(23)), 23)
 
     def test_can_ask_for_nothing(self):
-        sock = SocketMock(recv_size=2)
-        self.assertEqual(len(self.s.recvall(sock, 0)), 0)
+        self.s.sock = SocketMock(recv_size=2)
+        self.assertEqual(len(self.s.recvall(0)), 0)
 
     def test_nothing_is_an_error(self):
-        sock = SocketMock(recv_size=0)
-        self.assertRaises(socket.error, self.s.recvall, sock, 23)
+        self.s.sock = SocketMock(recv_size=0)
+        self.assertRaises(socket.error, self.s.recvall, 23)
 
     def test_nothing_is_not_an_error_when_asked_for_nothing(self):
-        sock = SocketMock(recv_size=0)
-        self.assertEqual(len(self.s.recvall(sock, 0)), 0)
+        self.s.sock = SocketMock(recv_size=0)
+        self.assertEqual(len(self.s.recvall(0)), 0)
 
     def test_no_more_than_asked(self):
-        sock = SocketMock(recv_size=42)
-        self.assertEqual(len(self.s.recvall(sock, 23)), 23)
+        self.s.sock = SocketMock(recv_size=42)
+        self.assertEqual(len(self.s.recvall(23)), 23)
 
 
 class PapovoxSocketMock(object):
@@ -135,14 +135,17 @@ class TestAccept(unittest.TestCase):
 
     def test_basic(self):
         nickname = u"Olavo".encode(SYSTEM_ENCODING)
-        s = PapovoxSocketMock(self.addr, nickname)
-        self.assertEqual(self.s.accept(s), (s, self.addr, nickname))
+        sock = PapovoxSocketMock(self.addr, nickname)
+        self.s.accept(sock)
+        self.assertEqual((self.s.sock, self.s.addr, self.s.nickname),
+                         (sock, self.addr, nickname))
 
     def test_nickname_with_accents(self):
         nickname = u"Anônimo".encode(SYSTEM_ENCODING)
-        s = PapovoxSocketMock(self.addr, nickname)
-        #accept(s)
-        self.assertEqual(self.s.accept(s), (s, self.addr, nickname))
+        sock = PapovoxSocketMock(self.addr, nickname)
+        self.s.accept(sock)
+        self.assertEqual((self.s.sock, self.s.addr, self.s.nickname),
+                         (sock, self.addr, nickname))
 
 
 class TestCaseXMPP(unittest.TestCase):
@@ -156,7 +159,7 @@ class TestCaseXMPP(unittest.TestCase):
         class FakeServer(object):
             sock = None
             @staticmethod
-            def sendmessage(sock, msg):
+            def sendmessage(msg):
                 self.outbox.append(msg)
         server = FakeServer()
 
@@ -190,8 +193,8 @@ class TestServerClientInteraction(TestCaseXMPP):
     def test_show_no_online_contacts(self):
         s = PapovoxLikeServer()
         self.assertEqual(len(self.outbox), 0, u"Caixa de saída começa vazia")
-        s.show_online_contacts(None, self.xmpp,
-                             sendmessage=self.xmpp.papovox_server.sendmessage)
+        s.show_online_contacts(self.xmpp,
+                               sendmessage=self.xmpp.papovox_server.sendmessage)
         self.assertEqual(len(self.outbox), 1, u"Aviso não há contatos online")
 
 
@@ -203,17 +206,17 @@ class TestCommands(unittest.TestCase):
             @staticmethod
             def sendall(data):
                 self.sysbox.append(data)
-        self.sock = FakeSocket()
         self.s = PapovoxLikeServer()
+        self.s.sock = FakeSocket()
 
     def test_unknown(self):
         self.assertEqual(len(self.sysbox), 0, u"vazio")
-        commands.process_command(self.sock, None, '/bogus command', self.s)
+        commands.process_command(None, '/bogus command', self.s)
         self.assertEqual(len(self.sysbox), 1, u"Aviso comando desconhecido")
 
     def test_ajuda(self):
         self.assertEqual(len(self.sysbox), 0, u"vazio")
-        commands.ajuda(self.sock, papovox_server=self.s)
+        commands.ajuda(papovox_server=self.s)
         self.assertEqual(len(self.sysbox), 4, u"Ajuda enviada em 4 partes")
 
 

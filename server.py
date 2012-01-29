@@ -62,6 +62,8 @@ class PapovoxLikeServer(object):
 
     def __init__(self, port=None):
         self.sock = None
+        self.addr = None
+        self.nickname = u""
         self.port = port or self.PORTA_PAPOVOX
 
     def run(self, xmpp):  # FIXME renomear para connect
@@ -77,23 +79,22 @@ class PapovoxLikeServer(object):
 
             # Conecta ao Papovox --------------------------------------------------#
             try:
-                conn, addr, nickname = self.accept(s)
-                self.sock = conn
+                self.accept(s)
             except socket.error:
                 log.error(u"Erro: Não foi possível conectar ao Papovox.")
                 raise
 
             xmpp.event('papovox_connected',
                        {'nick': nickname,
-                        'message_handler': self.new_message_handler(conn, xmpp)})
+                        'message_handler': self.new_message_handler(xmpp)})
             #----------------------------------------------------------------------#
 
             # Exibe lista de contatos online alguns segundos depois de iniciar.
             # É necessário esperar um tempo para receber presenças dos contatos.
-            Timer(5, self.show_online_contacts, (conn, xmpp)).start()
+            Timer(5, self.show_online_contacts, (xmpp,)).start()
 
             # Bloqueia processando mensagens do Papovox.
-            self.process_messages(conn, xmpp)
+            self.process_messages(xmpp)
         except socket.error, e:
             log.error(e.message or u" ".join(map(unicode, e.args)))
             sys.exit(1)
@@ -101,7 +102,7 @@ class PapovoxLikeServer(object):
             xmpp.event('papovox_disconnected')
             log.info(u"Fim do XMPPVOX")
 
-    def accept(self, sock):
+    def accept(self, server_sock):
         ur"""Aceita uma conexão via socket com o Papovox.
 
         Retorna socket e endereço de rede do Papovox e o nome do usuário conectado.
@@ -110,10 +111,10 @@ class PapovoxLikeServer(object):
         'C:\winvox\Fontes\SITIOVOX\SVPROC.PAS'.
         """
         log.info(u"Aguardando Papovox conectar...")
-        conn, addr = sock.accept()
-        self.sendline(conn, u"+OK - %s:%s conectado" % addr)
-        nickname = self.recvline(conn, self.TAMANHO_DO_BUFFER)
-        self.sendline(conn, u"+OK")
+        self.sock, self.addr = server_sock.accept()
+        self.sendline(u"+OK - %s:%s conectado" % self.addr)
+        self.nickname = self.recvline(self.TAMANHO_DO_BUFFER)
+        self.sendline(u"+OK")
 
         # Espera Papovox estar pronto para receber mensagens.
         #
@@ -124,25 +125,23 @@ class PapovoxLikeServer(object):
         time.sleep(0.1)
 
         log.info(u"Conectado ao Papovox")
-        log.info(u"Apelido: %s", nickname)
+        log.info(u"Apelido: %s", self.nickname)
 
         # Envia mensagem de boas-vindas
-        self.sendmessage(conn, S.WELCOME.format(nick=nickname,
-                                                # FIXME controlar versão noutro lugar
-                                                version="1.0"))
+        self.sendmessage(S.WELCOME.format(nick=self.nickname,
+                                          # FIXME controlar versão noutro lugar
+                                          version="1.0"))
 
-        return conn, addr, nickname
-
-    def new_message_handler(self, sock, xmpp):
+    def new_message_handler(self, xmpp):
         u"""Cria uma função para processar mensagens recebidas da rede XMPP."""
         def message_handler(msg):
             u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
             sender = xmpp.get_chatty_name(msg['from'])
             body = msg['body']
-            self.send_chat_message(sock, sender, body)
+            self.send_chat_message(sender, body)
         return message_handler
 
-    def show_online_contacts(self, sock, xmpp, sendmessage=None):
+    def show_online_contacts(self, xmpp, sendmessage=None):
         u"""Envia para o Papovox informação sobre contatos disponíveis."""
         online_contacts_count = len(commands.enumerate_online_roster(xmpp))
         if online_contacts_count == 0:
@@ -152,12 +151,12 @@ class PapovoxLikeServer(object):
             contacts = u"contato disponível"
         else:
             contacts = u"contatos disponíveis"
-        sendmessage = sendmessage or self.sendmessage
-        sendmessage(sock, S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
-                                                        contacts=contacts))
+        sendmessage = sendmessage or self.sendmessage  # FIXME forçação de barra para testar código
+        sendmessage(S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
+                                                  contacts=contacts))
 
 
-    def process_messages(self, sock, xmpp):   # FIXME renomear para process
+    def process_messages(self, xmpp):   # FIXME renomear para process
         u"""Processa mensagens do Papovox para a rede XMPP.
 
         Mensagens podem conter comandos para o XMPPVOX.
@@ -166,43 +165,43 @@ class PapovoxLikeServer(object):
         """
         try:
             while True:
-                data = self.recvmessage(sock)
+                data = self.recvmessage()
                 # Tenta executar algum comando contido na mensagem.
-                if commands.process_command(sock, xmpp, data, self):
+                if commands.process_command(xmpp, data, self):
                     # Caso algum comando seja executado, sai do loop e passa
                     # para a próxima mensagem.
                     continue
                 else:
                     # Caso contrário, envia a mensagem para a rede XMPP.
-                    self.send_xmpp_message(sock, xmpp, data)
+                    self.send_xmpp_message(xmpp, data)
         except socket.error, e:
             log.debug(e.message)
         finally:
             log.info(u"Conexão com o Papovox encerrada")
 
-    def send_xmpp_message(self, sock, xmpp, mbody):
+    def send_xmpp_message(self, xmpp, mbody):
         u"""Envia mensagem XMPP para quem está conversando comigo."""
         if xmpp.talking_to is not None:
             mto = xmpp.talking_to
             # Envia mensagem XMPP.
             xmpp.send_message(mto=mto, mbody=mbody, mtype='chat')
             # Repete a mensagem que estou enviando para ser falada pelo Papovox.
-            self.send_chat_message(sock, u"eu", mbody)
+            self.send_chat_message(u"eu", mbody)
 
             # Avisa se o contato estiver offline.
             bare_jid = xmpp.get_bare_jid(mto)
             roster = xmpp.client_roster
             if bare_jid in roster and not roster[bare_jid].resources:
                 name = xmpp.get_chatty_name(mto)
-                self.sendmessage(sock, S.WARN_MSG_TO_OFFLINE_USER.format(name=name))
+                self.sendmessage(S.WARN_MSG_TO_OFFLINE_USER.format(name=name))
         else:
             mto = u"ninguém"
-            self.sendmessage(sock, S.WARN_MSG_TO_NOBODY)
+            self.sendmessage(S.WARN_MSG_TO_NOBODY)
         log.debug(u"[send_xmpp_message] para %(mto)s: %(mbody)s", locals())
 
     # Funções de envio de dados para o Papovox --------------------------------#
 
-    def sendline(self, sock, line):
+    def sendline(self, line):
         u"""Codifica e envia texto via socket pelo protocolo do Papovox.
 
         Uma quebra de linha é adicionada automaticamente ao fim da mensagem.
@@ -212,9 +211,9 @@ class PapovoxLikeServer(object):
         """
         log.debug(u"[sendline] %s", line)
         line = line.encode(SYSTEM_ENCODING, 'replace')
-        sock.sendall("%s\r\n" % (line,))
+        self.sock.sendall("%s\r\n" % (line,))
 
-    def sendmessage(self, sock, msg):
+    def sendmessage(self, msg):
         u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
         log.debug(u"[sendmessage] %s", msg)
         msg = msg.encode(SYSTEM_ENCODING, 'replace')
@@ -232,11 +231,11 @@ class PapovoxLikeServer(object):
         )
 
         def sendmsg(msg):
-            sock.sendall("%s%s" % (struct.pack('<BH', self.DADOTECLADO, len(msg)), msg))
+            self.sock.sendall("%s%s" % (struct.pack('<BH', self.DADOTECLADO, len(msg)), msg))
         # Envia uma ou mais mensagens pelo socket
         map(sendmsg, chunks)
 
-    def send_chat_message(self, sock, sender, body, _state={}):
+    def send_chat_message(self, sender, body, _state={}):
         u"""Formata e envia uma mensagem de bate-papo via socket.
 
         Use esta função para enviar uma mensagem para o Papovox sintetizar.
@@ -256,7 +255,7 @@ class PapovoxLikeServer(object):
             msg = S.MSG
         else:
             msg = S.MSG_FROM
-        self.sendmessage(sock, msg.format(**locals()))
+        self.sendmessage(msg.format(**locals()))
 
         # Guarda estado para ser usado na próxima execução.
         _state['last_sender'] = sender
@@ -264,7 +263,7 @@ class PapovoxLikeServer(object):
 
     # Funções de recebimento de dados do Papovox ------------------------------#
 
-    def recv(self, sock, size):
+    def recv(self, size):
         u"""Recebe dados via socket.
 
         Use esta função para receber do socket `size' bytes ou menos.
@@ -273,24 +272,24 @@ class PapovoxLikeServer(object):
         Nota: em geral, use esta função ao invés do método 'sock.recv'.
         Veja também a função 'recvall'.
         """
-        data = sock.recv(size)
+        data = self.sock.recv(size)
         if not data and size:
             raise socket.error(u"Nenhum dado recebido do socket, conexão perdida.")
         return data
 
-    def recvline(self, sock, size):
+    def recvline(self, size):
         u"""Recebe uma linha via socket.
 
         A string é retornada em unicode e não contém \r nem \n.
         """
         # Assume que apenas uma linha está disponível no socket.
-        data = self.recv(sock, size).rstrip('\r\n')
+        data = self.recv(size).rstrip('\r\n')
         data = data.decode(SYSTEM_ENCODING)
         if any(c in data for c in '\r\n'):
             log.warning("[recvline] recebeu mais que uma linha!")
         return data
 
-    def recvall(self, sock, size):
+    def recvall(self, size):
         u"""Recebe dados exaustivamente via socket.
 
         Use esta função para receber do socket exatamente `size' bytes.
@@ -300,12 +299,12 @@ class PapovoxLikeServer(object):
         """
         data = StringIO()
         while data.tell() < size:
-            data.write(self.recv(sock, size - data.tell()))
+            data.write(self.recv(size - data.tell()))
         data_str = data.getvalue()
         data.close()
         return data_str
 
-    def recvmessage(self, sock):
+    def recvmessage(self):
         u"""Recebe uma mensagem via socket pelo protocolo do Papovox.
 
         A mensagem é retornada em unicode.
@@ -313,7 +312,7 @@ class PapovoxLikeServer(object):
         """
         # Tenta receber mensagem até obter sucesso.
         while True:
-            datatype, datalen = struct.unpack('<BH', self.recvall(sock, 3))
+            datatype, datalen = struct.unpack('<BH', self.recvall(3))
 
             # Recusa dados do Papovox que não sejam do tipo DADOTECLADO
             if datatype != self.DADOTECLADO:
@@ -326,7 +325,7 @@ class PapovoxLikeServer(object):
                 continue
 
             # Recebe dados/mensagem do Papovox
-            data = self.recvall(sock, datalen)
+            data = self.recvall(datalen)
             data = data.decode(SYSTEM_ENCODING)
             return data
 

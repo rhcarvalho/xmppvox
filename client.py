@@ -153,9 +153,8 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             from_bare = self.get_bare_jid(msg['from'])
             if self.last_sender is None and talking_to_bare != from_bare:
                 sendmessage = self.papovox_server.sendmessage
-                sock = self.papovox_server.sock
                 name = self.get_chatty_name(msg['from'])
-                sendmessage(sock, S.FIRST_INCOME_MSG_HELP.format(name=name))
+                sendmessage(S.FIRST_INCOME_MSG_HELP.format(name=name))
             # Lembra da última pessoa que falou comigo. Útil para usar comando
             # /responder.
             self.last_sender = msg['from']
@@ -196,8 +195,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def no_auth(self, stanza):
         log.error(u"Falha na autenticação: usuário ou senha incorretos.")
-        #sock = self.papovox_server.sock
-        #self.papovox_server.sendline(sock, u"-ERRO usuário ou senha incorretos")
+        #self.papovox_server.sendline(u"-ERRO usuário ou senha incorretos")
 
     def socket_error(self, error):
         raise SystemExit(
