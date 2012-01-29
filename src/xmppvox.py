@@ -55,8 +55,8 @@ def main():
         # Para especificar o mecanismo de autenticação:
         #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
 
-        log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
-        if xmpp.connect():
+        # Valida JID e tenta conectar ao servidor XMPP.
+        if xmpp.validate_jid() and xmpp.connect():
             log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
 
             # Executa cliente XMPP em outra thread.

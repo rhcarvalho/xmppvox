@@ -141,3 +141,4 @@ WARN_MSG_TO_NOBODY = (802, u"Mensagem não enviada. "
 
 # Erros -----------------------------------------------------------------------#
 ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos")
+ERROR_INVALID_JID = (902, u"Erro: conta inválida ({jid})")

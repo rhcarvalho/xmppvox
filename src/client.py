@@ -62,13 +62,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     auto_subscribe = True
 
     def __init__(self, jid, password, papovox):
-        # Valida JID.
-        if not commands.jid_regexp.match(jid):
-            log.error(u"Usuário inválido '%s'.\n"
-                      u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
-                      u"regina@jabber.org", jid)
-            # FIXME avisa e encerra Papovox
-            raise ValueError
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # Referência para o servidor compatível com o Papovox
@@ -94,6 +87,10 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.register_plugin('xep_0004') # Data Forms
         self.register_plugin('xep_0060') # PubSub
         self.register_plugin('xep_0199') # XMPP Ping
+
+    def connect(self, *args, **kwargs):
+        log.info(u"Tentando conectar ao servidor %s...", self.boundjid.host)
+        sleekxmpp.ClientXMPP.connect(self, *args, **kwargs)
 
     def start(self, event):
         u"""Processa evento de início de sessão.
@@ -219,3 +216,17 @@ class BotXMPP(sleekxmpp.ClientXMPP):
             # Ou, se for uma string, remove resource (tudo depois da /, inclusive):
             bare_jid = jid_obj_or_string.split('/', 1)[0]
         return bare_jid
+
+    def validate_jid(self):
+        u"""Valida e avisa ao Papovox caso o JID seja inválido."""
+        jid = self.boundjid.full
+        if not commands.jid_regexp.match(jid):
+            log.error(u"Usuário inválido '%s'.\n"
+                      u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
+                      u"regina@jabber.org", jid)
+            # Avisa ao Papovox que o JID é inválido.
+            self.papovox.sendmessage(S.ERROR_INVALID_JID.format(jid=jid))
+            # Encerra conexão com o Papovox.
+            self.papovox.disconnect()
+            return False
+        return True
