@@ -40,7 +40,7 @@ class get_string(object):
         s = globals()[attr]
         if isinstance(s, tuple):
             if self.show_code:
-                return u"%{:03d}{}".format(*s)
+                return u"%{:03d} {}".format(*s)
             else:
                 return s[1]
         elif isinstance(s, basestring):
@@ -70,17 +70,6 @@ FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}")
 # Conversação -----------------------------------------------------------------#
 MSG = (10, u"{body}")
 MSG_FROM = (11, u"{sender} disse: {body}")
-
-# Avisos ----------------------------------------------------------------------#
-WARN_MSG_TO_OFFLINE_USER = (30, u"* {name} está indisponível agora. "
-                                u"Talvez a mensagem não tenha sido recebida.")
-WARN_MSG_TO_NOBODY = (31, u"Mensagem não enviada. "
-                          u"Com quem deseja falar? \n"
-                          u"Tecle /para seguido do número do contato. \n"
-                          u"Se não souber o número tecle /lista ou /todos.")
-
-# Erros -----------------------------------------------------------------------#
-ERROR_NO_AUTH = (40, u"Erro: usuário ou senha incorretos")
 
 # Comandos --------------------------------------------------------------------#
 
@@ -141,3 +130,14 @@ CMD_ADD_FAIL = (161, u"Não entendi: {invalid_jid}. "
 CMD_DEL_OK = (170, u"Removi contato: {jid}")
 CMD_DEL_FAIL = (171, u"Não entendi: {invalid_jid}. "
                      u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+
+# Avisos ----------------------------------------------------------------------#
+WARN_MSG_TO_OFFLINE_USER = (801, u"* {name} está indisponível agora. "
+                                 u"Talvez a mensagem não tenha sido recebida.")
+WARN_MSG_TO_NOBODY = (802, u"Mensagem não enviada. "
+                           u"Com quem deseja falar? \n"
+                           u"Tecle /para seguido do número do contato. \n"
+                           u"Se não souber o número tecle /lista ou /todos.")
+
+# Erros -----------------------------------------------------------------------#
+ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos")
