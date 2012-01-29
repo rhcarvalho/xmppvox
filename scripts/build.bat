@@ -54,7 +54,7 @@ IF EXIST dist (
 
 SETLOCAL
 SET DNSPYTHON_ZIP=%CD%\thirdparty\dnspython-master-d5dc023.zip
-SET SLEEKXMPP_ZIP=%CD%\thirdparty\sleekxmpp-develop-999f193.zip
+SET SLEEKXMPP_ZIP=%CD%\thirdparty\sleekxmpp-develop-3ab7c8b.zip
 
 IF NOT EXIST "%DNSPYTHON_ZIP%" (
     ECHO Aten‡Æo: falta dependˆncia -- dnspython

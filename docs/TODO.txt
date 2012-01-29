@@ -3,7 +3,6 @@
 Para finalizar v1.0:
 
 * revisar documentação
-* atualizar versão do SleekXMPP
 
 --------------------------------------------------------------------------------
 
