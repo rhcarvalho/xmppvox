@@ -14,5 +14,5 @@ compilar e compactar em um zip cada um dos projetos.
 
 Os zips devem ficar neste diretório.
 
-Se a versão algum projeto for alterada, será preciso alterar o script
+Se a versão de algum projeto for alterada, será preciso alterar o script
 build.bat para usar as versões corretas.

@@ -73,7 +73,6 @@ IF EXIST c:\pyinstaller\pyinstaller.py (
     ECHO Aten‡Æo: PyInstaller nÆo encontrado!
     EXIT 1
 )
-ENDLOCAL
 
 IF NOT EXIST dist (
     ECHO Aten‡Æo: PyInstaller falhou!
@@ -82,6 +81,11 @@ IF NOT EXIST dist (
 
 REM Copia c¢digo-fonte para ser distribu¡do:
 bzr export dist\xmppvox-src
+
+REM Copia dependˆncias:
+COPY "%DNSPYTHON_ZIP%" dist\xmppvox-src\thirdparty\
+COPY "%SLEEKXMPP_ZIP%" dist\xmppvox-src\thirdparty\
+ENDLOCAL
 
 REM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 REM Abaixo seguem dois m‚todos diferentes para descobrir se um execut vel
