@@ -50,16 +50,15 @@ def main():
     strings.get_string.show_code = opts.show_code
     jid, password = get_jid_and_password(opts)
 
-    # FIXME Não deveria alterar constante global...
-    if opts.port:
-        server.PORTA_PAPOVOX = opts.port
+    # Instancia servidor Papovox.
+    papovox_server = server.PapovoxLikeServer(opts.port)
 
     # Inicia cliente XMPP.
-    xmpp = client.BotXMPP(jid, password, server)
-    #xmpp = client.BotXMPP(jid, password, server, sasl_mech="X-GOOGLE-TOKEN")
+    xmpp = client.BotXMPP(jid, password, papovox_server)
+    #xmpp = client.BotXMPP(jid, password, papovox_server, sasl_mech="X-GOOGLE-TOKEN")
 
     # Executa o servidor para o Papovox em outra thread.
-    threading.Thread(target=server.run, args=(xmpp,)).start()
+    threading.Thread(target=papovox_server.run, args=(xmpp,)).start()
 
     log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
     if xmpp.connect():

@@ -27,7 +27,6 @@ Este módulo implementa comandos que o servidor reconhece.
 import re
 import textwrap
 
-import server
 from strings import get_string as S
 
 import logging
@@ -40,7 +39,7 @@ log = logging.getLogger(__name__)
 email_regexp = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', re.I)
 
 
-def process_command(sock, xmpp, data):
+def process_command(sock, xmpp, data, papovox_server):
     u"""Tenta processar algum comando contido em 'data'.
 
     Retorna um booleano indicando se algum comando foi executado.
@@ -73,17 +72,17 @@ def process_command(sock, xmpp, data):
         if mo is not None:
             log.debug("[comando %s]" % cmd_func.__name__)
             # ... executa o comando e encerra o loop
-            cmd_func(sock, xmpp, mo)
+            cmd_func(sock, xmpp, mo, papovox_server=papovox_server)
             break
     else:
         # Nenhum comando foi executado no loop
-        server.sendmessage(sock, S.CMD_UNKNOWN.format(cmd=cmd))
+        papovox_server.sendmessage(sock, S.CMD_UNKNOWN.format(cmd=cmd))
     return True
 
 
 # Comandos --------------------------------------------------------------------#
 
-def ajuda(sock, xmpp=None, mo=None):
+def ajuda(sock, xmpp=None, mo=None, papovox_server=None):
     # Ajuda dividida em blocos para facilitar a leitura.
     help = (S.CMD_HELP1, S.CMD_HELP2, S.CMD_HELP3, S.CMD_HELP4)
     def send_help(help):
@@ -94,10 +93,10 @@ def ajuda(sock, xmpp=None, mo=None):
         help = u" \n".join(textwrap.dedent(help).splitlines())
         # Envia uma única mensagem. Sua leitura pode ser interrompida no
         # Papovox usando Backspace.
-        server.sendmessage(sock, help)
+        papovox_server.sendmessage(sock, help)
     map(send_help, help)
 
-def quem(sock, xmpp, mo=None):
+def quem(sock, xmpp, mo=None, papovox_server=None):
     warning = u""
     if xmpp.talking_to is None:
         # Caso 1: nenhuma conversa iniciada.
@@ -128,53 +127,53 @@ def quem(sock, xmpp, mo=None):
         elif not roster[bare_jid].resources:
             warning = u"não está disponível agora"
     if not warning:
-        server.sendmessage(sock, S.CMD_WHO.format(who=who))
+        papovox_server.sendmessage(sock, S.CMD_WHO.format(who=who))
     else:
-        server.sendmessage(sock, S.CMD_WHO_WARN.format(who=who,
+        papovox_server.sendmessage(sock, S.CMD_WHO_WARN.format(who=who,
                                                        warning=warning))
 
-def lista(sock, xmpp, mo=None):
+def lista(sock, xmpp, mo=None, papovox_server=None):
     u"""Lista contatos disponíveis/online."""
     for number, roster_item in enumerate_online_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        server.sendmessage(sock, S.CMD_LIST_ITEM.format(number=number,
+        papovox_server.sendmessage(sock, S.CMD_LIST_ITEM.format(number=number,
                                                         name=name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        server.sendmessage(sock, S.CMD_LIST_ALL_OFFLINE)
+        papovox_server.sendmessage(sock, S.CMD_LIST_ALL_OFFLINE)
 
-def todos(sock, xmpp, mo=None):
+def todos(sock, xmpp, mo=None, papovox_server=None):
     u"""Lista todos os contatos (online/offline)."""
     for number, roster_item in enumerate_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        server.sendmessage(sock, S.CMD_ALL_ITEM.format(number=number,
+        papovox_server.sendmessage(sock, S.CMD_ALL_ITEM.format(number=number,
                                                        name=name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
     except NameError:
-        server.sendmessage(sock, S.CMD_ALL_NOBODY)
+        papovox_server.sendmessage(sock, S.CMD_ALL_NOBODY)
 
-def para(sock, xmpp, mo):
+def para(sock, xmpp, mo, papovox_server=None):
     try:
         number = int(mo.group(1))
         roster_item = dict(enumerate_roster(xmpp)).get(number, None)
         if roster_item is None:
-            server.sendmessage(sock, S.CMD_TO_WRONG_NUMBER)
+            papovox_server.sendmessage(sock, S.CMD_TO_WRONG_NUMBER)
         else:
             xmpp.talking_to = roster_item.jid
     except ValueError:
-        server.sendmessage(sock, S.CMD_TO_MISSING_NUMBER)
+        papovox_server.sendmessage(sock, S.CMD_TO_MISSING_NUMBER)
     quem(sock, xmpp)
 
-def responder(sock, xmpp, mo=None):
+def responder(sock, xmpp, mo=None, papovox_server=None):
     if xmpp.last_sender is not None:
         xmpp.talking_to = xmpp.last_sender
     quem(sock, xmpp)
 
-def adicionar(sock, xmpp, mo):
+def adicionar(sock, xmpp, mo, papovox_server=None):
     maybe_jid = mo.group(1)
     email_mo = email_regexp.match(maybe_jid)
     if email_mo is not None:
@@ -182,20 +181,20 @@ def adicionar(sock, xmpp, mo):
         xmpp.send_presence_subscription(pto=user_jid,
                                         ptype='subscribe',
                                         pnick=xmpp.nickname)
-        server.sendmessage(sock, S.CMD_ADD_OK.format(jid=user_jid))
+        papovox_server.sendmessage(sock, S.CMD_ADD_OK.format(jid=user_jid))
     else:
-        server.sendmessage(sock, S.CMD_ADD_FAIL.format(invalid_jid=maybe_jid))
+        papovox_server.sendmessage(sock, S.CMD_ADD_FAIL.format(invalid_jid=maybe_jid))
 
-def remover(sock, xmpp, mo):
+def remover(sock, xmpp, mo, papovox_server=None):
     maybe_jid = mo.group(1)
     email_mo = email_regexp.match(maybe_jid)
     if email_mo is not None:
         user_jid = email_mo.group(0)
         xmpp.send_presence_subscription(pto=user_jid, ptype='unsubscribe')
         # ... ou talvez usar xmpp.del_roster_item(user_jid)
-        server.sendmessage(sock, S.CMD_DEL_OK.format(jid=user_jid))
+        papovox_server.sendmessage(sock, S.CMD_DEL_OK.format(jid=user_jid))
     else:
-        server.sendmessage(sock, S.CMD_DEL_FAIL.format(invalid_jid=maybe_jid))
+        papovox_server.sendmessage(sock, S.CMD_DEL_FAIL.format(invalid_jid=maybe_jid))
 
 
 # Utilitários -----------------------------------------------------------------#
