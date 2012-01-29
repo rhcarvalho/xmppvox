@@ -181,9 +181,15 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.papovox.disconnect()
 
     def socket_error(self, error):
-        raise SystemExit(
-            (u"Não foi possível conectar ao servidor '%s'.\n"
-             u"Verifique sua conexão com a Internet.") % self.boundjid.host)
+        host = self.boundjid.host
+        log.error(u"Não foi possível conectar ao servidor '%s'.\n"
+                  u"Verifique sua conexão com a Internet.", host)
+        # Avisa ao Papovox que houve erro de conexão.
+        self.papovox.sendmessage(S.ERROR_SOCKET_ERROR.format(host=host))
+        # Encerra conexão com o Papovox.
+        self.papovox.disconnect()
+        # Interrompe atividades deste cliente XMPP.
+        self.stop.set()
 
     def get_chatty_name(self, jid_obj_or_string):
         u"""Retorna nome de usuário para ser usado numa conversa."""

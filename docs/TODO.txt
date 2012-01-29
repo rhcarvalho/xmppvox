@@ -195,3 +195,6 @@ ________________________________________________________________________________
   Correto:
         /adicionar tereza@gmail.com
         /a tereza@gmail.com
+
+* enviar mensagem pro Papovox caso falhe a validação do nome de usuário
+* enviar mensagem pro Papovox caso falhe a conexão com o servidor XMPP
