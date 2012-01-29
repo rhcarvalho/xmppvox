@@ -56,6 +56,7 @@ def main():
 
     # Inicia cliente XMPP.
     xmpp = client.BotXMPP(jid, password, server)
+    #xmpp = client.BotXMPP(jid, password, server, sasl_mech="X-GOOGLE-TOKEN")
 
     # Executa o servidor para o Papovox em outra thread.
     threading.Thread(target=server.run, args=(xmpp,)).start()
