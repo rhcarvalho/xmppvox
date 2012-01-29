@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 # preciso neste módulo. Além da parte do email, é possível especificar
 # o resource (opcional).
 jid_regexp = re.compile(r'^([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4})(/.*)?$',
-                          re.I)
+                        re.I)
 
 
 def process_command(xmpp, data, papovox):
@@ -63,8 +63,8 @@ def process_command(xmpp, data, papovox):
         (r't(?:odos)?\s*$', todos),
         (r'(?:p(?:ara)?)?\s*(\d*)\s*$', para),
         (r'r(?:esponder)?\s*$', responder),
-        (r'a(?:dicionar)?\s*([^\s*]*)\s*$', adicionar),
-        (r'remover\s*([^\s*]*)\s*$', remover),
+        (r'a(?:dicionar)?(?:\s+([^\s*]*)\s*)?$', adicionar),
+        (r'remover(?:\s+([^\s*]*)\s*)?$', remover),
     )
 
     # Tenta encontrar um comando dentre os existentes
@@ -176,9 +176,9 @@ def responder(xmpp, mo=None, papovox=None):
     quem(xmpp, papovox=papovox)
 
 def adicionar(xmpp, mo, papovox=None):
-    maybe_jid = mo.group(1)
+    maybe_jid = mo.group(1) or u""
     jid_mo = jid_regexp.match(maybe_jid)
-    if jid_mo is not None:
+    if jid_mo:
         user_bare_jid = jid_mo.group(1)
         xmpp.send_presence_subscription(pto=user_bare_jid,
                                         ptype='subscribe',
@@ -188,9 +188,9 @@ def adicionar(xmpp, mo, papovox=None):
         papovox.sendmessage(S.CMD_ADD_FAIL.format(invalid_jid=maybe_jid))
 
 def remover(xmpp, mo, papovox=None):
-    maybe_jid = mo.group(1)
+    maybe_jid = mo.group(1) or u""
     jid_mo = jid_regexp.match(maybe_jid)
-    if jid_mo is not None:
+    if jid_mo:
         user_bare_jid = jid_mo.group(1)
         xmpp.send_presence_subscription(pto=user_bare_jid, ptype='unsubscribe')
         # ... ou talvez usar xmpp.del_roster_item(user_bare_jid)

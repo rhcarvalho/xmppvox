@@ -189,3 +189,9 @@ ________________________________________________________________________________
 * encoding padrão = latin1
 * Sempre iniciar o Papovox e notificar caso senha esteja incorreta
 * organizar em diretórios
+* espaço obrigatório entre comandos e argumento.
+  Incorreto:
+        /atereza@gmail.com é inválido.
+  Correto:
+        /adicionar tereza@gmail.com
+        /a tereza@gmail.com
