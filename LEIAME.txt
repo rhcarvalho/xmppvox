@@ -6,7 +6,7 @@ XMPPVOX: Cliente de bate-papo XMPP para o DOSVOX
 ---------------------
 
 O XMPPVOX é um cliente de bate-papo que suporta o protocolo XMPP. Este
-protocolo é usado na Internet para permitir bate-papo em "tempo real",
+protocolo é usado na Internet para permitir bate-papo em tempo real,
 com suporte a diversas funcionalidadades, que incluem informação sobre
 presença (disponível, ocupado, indisponível, etc) e lista de
 contatos.
@@ -14,16 +14,17 @@ contatos.
 O protocolo é amplamente utilizado, e conta com milhões de usuários
 em todo o mundo. Ele é usado pelo Google Talk (bate-papo do Google,
 incluído no Gmail) e Facebook para permitir que seus usuários se
-comuniquem. O site jabber.org também permite criar uma conta para ser
-usada com clientes XMPP, incluindo o XMPPVOX.
+comuniquem. O site Jabber.org (ou seu equivalente brasileiro jabber-br.org)
+também permite criar uma conta para ser usada com clientes XMPP, incluindo
+o XMPPVOX.
 
 Existe a possibilidade de comunicação entre clientes de servidores
 diferentes. Isto quer dizer que com uma conta Google é possível falar
 não só com seus amigos que tem conta no Google, mas também com seus
-amigos que usam qualquer outro servidor XMPP, como o Facebook ou o
-Jabber.
+amigos que usam outro servidor XMPP, bastando adicioná-los a sua lista
+de contatos.
 
-O XMPPVOX é utilizado através do Papovox, parte integrante do DOSVOX.
+O XMPPVOX é utilizado através do PapoX, parte integrante do DOSVOX.
 
 
 2. Como usar o XMPPVOX?
@@ -45,14 +46,15 @@ XMPPVOX, seu nome de usuário XMPP é fulano@chat.facebook.com e sua
 senha é a mesma usada para acessar o Facebook.
 
 Se você ainda não tem uma conta, sugerimos que crie ou peça ajuda a
-algum conhecido para criar uma conta no Google ou no Jabber.org. O
-XMPPVOX não cria novas contas.
+algum conhecido para criar uma conta no Google, Jabber.org ou Jabber-br.org.
+O XMPPVOX não cria novas contas.
 
 
 2.2. Iniciar o XMPPVOX
 
-Execute o aplicativo XMPPVOX.exe para iniciar o XMPPVOX. É preciso
-fornecer seu usuário e senha para conectar ao servidor XMPP.
+Execute PapoX através do DOSVOX. Ele se encarregará de iniciar o aplicativo
+xmppvox.exe para você. É preciso fornecer seu usuário e senha para conectar
+ao servidor XMPP.
 
 O servidor XMPP é identificado automaticamente a partir de seu nome de
 usuário. Digite seu nome de usuário completo, algo como
@@ -62,24 +64,12 @@ similar. Em seguida, tecle ENTER.
 Digite sua senha e tecle ENTER. Ao digitar a senha, ela não aparece na
 tela para sua segurança.
 
-Agora o XMPPVOX está conectado à rede XMPP, e aguardando o início do
-Papovox.
+Agora o XMPPVOX está conectado à rede XMPP.
 
 
-2.3. Iniciar o Papovox
+2.3. Converse com seus amigos
 
-No DOSVOX, e escolha a opção rede (r), seguida de Papovox (p).
-Configure o Papovox para se conectar a "localhost", e peça para chamar
-(l).
-
-"localhost" é o nome que corresponde a seu próprio computador. Isto é
-necessário para ligar o Papovox ao XMPPVOX. O XMPPVOX conecta você a
-um servidor XMPP na Internet.
-
-
-2.4. Converse com seus amigos
-
-Depois de iniciar o Papovox, você deve receber uma mensagem de
+Depois de iniciar o PapoX, você deve receber uma mensagem de
 boas-vindas.
 
 Se esta é a primeira vez que usa o XMPPVOX, digite /ajuda e tecle ENTER
@@ -119,8 +109,7 @@ contatos terão sempre o mesmo número.
 Para saber com quem você está falando agora, use o comando /quem (ou
 o atalho /q).
 
-Para terminar o XMPPVOX, basta terminar o Papovox. Use a tecla ESC e
-confirme com s.
+Para terminar o XMPPVOX, basta sair do PapoX. Use a tecla ESC e confirme com s.
 
 
 3. Licença
@@ -144,7 +133,7 @@ significa, pode ignorar esta seção.*
 Para utilizar o XMPPVOX é preciso que estejam instalados os seguintes
 programas e bibliotecas:
 
-    - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
+    - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B) ou PapoX
     - Python 2.7 (testado com 2.7.2)
-    - dnspython (testado com 1.9.4)
-    - SleekXMPP (testado com 1.0)
+    - dnspython (versão incluída no diretório thirdparty)
+    - SleekXMPP (versão incluída no diretório thirdparty)

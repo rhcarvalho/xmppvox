@@ -1,9 +1,5 @@
 ﻿XMPPVOX
 
-Para finalizar v1.0:
-
-* revisar documentação
-
 --------------------------------------------------------------------------------
 
 * remover contato usando seu número na lista de contatos (não implementar)
@@ -198,3 +194,5 @@ ________________________________________________________________________________
 
 * enviar mensagem pro Papovox caso falhe a validação do nome de usuário
 * enviar mensagem pro Papovox caso falhe a conexão com o servidor XMPP
+
+* revisar documentação
