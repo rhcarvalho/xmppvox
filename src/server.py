@@ -130,6 +130,7 @@ class PapovoxLikeServer(object):
 
     def disconnect(self):
         u"""Desliga a conexão com o Papovox."""
+        log.debug(u"Encerrando conexão com o Papovox...")
         self.socket.shutdown(socket.SHUT_RDWR)
 
     # Funções de integração com o cliente XMPP --------------------------------#
