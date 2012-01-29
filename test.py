@@ -154,7 +154,7 @@ class TestCaseXMPP(unittest.TestCase):
         self.inbox = []
 
         class FakeServer(object):
-            _SOCK = None
+            sock = None
             @staticmethod
             def sendmessage(sock, msg):
                 self.outbox.append(msg)

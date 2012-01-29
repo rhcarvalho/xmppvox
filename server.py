@@ -49,7 +49,6 @@ SYSTEM_ENCODING = 'cp1252'
 #------------------------------------------------------------------------------#
 
 
-
 class PapovoxLikeServer(object):
     u"""Um servidor compatível com o Papovox."""
 
@@ -62,7 +61,7 @@ class PapovoxLikeServer(object):
     TAMANHO_MAXIMO_MSG = 255
 
     def __init__(self, port=None):
-        self._SOCK = None   # FIXME renomear _SOCK => sock
+        self.sock = None
         self.port = port or self.PORTA_PAPOVOX
 
     def run(self, xmpp):  # FIXME renomear para connect
@@ -79,7 +78,7 @@ class PapovoxLikeServer(object):
             # Conecta ao Papovox --------------------------------------------------#
             try:
                 conn, addr, nickname = self.accept(s)
-                self._SOCK = conn
+                self.sock = conn
             except socket.error:
                 log.error(u"Erro: Não foi possível conectar ao Papovox.")
                 raise
