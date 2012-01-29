@@ -11,16 +11,16 @@ Rede
                 'message'                            +
                 'message_form'                       -
                 'message_xform'                      -
-                'no_auth'                            -
+                'no_auth'                            +
                 'proxy_error'                        ?
                 'sent_presence'                      -
                 'session_end'                        -
                 'session_start'                      +
-                'socket_error'                       ?
+                'socket_error'                       +
                 'stream_error'                       ?
 
 Contatos
-                'attention'                          - v1.1
+                'attention'                          - v1.1+
                 'changed_status'                     + (apenas pegar apelido) v1.1 ler outros dados de status
                 'changed_subscription'               -
                 'got_offline'                        +
