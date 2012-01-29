@@ -68,18 +68,18 @@ ONLINE_CONTACTS_INFO = (1, u"{amount} {contacts}. \n"
 FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}")
 
 # Conversação -----------------------------------------------------------------#
-MSG = (10, u"{body}")
-MSG_FROM = (11, u"{sender} disse: {body}")
+MSG_FROM = (101, u"{sender} disse: {body}")
+MSG = (102, u"{body}")
 
 # Comandos --------------------------------------------------------------------#
 
 # Prefixo que ativa o modo de comando
 CMD_PREFIX = '/'
 
-CMD_UNKNOWN = (100, u"Comando desconhecido: {cmd}")
+CMD_UNKNOWN = (200, u"Comando desconhecido: {cmd}")
 
 CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
-    (111, u"""\
+    (211, u"""\
 
     Ajuda do XMPPVOX:
 
@@ -87,18 +87,18 @@ CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
     Cada frase é enviada para apenas um contato.
 
     """),
-    (112, u"""\
+    (212, u"""\
     Para saber quais são os contatos disponíveis tecle {prefix}lista.
     Para saber todos os contatos (inclusive indisponíveis) tecle {prefix}todos.
     Para conversar com alguém tecle {prefix}para seguido do número do contato.
     """),
-    (113, u"""\
+    (213, u"""\
     Para falar com a última pessoa que enviou mensagem para você, tecle {prefix}responder.
     Para saber com quem fala agora tecle {prefix}quem.
     Para adicionar ou remover um contato tecle {prefix}adicionar ou {prefix}remover seguido do contato.
 
     """),
-    (114, u"""\
+    (214, u"""\
     Atalhos para os comandos:
     {prefix}ajuda = {prefix}? .
     {prefix}lista = {prefix}l .
@@ -111,24 +111,24 @@ CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
     """),
     )
 
-CMD_WHO = (120, u"Falando com {who}.")
+CMD_WHO = (220, u"Falando com {who}.")
 CMD_WHO_WARN = (121, u"Falando com ¬ {who} ({warning}).")
 
-CMD_LIST_ITEM = (130, u"{number} {name}")
+CMD_LIST_ITEM = (230, u"{number} {name}")
 CMD_LIST_ALL_OFFLINE = (131, u"Nenhum contato disponível agora!")
 
-CMD_ALL_ITEM = (140, u"{number} {name}")
-CMD_ALL_NOBODY = (141, u"Nenhum contato na sua lista!")
+CMD_ALL_ITEM = (240, u"{number} {name}")
+CMD_ALL_NOBODY = (241, u"Nenhum contato na sua lista!")
 
-CMD_TO_WRONG_NUMBER = (150, u"Número de contato inexistente! Use %slista." % CMD_PREFIX)
-CMD_TO_MISSING_NUMBER = (151, u"Faltou número do contato! Use %slista." % CMD_PREFIX)
+CMD_TO_WRONG_NUMBER = (250, u"Número de contato inexistente! Use %slista." % CMD_PREFIX)
+CMD_TO_MISSING_NUMBER = (251, u"Faltou número do contato! Use %slista." % CMD_PREFIX)
 
-CMD_ADD_OK = (160, u"Adicionei contato: {jid}")
-CMD_ADD_FAIL = (161, u"Não entendi: {invalid_jid}. "
+CMD_ADD_OK = (260, u"Adicionei contato: {jid}")
+CMD_ADD_FAIL = (261, u"Não entendi: {invalid_jid}. "
                      u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
 
-CMD_DEL_OK = (170, u"Removi contato: {jid}")
-CMD_DEL_FAIL = (171, u"Não entendi: {invalid_jid}. "
+CMD_DEL_OK = (270, u"Removi contato: {jid}")
+CMD_DEL_FAIL = (271, u"Não entendi: {invalid_jid}. "
                      u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
 
 # Avisos ----------------------------------------------------------------------#
