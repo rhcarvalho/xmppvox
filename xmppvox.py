@@ -62,9 +62,6 @@ def main():
         if xmpp.connect():
             log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
 
-            xmpp.event('papovox_connected',
-                       {'nick': papovox.nickname})
-
             # Executa cliente XMPP em outra thread.
             xmpp.process(block=False)
 
@@ -73,7 +70,8 @@ def main():
             # gerado pelo PyInstaller termina prematuramente.
             papovox.process(xmpp)
 
-            xmpp.event('papovox_disconnected')
+            # Interrompe cliente XMPP quando Papovox desconectar.
+            xmpp.disconnect()
     else:
         log.error(u"Erro: Não foi possível conectar ao Papovox.")
     log.info(u"Fim do XMPPVOX")

@@ -64,6 +64,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
         # Referência para o servidor compatível com o Papovox
         self.papovox = papovox
+        self.nickname = papovox.nickname
 
         # Eventos do SleekXMPP que serão tratados
         self.add_event_handler("session_start", self.start)
@@ -73,15 +74,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('changed_status', self.changed_status)
         self.add_event_handler('no_auth', self.no_auth)
         self.add_event_handler('socket_error', self.socket_error)
-
-        # Eventos de integração com Papovox
-        self.add_event_handler('papovox_connected', self.papovox_connected)
-        self.add_event_handler('papovox_disconnected', self.papovox_disconnected)
-
-        self.nickname = u""
-
-        # Indica se a conexão com o Papovox já foi estabelecida
-        self.papovox_is_connected = False
 
         # Com quem estou conversando
         self.talking_to = None
@@ -100,37 +92,8 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         Quando uma conexão é estabelecida, a lista de contatos é solicitada.
         """
         self.get_roster()
-        self.send_initial_presence()
-
-    def papovox_connected(self, event):
-        u"""Processa evento de conexão com o Papovox.
-
-        Quando o Papovox se conecta ao XMPPVOX, o usuário envia a presença
-        inicial para o servidor e passa a estar efetivamente online para
-        seus contatos.
-        """
-        self.papovox_is_connected = True
-        self.nickname = event.get('nick')
-        self.send_initial_presence()
-
-    def send_initial_presence(self):
-        u"""Envia presença inicial em broadcast.
-
-        Neste momento o usuário aparece como online para seus contatos.
-        Pode ser chamado mais de uma vez, mas apenas uma presença será enviada.
-        """
-        if not self.sentpresence and self.sessionstarted and self.papovox_is_connected:
-            log.debug(u"Enviando presença inicial...")
-            self.send_presence(pnick=self.nickname)
-
-    def papovox_disconnected(self, event):
-        u"""Processa evento de desconexão do Papovox.
-
-        Quando o Papovox se desconecta do XMPPVOX, a conexão com o servidor
-        XMPP é encerrada.
-        """
-        self.papovox_is_connected = False
-        self.disconnect()
+        log.debug(u"Enviando presença inicial...")
+        self.send_presence(pnick=self.nickname)
 
     def message(self, msg):
         u"""Processa mensagens recebidas.
