@@ -27,6 +27,7 @@ Google Talk, Facebook chat e Jabber.
 """
 
 import sys
+from threading import Timer
 
 import sleekxmpp
 
@@ -58,11 +59,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     auto_authorize = True
     auto_subscribe = True
 
-    def __init__(self, jid, password, server):
+    def __init__(self, jid, password, papovox):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
         # Referência para o servidor compatível com o Papovox
-        self.papovox_server = server
+        self.papovox = papovox
 
         # Eventos do SleekXMPP que serão tratados
         self.add_event_handler("session_start", self.start)
@@ -152,7 +153,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
                 talking_to_bare = None
             from_bare = self.get_bare_jid(msg['from'])
             if self.last_sender is None and talking_to_bare != from_bare:
-                sendmessage = self.papovox_server.sendmessage
+                sendmessage = self.papovox.sendmessage
                 name = self.get_chatty_name(msg['from'])
                 sendmessage(S.FIRST_INCOME_MSG_HELP.format(name=name))
             # Lembra da última pessoa que falou comigo. Útil para usar comando
@@ -162,6 +163,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def got_online(self, presence):
         u"""Registra que um contato apareceu online."""
         log.debug(u"Entrou: %s" % presence['from'])
+        if presence['from'].bare == self.boundjid.bare:
+            # Exibe lista de contatos online alguns segundos após eu ficar
+            # online. É necessário esperar um tempo para receber presenças dos
+            # contatos.
+            Timer(3, self.papovox.show_online_contacts, (self,)).start()
 
     def got_offline(self, presence):
         u"""Registra que um contato ficou offline."""
@@ -195,7 +201,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def no_auth(self, stanza):
         log.error(u"Falha na autenticação: usuário ou senha incorretos.")
-        #self.papovox_server.sendline(u"-ERRO usuário ou senha incorretos")
+        #self.papovox.sendline(u"-ERRO usuário ou senha incorretos")
 
     def socket_error(self, error):
         raise SystemExit(

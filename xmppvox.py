@@ -26,7 +26,6 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
 import sys
-from threading import Timer
 
 from optparse import OptionParser
 import getpass
@@ -68,10 +67,6 @@ def main():
 
             # Executa cliente XMPP em outra thread.
             xmpp.process(block=False)
-
-            # Exibe lista de contatos online alguns segundos depois de iniciar.
-            # É necessário esperar um tempo para receber presenças dos contatos.
-            Timer(5, papovox.show_online_contacts, (xmpp,)).start()
 
             # Bloqueia processando mensagens do Papovox.
             # Sem o bloqueio, a thread principal termina e o executável
