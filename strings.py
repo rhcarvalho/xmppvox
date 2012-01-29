@@ -79,6 +79,9 @@ WARN_MSG_TO_NOBODY = (31, u"Mensagem não enviada. "
                           u"Tecle /para seguido do número do contato. \n"
                           u"Se não souber o número tecle /lista ou /todos.")
 
+# Erros -----------------------------------------------------------------------#
+ERROR_NO_AUTH = (40, u"Erro: usuário ou senha incorretos")
+
 # Comandos --------------------------------------------------------------------#
 
 # Prefixo que ativa o modo de comando

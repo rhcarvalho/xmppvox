@@ -2,7 +2,6 @@
 
 Para finalizar v1.0:
 
-* Sempre iniciar o Papovox e notificar caso senha esteja incorreta (ou mensagem +OK, ou -FALHOU)
 * organizar em diretórios
 * revisar documentação
 * atualizar versão do SleekXMPP
@@ -190,3 +189,4 @@ ________________________________________________________________________________
   (precisa passar -c na linha de comando)
 * Permitir user@server.tld/resource
 * encoding padrão = latin1
+* Sempre iniciar o Papovox e notificar caso senha esteja incorreta

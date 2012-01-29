@@ -165,7 +165,10 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def no_auth(self, stanza):
         log.error(u"Falha na autenticação: usuário ou senha incorretos.")
-        #self.papovox.sendline(u"-ERRO usuário ou senha incorretos")
+        # Avisa ao Papovox que a autenticação falhou.
+        self.papovox.sendmessage(S.ERROR_NO_AUTH)
+        # Encerra conexão com o Papovox.
+        self.papovox.disconnect()
 
     def socket_error(self, error):
         raise SystemExit(
