@@ -127,7 +127,14 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def got_online(self, presence):
         u"""Registra que um contato apareceu online."""
         log.debug(u"Entrou: %s" % presence['from'])
+
+        # Quando eu entrar...
         if presence['from'].bare == self.boundjid.bare:
+            # Envia mensagem de boas-vindas
+            self.papovox.sendmessage(S.WELCOME.format(nick=self.nickname,
+                                                      # FIXME controlar versão noutro lugar
+                                                      version="1.0"))
+
             # Exibe lista de contatos online alguns segundos após eu ficar
             # online. É necessário esperar um tempo para receber presenças dos
             # contatos.

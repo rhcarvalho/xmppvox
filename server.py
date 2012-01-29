@@ -100,11 +100,6 @@ class PapovoxLikeServer(object):
             except socket.error:
                 return False
             #------------------------------------------------------------------#
-
-            # Envia mensagem de boas-vindas
-            self.sendmessage(S.WELCOME.format(nick=self.nickname,
-                                              # FIXME controlar versão noutro lugar
-                                              version="1.0"))
             return True
         except socket.error, e:
             log.error(e.message or u" ".join(map(unicode, e.args)))
