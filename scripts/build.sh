@@ -20,7 +20,13 @@
 
 if  [[ `uname` == MINGW* ]] ;
 then
-    cmd.exe //c build.bat
+
+    SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
+    PROJECT_HOME_DIR=SCRIPTS_DIR/..
+
+    pushd $PROJECT_HOME_DIR > /dev/null
+    cmd.exe //c "$SCRIPTS_DIR\\build.bat"
+    popd > /dev/null
 else
     echo "Este script deve ser executado usando o MSYS (sh no Windows)"
 fi

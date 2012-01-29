@@ -2,7 +2,6 @@
 
 Para finalizar v1.0:
 
-* organizar em diretórios
 * revisar documentação
 * atualizar versão do SleekXMPP
 
@@ -190,3 +189,4 @@ ________________________________________________________________________________
 * Permitir user@server.tld/resource
 * encoding padrão = latin1
 * Sempre iniciar o Papovox e notificar caso senha esteja incorreta
+* organizar em diretórios

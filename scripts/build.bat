@@ -43,6 +43,9 @@ REM       compactados:
 REM          pip zip dns
 REM          pip zip sleekxmpp
 REM
+REM Execute este script a partir do diret¢rio principal do projeto:
+REM     scripts\build.bat
+REM Ou use o bash script (com MINGW)
 
 REM Remove arquivos antigos se existirem
 IF EXIST dist (
@@ -65,7 +68,7 @@ IF NOT EXIST "%SLEEKXMPP_ZIP%" (
 REM Executa o pyinstaller.py se existir ou exibe mensagem e termina.
 IF EXIST c:\pyinstaller\pyinstaller.py (
     c:\pyinstaller\pyinstaller.py --onefile --version-file=version ^
-        --paths="%DNSPYTHON_ZIP%;%SLEEKXMPP_ZIP%" xmppvox.py
+        --paths="%DNSPYTHON_ZIP%;%SLEEKXMPP_ZIP%" src/xmppvox.py
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     EXIT 1

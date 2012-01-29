@@ -41,7 +41,8 @@ then
     exit 3
 fi
 
-out=$PWD/thirdparty
+SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
+out=$SCRIPTS_DIR/../thirdparty
 
 pushd $1
 
