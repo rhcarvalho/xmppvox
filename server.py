@@ -158,15 +158,6 @@ class PapovoxLikeServer(object):
         finally:
             log.info(u"Conexão com o Papovox encerrada")
 
-    def new_message_handler(self, xmpp):
-        u"""Cria uma função para processar mensagens recebidas da rede XMPP."""
-        def message_handler(msg):
-            u"""Recebe uma mensagem da rede XMPP e envia para o Papovox."""
-            sender = xmpp.get_chatty_name(msg['from'])
-            body = msg['body']
-            self.send_chat_message(sender, body)
-        return message_handler
-
     def show_online_contacts(self, xmpp, sendmessage=None):
         u"""Envia para o Papovox informação sobre contatos disponíveis."""
         online_contacts_count = len(commands.enumerate_online_roster(xmpp))

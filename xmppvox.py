@@ -63,8 +63,7 @@ def main():
             log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
 
             xmpp.event('papovox_connected',
-                       {'nick': papovox.nickname,
-                        'message_handler': papovox.new_message_handler(xmpp)})
+                       {'nick': papovox.nickname})
 
             # Executa cliente XMPP em outra thread.
             xmpp.process(block=False)

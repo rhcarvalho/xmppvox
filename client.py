@@ -79,7 +79,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.add_event_handler('papovox_disconnected', self.papovox_disconnected)
 
         self.nickname = u""
-        self.message_handler = None
 
         # Indica se a conexão com o Papovox já foi estabelecida
         self.papovox_is_connected = False
@@ -112,7 +111,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         """
         self.papovox_is_connected = True
         self.nickname = event.get('nick')
-        self.message_handler = event.get('message_handler')
         self.send_initial_presence()
 
     def send_initial_presence(self):
@@ -140,11 +138,14 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         As mensagens podem ser também de bate-papo multi-usuário (MUC)
         ou mensagens de erro.
         """
-        # Só processa mensagens depois que 'message_handler' for definido.
         # Ignora mensagens que não sejam 'chat' ou 'normal', por exemplo
         # mensagens de erro.
-        if callable(self.message_handler) and msg['type'] in ('chat', 'normal'):
-            self.message_handler(msg)
+        if msg['type'] in ('chat', 'normal'):
+            # Recebe mensagem da rede XMPP e envia para o Papovox.
+            sender = self.get_chatty_name(msg['from'])
+            body = msg['body']
+            self.papovox.send_chat_message(sender, body)
+
             # Ensina o comando /responder na primeira vez que alguém me mandar
             # mensagem, se eu ainda não estiver falando com este alguém.
             if self.talking_to:
