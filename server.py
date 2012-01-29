@@ -158,7 +158,7 @@ class PapovoxLikeServer(object):
         finally:
             log.info(u"Conexão com o Papovox encerrada")
 
-    def show_online_contacts(self, xmpp, sendmessage=None):
+    def show_online_contacts(self, xmpp):
         u"""Envia para o Papovox informação sobre contatos disponíveis."""
         online_contacts_count = len(commands.enumerate_online_roster(xmpp))
         if online_contacts_count == 0:
@@ -168,9 +168,8 @@ class PapovoxLikeServer(object):
             contacts = u"contato disponível"
         else:
             contacts = u"contatos disponíveis"
-        sendmessage = sendmessage or self.sendmessage  # FIXME forçação de barra para testar código
-        sendmessage(S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
-                                                  contacts=contacts))
+        self.sendmessage(S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
+                                                       contacts=contacts))
 
     def send_xmpp_message(self, xmpp, mbody):
         u"""Envia mensagem XMPP para quem está conversando comigo."""

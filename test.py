@@ -164,8 +164,7 @@ class TestCaseXMPP(unittest.TestCase):
         self.outbox = []
         # Caixa de entrada de mensagens XMPP
         self.inbox = []
-
-        class FakePapovoxServer(object):
+        class FakePapovoxServer(PapovoxLikeServer):
             nickname = u"Test"
             @staticmethod
             def sendmessage(msg):
@@ -174,7 +173,6 @@ class TestCaseXMPP(unittest.TestCase):
             def send_chat_message(sender, body):
                 self.inbox.append(body)
         papovox = FakePapovoxServer()
-
         self.xmpp = BotXMPP('', '', papovox)
 
 
@@ -199,10 +197,8 @@ class TestClient(TestCaseXMPP):
 
 class TestServerClientInteraction(TestCaseXMPP):
     def test_show_no_online_contacts(self):
-        s = PapovoxLikeServer()
         self.assertEqual(len(self.outbox), 0, u"Caixa de saída começa vazia")
-        s.show_online_contacts(self.xmpp,
-                               sendmessage=self.xmpp.papovox.sendmessage)
+        self.xmpp.papovox.show_online_contacts(self.xmpp)
         self.assertEqual(len(self.outbox), 1, u"Aviso não há contatos online")
 
 
