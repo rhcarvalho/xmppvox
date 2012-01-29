@@ -42,8 +42,8 @@ log = logging.getLogger(__name__)
 # Constantes ------------------------------------------------------------------#
 
 # Todas as strings passadas para o Papovox devem ser codificadas usando a
-# codificação padrão do Windows.
-SYSTEM_ENCODING = 'cp1252'
+# codificação padrão do DOSVOX, ISO-8859-1, também conhecida como Latin-1.
+SYSTEM_ENCODING = 'ISO-8859-1'
 
 #------------------------------------------------------------------------------#
 
