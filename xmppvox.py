@@ -55,6 +55,7 @@ def main():
 
         # Inicia cliente XMPP.
         xmpp = client.BotXMPP(jid, password, papovox)
+        # Para especificar o mecanismo de autenticação:
         #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
 
         log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
@@ -63,7 +64,7 @@ def main():
 
             xmpp.event('papovox_connected',
                        {'nick': papovox.nickname,
-                        'message_handler': papovox.new_message_handler(xmpp)})  # FIXME direct=True
+                        'message_handler': papovox.new_message_handler(xmpp)})
 
             # Executa cliente XMPP em outra thread.
             xmpp.process(block=False)
