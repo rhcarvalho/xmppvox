@@ -90,7 +90,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def connect(self, *args, **kwargs):
         log.info(u"Tentando conectar ao servidor %s...", self.boundjid.host)
-        sleekxmpp.ClientXMPP.connect(self, *args, **kwargs)
+        return sleekxmpp.ClientXMPP.connect(self, *args, **kwargs)
 
     def start(self, event):
         u"""Processa evento de início de sessão.
