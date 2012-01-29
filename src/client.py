@@ -90,11 +90,20 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def start(self, event):
         u"""Processa evento de início de sessão.
 
-        Quando uma conexão é estabelecida, a lista de contatos é solicitada.
+        Quando uma conexão é estabelecida, a lista de contatos é solicitada,
+        a presença inicial enviada para rede XMPP e uma mensagem de boas-vindas
+        é enviada ao Papovox.
         """
         self.get_roster()
         log.debug(u"Enviando presença inicial...")
         self.send_presence(pnick=self.nickname)
+        # Envia mensagem de boas-vindas
+        self.papovox.sendmessage(S.WELCOME.format(nick=self.nickname,
+                                                  version=__version__))
+        # Exibe lista de contatos online alguns segundos após eu ficar
+        # online. É necessário esperar um tempo para receber presenças dos
+        # contatos.
+        Timer(5, self.papovox.show_online_contacts, (self,)).start()
 
     def message(self, msg):
         u"""Processa mensagens recebidas.
@@ -128,17 +137,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def got_online(self, presence):
         u"""Registra que um contato apareceu online."""
         log.debug(u"Entrou: %s" % presence['from'])
-
-        # Quando eu entrar...
-        if presence['from'].bare == self.boundjid.bare:
-            # Envia mensagem de boas-vindas
-            self.papovox.sendmessage(S.WELCOME.format(nick=self.nickname,
-                                                      version=__version__))
-
-            # Exibe lista de contatos online alguns segundos após eu ficar
-            # online. É necessário esperar um tempo para receber presenças dos
-            # contatos.
-            Timer(3, self.papovox.show_online_contacts, (self,)).start()
 
     def got_offline(self, presence):
         u"""Registra que um contato ficou offline."""
