@@ -26,7 +26,7 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
 import sys
-import threading
+from threading import Timer
 
 from optparse import OptionParser
 import getpass
@@ -48,25 +48,40 @@ def main():
     opts, args = parse_command_line()
     configure_logging(opts)
     strings.get_string.show_code = opts.show_code
-    jid, password = get_jid_and_password(opts)
 
-    # Instancia servidor Papovox.
-    papovox_server = server.PapovoxLikeServer(opts.port)
+    # Instancia servidor e aguarda conexão do Papovox.
+    papovox = server.PapovoxLikeServer(opts.port)
+    if papovox.connect():
+        jid, password = get_jid_and_password(opts)
 
-    # Inicia cliente XMPP.
-    xmpp = client.BotXMPP(jid, password, papovox_server)
-    #xmpp = client.BotXMPP(jid, password, papovox_server, sasl_mech="X-GOOGLE-TOKEN")
+        # Inicia cliente XMPP.
+        xmpp = client.BotXMPP(jid, password, papovox)
+        #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
 
-    # Executa o servidor para o Papovox em outra thread.
-    threading.Thread(target=papovox_server.run, args=(xmpp,)).start()
+        log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
+        if xmpp.connect():
+            log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
 
-    log.info(u"Tentando conectar ao servidor %s...", xmpp.boundjid.host)
-    if xmpp.connect():
-        log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
-        # Executa cliente XMPP e bloqueia.
-        # Sem o bloqueio, a thread principal termina e o executável
-        # gerado pelo PyInstaller termina prematuramente.
-        xmpp.process(block=True)
+            xmpp.event('papovox_connected',
+                       {'nick': papovox.nickname,
+                        'message_handler': papovox.new_message_handler(xmpp)})  # FIXME direct=True
+
+            # Executa cliente XMPP em outra thread.
+            xmpp.process(block=False)
+
+            # Exibe lista de contatos online alguns segundos depois de iniciar.
+            # É necessário esperar um tempo para receber presenças dos contatos.
+            Timer(5, papovox.show_online_contacts, (xmpp,)).start()
+
+            # Bloqueia processando mensagens do Papovox.
+            # Sem o bloqueio, a thread principal termina e o executável
+            # gerado pelo PyInstaller termina prematuramente.
+            papovox.process(xmpp)
+
+            xmpp.event('papovox_disconnected')
+    else:
+        log.error(u"Erro: Não foi possível conectar ao Papovox.")
+    log.info(u"Fim do XMPPVOX")
 
 
 def parse_command_line():

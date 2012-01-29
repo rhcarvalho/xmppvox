@@ -54,23 +54,23 @@ class TestRecv(unittest.TestCase):
         self.s = PapovoxLikeServer()
 
     def test_exact_amount(self):
-        self.s.sock = SocketMock()
+        self.s.socket = SocketMock()
         self.assertEqual(len(self.s.recv(23)), 23)
 
     def test_less_data(self):
-        self.s.sock = SocketMock(recv_size=2)
+        self.s.socket = SocketMock(recv_size=2)
         self.assertEqual(len(self.s.recv(23)), 2)
 
     def test_nothing_is_an_error(self):
-        self.s.sock = SocketMock(recv_size=0)
+        self.s.socket = SocketMock(recv_size=0)
         self.assertRaises(socket.error, self.s.recv, 23)
 
     def test_nothing_is_not_an_error_when_asked_for_nothing(self):
-        self.s.sock = SocketMock(recv_size=0)
+        self.s.socket = SocketMock(recv_size=0)
         self.assertEqual(len(self.s.recv(0)), 0)
 
     def test_no_more_than_asked(self):
-        self.s.sock = SocketMock(recv_size=42)
+        self.s.socket = SocketMock(recv_size=42)
         self.assertEqual(len(self.s.recv(23)), 23)
 
 
@@ -79,40 +79,46 @@ class TestRecvAll(unittest.TestCase):
         self.s = PapovoxLikeServer()
 
     def test_single_try(self):
-        self.s.sock = SocketMock()
+        self.s.socket = SocketMock()
         self.assertEqual(len(self.s.recvall(23)), 23)
 
     def test_multiple_tries(self):
-        self.s.sock = SocketMock(recv_size=2)
+        self.s.socket = SocketMock(recv_size=2)
         self.assertEqual(len(self.s.recvall(23)), 23)
 
     def test_can_ask_for_nothing(self):
-        self.s.sock = SocketMock(recv_size=2)
+        self.s.socket = SocketMock(recv_size=2)
         self.assertEqual(len(self.s.recvall(0)), 0)
 
     def test_nothing_is_an_error(self):
-        self.s.sock = SocketMock(recv_size=0)
+        self.s.socket = SocketMock(recv_size=0)
         self.assertRaises(socket.error, self.s.recvall, 23)
 
     def test_nothing_is_not_an_error_when_asked_for_nothing(self):
-        self.s.sock = SocketMock(recv_size=0)
+        self.s.socket = SocketMock(recv_size=0)
         self.assertEqual(len(self.s.recvall(0)), 0)
 
     def test_no_more_than_asked(self):
-        self.s.sock = SocketMock(recv_size=42)
+        self.s.socket = SocketMock(recv_size=42)
         self.assertEqual(len(self.s.recvall(23)), 23)
 
 
 class PapovoxSocketMock(object):
     def __init__(self, addr, nickname):
-        self.conn = self
-        self.addr = addr
-        self.nickname = nickname
-        self.__stage = 0
+        # Socket servidor
+        if addr:
+            self.client_socket = PapovoxSocketMock(None, nickname)
+            self.addr = addr
+        # Socket cliente
+        else:
+            self.nickname = nickname
+            self.__stage = 0
 
+    # Socket servidor
     def accept(self):
-        return self.conn, self.addr
+        return self.client_socket, self.addr
 
+    # Socket cliente
     def sendall(self, data):
         if data.startswith('+OK'):
             self.__stage += 1
@@ -121,6 +127,7 @@ class PapovoxSocketMock(object):
         else:
             raise socket.error
 
+    # Socket cliente
     def recv(self, size):
         if self.__stage == 1:
             return self.nickname + "\r\n"
@@ -135,17 +142,19 @@ class TestAccept(unittest.TestCase):
 
     def test_basic(self):
         nickname = u"Olavo".encode(SYSTEM_ENCODING)
-        sock = PapovoxSocketMock(self.addr, nickname)
-        self.s.accept(sock)
-        self.assertEqual((self.s.sock, self.s.addr, self.s.nickname),
-                         (sock, self.addr, nickname))
+        self.s.server_socket = PapovoxSocketMock(self.addr, nickname)
+        client_socket = self.s.server_socket.client_socket
+        self.s._accept()
+        self.assertEqual((self.s.socket, self.s.addr, self.s.nickname),
+                         (client_socket, self.addr, nickname))
 
     def test_nickname_with_accents(self):
         nickname = u"Anônimo".encode(SYSTEM_ENCODING)
-        sock = PapovoxSocketMock(self.addr, nickname)
-        self.s.accept(sock)
-        self.assertEqual((self.s.sock, self.s.addr, self.s.nickname),
-                         (sock, self.addr, nickname))
+        self.s.server_socket = PapovoxSocketMock(self.addr, nickname)
+        client_socket = self.s.server_socket.client_socket
+        self.s._accept()
+        self.assertEqual((self.s.socket, self.s.addr, self.s.nickname),
+                         (client_socket, self.addr, nickname))
 
 
 class TestCaseXMPP(unittest.TestCase):
@@ -207,7 +216,7 @@ class TestCommands(unittest.TestCase):
             def sendall(data):
                 self.sysbox.append(data)
         self.s = PapovoxLikeServer()
-        self.s.sock = FakeSocket()
+        self.s.socket = FakeSocket()
 
     def test_unknown(self):
         self.assertEqual(len(self.sysbox), 0, u"vazio")

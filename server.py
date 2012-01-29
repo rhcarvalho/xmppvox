@@ -31,7 +31,6 @@ import textwrap
 import time
 import sys
 from cStringIO import StringIO
-from threading import Timer
 
 import commands
 from strings import get_string as S
@@ -61,57 +60,64 @@ class PapovoxLikeServer(object):
     TAMANHO_MAXIMO_MSG = 255
 
     def __init__(self, port=None):
-        self.sock = None
-        self.addr = None
-        self.nickname = u""
+        u"""Cria servidor compatível com o Papovox."""
+        # Socket do servidor
+        self.server_socket = None
+        # Porta do servidor
         self.port = port or self.PORTA_PAPOVOX
 
-    def run(self, xmpp):  # FIXME renomear para connect
-        u"""Inicia socket para conectar ao Papovox e processar interações."""
+        # Socket do cliente
+        self.socket = None
+        # Endereço do cliente
+        self.addr = None
+
+        # Apelido
+        self.nickname = u""
+
+    def connect(self):
+        u"""Conecta ao Papovox via socket.
+
+        Retorna booleano indicando se a conexão foi bem-sucedida.
+        Bloqueia aguardando Papovox conectar.
+        Define atributos:
+            self.server_socket
+            self.socket
+            self.addr
+            self.nickname
+        """
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # Reutilizar porta já aberta
-            #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.bind((self.HOST, self.port))
-            s.listen(1)
+            #self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.server_socket.bind((self.HOST, self.port))
+            self.server_socket.listen(1)
 
             log.debug(u"XMPPVOX servindo na porta %s" % self.port)
 
-            # Conecta ao Papovox --------------------------------------------------#
+            # Conecta ao Papovox ----------------------------------------------#
             try:
-                self.accept(s)
+                self._accept()
             except socket.error:
-                log.error(u"Erro: Não foi possível conectar ao Papovox.")
-                raise
+                return False
+            #------------------------------------------------------------------#
 
-            xmpp.event('papovox_connected',
-                       {'nick': nickname,
-                        'message_handler': self.new_message_handler(xmpp)})
-            #----------------------------------------------------------------------#
-
-            # Exibe lista de contatos online alguns segundos depois de iniciar.
-            # É necessário esperar um tempo para receber presenças dos contatos.
-            Timer(5, self.show_online_contacts, (xmpp,)).start()
-
-            # Bloqueia processando mensagens do Papovox.
-            self.process_messages(xmpp)
+            # Envia mensagem de boas-vindas
+            self.sendmessage(S.WELCOME.format(nick=self.nickname,
+                                              # FIXME controlar versão noutro lugar
+                                              version="1.0"))
+            return True
         except socket.error, e:
             log.error(e.message or u" ".join(map(unicode, e.args)))
             sys.exit(1)
-        finally:
-            xmpp.event('papovox_disconnected')
-            log.info(u"Fim do XMPPVOX")
 
-    def accept(self, server_sock):
+    def _accept(self):
         ur"""Aceita uma conexão via socket com o Papovox.
-
-        Retorna socket e endereço de rede do Papovox e o nome do usuário conectado.
 
         Ver 'C:\winvox\Fontes\PAPOVOX\PPLIGA.PAS' e
         'C:\winvox\Fontes\SITIOVOX\SVPROC.PAS'.
         """
         log.info(u"Aguardando Papovox conectar...")
-        self.sock, self.addr = server_sock.accept()
+        self.socket, self.addr = self.server_socket.accept()
         self.sendline(u"+OK - %s:%s conectado" % self.addr)
         self.nickname = self.recvline(self.TAMANHO_DO_BUFFER)
         self.sendline(u"+OK")
@@ -127,10 +133,7 @@ class PapovoxLikeServer(object):
         log.info(u"Conectado ao Papovox")
         log.info(u"Apelido: %s", self.nickname)
 
-        # Envia mensagem de boas-vindas
-        self.sendmessage(S.WELCOME.format(nick=self.nickname,
-                                          # FIXME controlar versão noutro lugar
-                                          version="1.0"))
+    # Funções de integração com o cliente XMPP --------------------------------#
 
     def new_message_handler(self, xmpp):
         u"""Cria uma função para processar mensagens recebidas da rede XMPP."""
@@ -155,8 +158,7 @@ class PapovoxLikeServer(object):
         sendmessage(S.ONLINE_CONTACTS_INFO.format(amount=online_contacts_count,
                                                   contacts=contacts))
 
-
-    def process_messages(self, xmpp):   # FIXME renomear para process
+    def process(self, xmpp):
         u"""Processa mensagens do Papovox para a rede XMPP.
 
         Mensagens podem conter comandos para o XMPPVOX.
@@ -211,7 +213,7 @@ class PapovoxLikeServer(object):
         """
         log.debug(u"[sendline] %s", line)
         line = line.encode(SYSTEM_ENCODING, 'replace')
-        self.sock.sendall("%s\r\n" % (line,))
+        self.socket.sendall("%s\r\n" % (line,))
 
     def sendmessage(self, msg):
         u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
@@ -231,7 +233,7 @@ class PapovoxLikeServer(object):
         )
 
         def sendmsg(msg):
-            self.sock.sendall("%s%s" % (struct.pack('<BH', self.DADOTECLADO, len(msg)), msg))
+            self.socket.sendall("%s%s" % (struct.pack('<BH', self.DADOTECLADO, len(msg)), msg))
         # Envia uma ou mais mensagens pelo socket
         map(sendmsg, chunks)
 
@@ -269,10 +271,10 @@ class PapovoxLikeServer(object):
         Use esta função para receber do socket `size' bytes ou menos.
         Levanta uma exceção caso nenhum byte seja recebido.
 
-        Nota: em geral, use esta função ao invés do método 'sock.recv'.
+        Nota: em geral, use esta função ao invés do método 'socket.recv'.
         Veja também a função 'recvall'.
         """
-        data = self.sock.recv(size)
+        data = self.socket.recv(size)
         if not data and size:
             raise socket.error(u"Nenhum dado recebido do socket, conexão perdida.")
         return data
@@ -295,7 +297,7 @@ class PapovoxLikeServer(object):
         Use esta função para receber do socket exatamente `size' bytes.
         Levanta uma exceção caso nenhum byte seja recebido.
 
-        Nota: em geral, use esta função ou 'recv' ao invés do método 'sock.recv'.
+        Nota: em geral, use esta função ou 'recv' ao invés do método 'socket.recv'.
         """
         data = StringIO()
         while data.tell() < size:
