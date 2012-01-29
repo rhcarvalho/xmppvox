@@ -253,6 +253,13 @@ class PapovoxLikeServer(object):
         _state['last_sender'] = sender
         _state['last_timestamp'] = timestamp
 
+    def signal_error(self, msg):
+        u"""Sinaliza erro para o Papovox e termina a conexão."""
+        # Avisa Papovox sobre o erro.
+        self.sendmessage(msg)
+        # Encerra conexão com o Papovox.
+        self.disconnect()
+
     # Funções de recebimento de dados do Papovox ------------------------------#
 
     def recv(self, size):

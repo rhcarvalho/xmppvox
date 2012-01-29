@@ -176,18 +176,14 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def no_auth(self, stanza):
         log.error(u"Falha na autenticação: usuário ou senha incorretos.")
         # Avisa ao Papovox que a autenticação falhou.
-        self.papovox.sendmessage(S.ERROR_NO_AUTH)
-        # Encerra conexão com o Papovox.
-        self.papovox.disconnect()
+        self.papovox.signal_error(S.ERROR_NO_AUTH)
 
     def socket_error(self, error):
         host = self.boundjid.host
         log.error(u"Não foi possível conectar ao servidor '%s'.\n"
                   u"Verifique sua conexão com a Internet.", host)
         # Avisa ao Papovox que houve erro de conexão.
-        self.papovox.sendmessage(S.ERROR_SOCKET_ERROR.format(host=host))
-        # Encerra conexão com o Papovox.
-        self.papovox.disconnect()
+        self.papovox.signal_error(S.ERROR_SOCKET_ERROR.format(host=host))
         # Interrompe atividades deste cliente XMPP.
         self.stop.set()
 
@@ -231,8 +227,6 @@ class BotXMPP(sleekxmpp.ClientXMPP):
                       u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
                       u"regina@jabber.org", jid)
             # Avisa ao Papovox que o JID é inválido.
-            self.papovox.sendmessage(S.ERROR_INVALID_JID.format(jid=jid))
-            # Encerra conexão com o Papovox.
-            self.papovox.disconnect()
+            self.papovox.signal_error(S.ERROR_INVALID_JID.format(jid=jid))
             return False
         return True
