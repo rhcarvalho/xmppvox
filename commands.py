@@ -168,12 +168,12 @@ def para(xmpp, mo, papovox=None):
             xmpp.talking_to = roster_item.jid
     except ValueError:
         papovox.sendmessage(S.CMD_TO_MISSING_NUMBER)
-    quem(xmpp)
+    quem(xmpp, papovox=papovox)
 
 def responder(xmpp, mo=None, papovox=None):
     if xmpp.last_sender is not None:
         xmpp.talking_to = xmpp.last_sender
-    quem(xmpp)
+    quem(xmpp, papovox=papovox)
 
 def adicionar(xmpp, mo, papovox=None):
     maybe_jid = mo.group(1)
