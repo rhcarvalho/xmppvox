@@ -20,8 +20,7 @@
 
 if  [[ `uname` == MINGW* ]] ;
 then
-
-    SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
+    SCRIPTS_DIR=$(cd "$(dirname "$0")" && pwd)
     PROJECT_HOME_DIR=SCRIPTS_DIR/..
 
     pushd $PROJECT_HOME_DIR > /dev/null
