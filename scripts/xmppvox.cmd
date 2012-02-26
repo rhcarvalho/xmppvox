@@ -1,14 +1,18 @@
 *XMPPVox
 *Autor: Neno Henrique Albernaz
 *Em 16/02/2012
+*Modificado por: Rodolfo Henrique Carvalho
+*Em 26/02/2012
 
-escreve "Script que abre o programa XMPPVox"
+escreve "Iniciando o XMPPVOX"
 
-cor 14
-fundo 1
+cor 15
+fundo 0
 tela limpa
-escreve "Digite o contato"
+escreve "Digite o JID"
+cor 14
 le c
+cor 15
 se c=""
     escreve "Desistiu"
     desvia @fim
