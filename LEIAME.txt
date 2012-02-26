@@ -7,7 +7,7 @@ XMPPVOX: Cliente de bate-papo XMPP para o DOSVOX
 
 O XMPPVOX é um cliente de bate-papo que suporta o protocolo XMPP. Este
 protocolo é usado na Internet para permitir bate-papo em tempo real,
-com suporte a diversas funcionalidadades, que incluem informação sobre
+com suporte a diversas funcionalidades, que incluem informação sobre
 presença (disponível, ocupado, indisponível, etc) e lista de
 contatos.
 
@@ -24,7 +24,7 @@ não só com seus amigos que tem conta no Google, mas também com seus
 amigos que usam outro servidor XMPP, bastando adicioná-los a sua lista
 de contatos.
 
-O XMPPVOX é utilizado através do PapoX, parte integrante do DOSVOX.
+O XMPPVOX pode ser utilizado atualmente através do Papovox.
 
 
 2. Como usar o XMPPVOX?
@@ -52,9 +52,9 @@ O XMPPVOX não cria novas contas.
 
 2.2. Iniciar o XMPPVOX
 
-Execute PapoX através do DOSVOX. Ele se encarregará de iniciar o aplicativo
-xmppvox.exe para você. É preciso fornecer seu usuário e senha para conectar
-ao servidor XMPP.
+Execute o script xmppvox.cmd através do DOSVOX (opção U, S). Ele se
+encarregará de iniciar o aplicativo xmppvox.exe para você. É preciso
+fornecer seu usuário e senha para conectar ao servidor XMPP.
 
 O servidor XMPP é identificado automaticamente a partir de seu nome de
 usuário. Digite seu nome de usuário completo, algo como
@@ -69,10 +69,10 @@ Agora o XMPPVOX está conectado à rede XMPP.
 
 2.3. Converse com seus amigos
 
-Depois de iniciar o PapoX, você deve receber uma mensagem de
-boas-vindas.
+Depois de iniciar o Papovox, configure a primeira vez conectando a
+"localhost". Você deve receber uma mensagem de boas-vindas.
 
-Se esta é a primeira vez que usa o XMPPVOX, digite /ajuda e tecle ENTER
+Se esta é a primeira vez que usa o XMPPVOX, digite /ajuda  ou /? e tecle ENTER
 para obter ajuda sobre os comandos que pode utilizar com o XMPPVOX.
 
 Depois de cada comando tecle ENTER para executar o comando. Para enviar
@@ -82,10 +82,10 @@ Provavelmente você vai querer usar o comando /lista (ou o atalho /l)
 para ver seus contatos que estão disponíveis para conversar.
 
 Caso não tenha nenhum contato ainda, você pode adicionar contatos pelo
-comando /adicionar.
+comando /adicionar ou o atalho /a.
 
     Para adicionar um amigo cujo email do Google é amigo@gmail.com:
-    /adicionar amigo@gmail.com
+    /a amigo@gmail.com
 
 Quando seu amigo confirmar seu pedido de adição, ele aparecerá na sua
 lista de contatos.
@@ -98,7 +98,7 @@ Para falar com um amigo de sua lista, use o comando /para (ou o atalho
     5 outro@gmail.com
 
     Para falar com outro@gmail.com, tecle:
-    /para 5
+    /p 5
 
     Como atalho rápido, você pode usar só o número. Tecle:
     /5
@@ -109,7 +109,7 @@ contatos terão sempre o mesmo número.
 Para saber com quem você está falando agora, use o comando /quem (ou
 o atalho /q).
 
-Para terminar o XMPPVOX, basta sair do PapoX. Use a tecla ESC e confirme com s.
+Para terminar o XMPPVOX, basta sair do Papovox. Use a tecla ESC.
 
 
 3. Licença
@@ -133,7 +133,7 @@ significa, pode ignorar esta seção.*
 Para utilizar o XMPPVOX é preciso que estejam instalados os seguintes
 programas e bibliotecas:
 
-    - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B) ou PapoX
+    - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
     - Python 2.7 (testado com 2.7.2)
     - dnspython (versão incluída no diretório thirdparty)
     - SleekXMPP (versão incluída no diretório thirdparty)
