@@ -65,7 +65,7 @@ ONLINE_CONTACTS_INFO = (1, u"{amount} {contacts}. \n"
                            u"/l para listar. \n"
                            u"/n para falar com o contato número n. \n")
 
-FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}")
+FIRST_INCOME_MSG_HELP = (2, u". \nDica: tecle /r para falar com {name}.")
 
 # Conversação -----------------------------------------------------------------#
 MSG_FROM = (101, u"{sender} disse: {body}")
@@ -83,7 +83,7 @@ CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
 
     Ajuda do XMPPVOX:
 
-    Tecle normalmente termine suas frases com ENTER.
+    Tecle normalmente, termine suas frases com ENTER.
     Cada frase é enviada para apenas um contato.
 
     """),
@@ -123,13 +123,13 @@ CMD_ALL_NOBODY = (241, u"Nenhum contato na sua lista!")
 CMD_TO_WRONG_NUMBER = (250, u"Número de contato inexistente! Use %slista." % CMD_PREFIX)
 CMD_TO_MISSING_NUMBER = (251, u"Faltou número do contato! Use %slista." % CMD_PREFIX)
 
-CMD_ADD_OK = (260, u"Adicionei contato: {jid}")
+CMD_ADD_OK = (260, u"Adicionei contato: {jid}.")
 CMD_ADD_FAIL = (261, u"Não entendi: {invalid_jid}. "
-                     u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+                     u"Exemplos: \n/a fulano@gmail.com, ou \n/a amigo@chat.facebook.com")
 
-CMD_DEL_OK = (270, u"Removi contato: {jid}")
+CMD_DEL_OK = (270, u"Removi contato: {jid}.")
 CMD_DEL_FAIL = (271, u"Não entendi: {invalid_jid}. "
-                     u"Exemplos: fulano@gmail.com, ou amigo@chat.facebook.com")
+                     u"Exemplos: \n/remover fulano@gmail.com, ou \n/remover amigo@chat.facebook.com")
 
 # Avisos ----------------------------------------------------------------------#
 WARN_MSG_TO_OFFLINE_USER = (801, u"* {name} está indisponível agora. "
@@ -140,6 +140,6 @@ WARN_MSG_TO_NOBODY = (802, u"Mensagem não enviada. "
                            u"Se não souber o número tecle /lista ou /todos.")
 
 # Erros -----------------------------------------------------------------------#
-ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos")
-ERROR_INVALID_JID = (902, u"Erro: conta inválida ({jid})")
-ERROR_SOCKET_ERROR = (903, u"Erro: falha na conexão com o servidor {host}")
+ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos.")
+ERROR_INVALID_JID = (902, u"Erro: conta inválida ({jid}).")
+ERROR_SOCKET_ERROR = (903, u"Erro: falha na conexão com o servidor {host}.")
