@@ -137,3 +137,13 @@ programas e bibliotecas:
     - Python 2.7 (testado com 2.7.2)
     - dnspython (versão incluída no diretório thirdparty)
     - SleekXMPP (versão incluída no diretório thirdparty)
+
+Dependências para gerar executável do Windows:
+
+    - pywin32 (testado com Build216)
+    - PyInstaller (testado com versão de desenvolvimento trunk-1899)
+    - UPX (opcional, testado com versão 3.08)
+
+Dependências para usar scripts ".sh":
+
+    - MinGW
