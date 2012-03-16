@@ -84,7 +84,7 @@ def parse_command_line():
                     const=logging.DEBUG, default=logging.INFO)
     # Configuração de strings.
     optp.add_option('-c', '--codificar',
-                    help=u"mostra mensagens codificadas para o Papovox",
+                    help=u"envia strings codificadas",
                     action='store_true', dest='show_code', default=False)
     # JID e senha
     optp.add_option("-j", "--jid", dest="jid",
