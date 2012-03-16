@@ -57,7 +57,6 @@ def main():
 
         # Valida JID e tenta conectar ao servidor XMPP.
         if xmpp.validate_jid() and xmpp.connect():
-            log.info(u"Conectado ao servidor %s", xmpp.boundjid.host)
 
             # Executa cliente XMPP em outra thread.
             xmpp.process(block=False)

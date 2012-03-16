@@ -69,6 +69,8 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.nickname = papovox.nickname
 
         # Eventos do SleekXMPP que serão tratados
+        self.add_event_handler("connected", self.handle_connected)
+        self.add_event_handler("disconnected", self.handle_disconnected)
         self.add_event_handler("session_start", self.start)
         self.add_event_handler("message", self.message)
         self.add_event_handler('got_online', self.got_online)
@@ -91,6 +93,13 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def connect(self, *args, **kwargs):
         log.info(u"Tentando conectar ao servidor %s...", self.boundjid.host)
         return sleekxmpp.ClientXMPP.connect(self, *args, **kwargs)
+
+    def handle_connected(self, event):
+        log.debug(u"** Conectado **")
+        log.info(u"Conectado ao servidor %s", self.boundjid.host)
+
+    def handle_disconnected(self, event):
+        log.debug(u"** Desconectado **")
 
     def start(self, event):
         u"""Processa evento de início de sessão.
