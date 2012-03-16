@@ -1,5 +1,7 @@
 ﻿XMPPVOX
 
+>>> ocorre problema quando a conexão cai. SleekXMPP captura um erro em client.BotXMPP.socket_error e reinicia. Já o server é desligado. O resultado é que o XMPPVOX continua executando, de forma irrecuperavelmente inconsistente.
+
 --------------------------------------------------------------------------------
 
 * remover contato usando seu número na lista de contatos (não implementar)
