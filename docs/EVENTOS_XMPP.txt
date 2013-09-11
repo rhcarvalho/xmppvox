@@ -1,4 +1,4 @@
-﻿Este arquivo documenta os possíveis eventos disparados pelo SleekXMPP e quais
+Este arquivo documenta os possíveis eventos disparados pelo SleekXMPP e quais
 são de interesse do XMPPVOX.
 
 

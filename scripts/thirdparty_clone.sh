@@ -20,7 +20,7 @@
 
 
 # Use este script para baixar as dependencias do XMPPVOX.
-# Depois de baixar em algum diretório de sua preferencia, instale
+# Depois de baixar em algum direté«io de sua preferencia, instale
 # no Python usando:
 #    pip install -e ..../dnspython
 #    pip install -e ..../SleekXMPP

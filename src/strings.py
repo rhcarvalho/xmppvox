@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 #    XMPPVOX: XMPP client for DOSVOX.
 #    Copyright (C) 2012  Rodolfo Henrique Carvalho
