@@ -47,6 +47,7 @@ def main():
 
     # Instancia servidor e aguarda conexão do Papovox.
     papovox = server.PapovoxLikeServer(opts.port)
+    papovox.HOST = opts.host
     if papovox.connect():
         jid, password = get_jid_and_password(opts)
 
@@ -90,6 +91,8 @@ def parse_command_line():
                     help="identificador do usuário")
     optp.add_option("-s", "--senha", dest="password",
                     help="senha")
+    optp.add_option("--host", type="string", dest="host",
+                    help="IP da interface de escuta")
     optp.add_option("-p", "--porta", type="int", dest="port",
                     help="porta de escuta")
     return optp.parse_args()
