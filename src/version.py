@@ -24,4 +24,4 @@ XMPPVOX - módulo de versão
 Este módulo contém informação sobre a versão do XMPPVOX.
 """
 
-__version__ = '1.0'
+__version__ = '1.1'
