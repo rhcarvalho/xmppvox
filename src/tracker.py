@@ -28,6 +28,7 @@ atividade do XMPPVOX.
 import json
 import os
 import platform
+import threading
 import uuid
 
 import logging
@@ -110,3 +111,38 @@ def close_session(session_id):
         session_id = None
         log.error(u"Falha ao encerrar sessão: %s" % e)
     return session_id
+
+
+class Timer(threading.Thread):
+    def __init__(self, interval, function, args=[], kwargs={}):
+        threading.Thread.__init__(self)
+        self.interval = interval
+        self.function = function
+        self.args = args
+        self.kwargs = kwargs
+        self.finished = threading.Event()
+
+    def cancel(self):
+        self.finished.set()
+
+    def run(self):
+        while not self.finished.is_set():
+            self.finished.wait(self.interval)
+            if not self.finished.is_set():
+                self.function(*self.args, **self.kwargs)
+
+def _ping(session_id):
+    try:
+        r = requests.post("{}session/ping".format(TRACKER_URL),
+                          data=dict(session_id=session_id,
+                                    machine_id=MACHINE_ID))
+        r.raise_for_status()
+        log.debug(u"PING da sessão: %s" % session_id)
+    except requests.exceptions.RequestException, e:
+        log.error(u"PING falhou: %s" % e)
+
+def ping(session_id, interval):
+    u"""Envia sinal de vida para o tracker central do XMPPVOX em intervalos regulares."""
+    t = Timer(interval, _ping, (session_id,))
+    t.start()
+    return t

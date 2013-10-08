@@ -66,6 +66,9 @@ def main():
                 papovox.sendmessage(message)
 
             if session_id is not None:
+                # Envia um PING para o tracker a cada 20 minutos.
+                timer = tracker.ping(session_id, 20 * 60)
+
                 if xmpp.connect():
                     # Executa cliente XMPP em outra thread.
                     xmpp.process(block=False)
@@ -78,6 +81,8 @@ def main():
                     # Interrompe cliente XMPP quando Papovox desconectar.
                     xmpp.disconnect()
 
+                # Cancela envio de PINGs para o tracker.
+                timer.cancel()
                 # Encerra sessão no tracker.
                 tracker.close_session(session_id)
             else:
