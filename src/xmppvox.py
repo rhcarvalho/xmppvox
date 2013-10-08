@@ -109,7 +109,7 @@ def configure_logging(opts):
     # Configura logging.
     logging.basicConfig(level=opts.loglevel,
                         format='%(levelname)-8s %(asctime)s %(message)s',
-                        datefmt='%H:%M')
+                        datefmt='%H:%M:%S')
     # Não mostrar mensagens de DEBUG do SleekXMPP.
     if opts.loglevel == logging.DEBUG:
         logging.getLogger('sleekxmpp').setLevel(logging.INFO)
