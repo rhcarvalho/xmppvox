@@ -51,7 +51,7 @@ SYSTEM_ENCODING = 'ISO-8859-1'
 class PapovoxLikeServer(object):
     u"""Um servidor compatível com o Papovox."""
 
-    HOST = '127.0.0.1'        # Escuta apenas conexões locais
+    DEFAULT_HOST = '127.0.0.1' # Escuta apenas conexões locais
     PORTA_PAPOVOX = 1963
     #PORTA_URGENTE = 1964
     #PORTA_NOMES = 1956
@@ -59,10 +59,12 @@ class PapovoxLikeServer(object):
     TAMANHO_DO_BUFFER = 4096  # Ver C:\winvox\Fontes\tradutor\DVINET.PAS
     TAMANHO_MAXIMO_MSG = 255
 
-    def __init__(self, port=None):
+    def __init__(self, host=None, port=None):
         u"""Cria servidor compatível com o Papovox."""
         # Socket do servidor
         self.server_socket = None
+        # Host/interface de escuta
+        self.host = host or self.DEFAULT_HOST
         # Porta do servidor
         self.port = port or self.PORTA_PAPOVOX
 
@@ -89,10 +91,10 @@ class PapovoxLikeServer(object):
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # Reutilizar porta já aberta
             #self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.server_socket.bind((self.HOST, self.port))
+            self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(1)
 
-            log.debug(u"XMPPVOX servindo na porta %s" % self.port)
+            log.debug(u"XMPPVOX servindo em %s:%s" % (self.host, self.port))
 
             # Conecta ao Papovox ----------------------------------------------#
             try:

@@ -46,8 +46,8 @@ def main():
     strings.get_string.show_code = opts.show_code
 
     # Instancia servidor e aguarda conexão do Papovox.
-    papovox = server.PapovoxLikeServer(opts.port)
-    papovox.HOST = opts.host
+    papovox = server.PapovoxLikeServer(opts.host, opts.port)
+
     if papovox.connect():
         jid, password = get_jid_and_password(opts)
 
