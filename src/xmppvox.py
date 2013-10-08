@@ -62,20 +62,21 @@ def main():
             # Cria sessão no tracker.
             session_id = tracker.new_session(jid)
 
-            if xmpp.connect():
-                # Executa cliente XMPP em outra thread.
-                xmpp.process(block=False)
+            if session_id is not None:
+                if xmpp.connect():
+                    # Executa cliente XMPP em outra thread.
+                    xmpp.process(block=False)
 
-                # Bloqueia processando mensagens do Papovox.
-                # Sem o bloqueio, a thread principal termina e o executável
-                # gerado pelo PyInstaller termina prematuramente.
-                papovox.process(xmpp)
+                    # Bloqueia processando mensagens do Papovox.
+                    # Sem o bloqueio, a thread principal termina e o executável
+                    # gerado pelo PyInstaller termina prematuramente.
+                    papovox.process(xmpp)
 
-                # Interrompe cliente XMPP quando Papovox desconectar.
-                xmpp.disconnect()
+                    # Interrompe cliente XMPP quando Papovox desconectar.
+                    xmpp.disconnect()
 
-            # Encerra sessão no tracker.
-            tracker.close_session(session_id)
+                # Encerra sessão no tracker.
+                tracker.close_session(session_id)
     else:
         log.error(u"Erro: Não foi possível conectar ao Papovox.")
     log.info(u"Fim do XMPPVOX")

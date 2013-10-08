@@ -30,6 +30,9 @@ import os
 import platform
 import uuid
 
+import logging
+log = logging.getLogger(__name__)
+
 import requests
 
 from version import __version__
@@ -75,15 +78,29 @@ MACHINE_ID = machine_id()
 
 def new_session(jid):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""
-    r = requests.post("{}session/new".format(TRACKER_URL),
-                      data=dict(jid=jid,
-                                machine_id=MACHINE_ID,
-                                xmppvox_version=__version__))
-    return r.text.strip()
+    try:
+        r = requests.post("{}session/new".format(TRACKER_URL),
+                          data=dict(jid=jid,
+                                    machine_id=MACHINE_ID,
+                                    xmppvox_version=__version__))
+        r.raise_for_status()
+        session_id = r.text.strip()
+        log.debug(u"Identificador de sessão do XMPPVOX: %s" % session_id)
+    except requests.exceptions.RequestException, e:
+        session_id = None
+        log.error(u"Falha ao obter identificador de sessão: %s" % e)
+    return session_id
 
 def close_session(session_id):
     u"""Encerra uma sessão no tracker central do XMPPVOX."""
-    r = requests.post("{}session/close".format(TRACKER_URL),
-                      data=dict(session_id=session_id,
-                                machine_id=MACHINE_ID))
-    return r.text.strip()
+    try:
+        r = requests.post("{}session/close".format(TRACKER_URL),
+                          data=dict(session_id=session_id,
+                                    machine_id=MACHINE_ID))
+        r.raise_for_status()
+        session_id = r.text.strip()
+        log.debug(u"Sessão encerrada: %s" % session_id)
+    except requests.exceptions.RequestException, e:
+        session_id = None
+        log.error(u"Falha ao encerrar sessão: %s" % e)
+    return session_id
