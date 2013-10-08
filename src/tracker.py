@@ -25,6 +25,11 @@ Este módulo implementa comunicação com servidor central remoto para tracking 
 atividade do XMPPVOX.
 """
 
+import json
+import os
+import platform
+import uuid
+
 import requests
 
 from version import __version__
@@ -32,8 +37,41 @@ from version import __version__
 
 #TRACKER_URL = "http://xmppvox.rodolfocarvalho.net/api/1/"
 TRACKER_URL = "http://localhost:9090/1/"
-MACHINE_ID = "de63fa34-2f5c-11e3-821a-60fb42f754da"
 
+def read_machine_id(config_path):
+    u"""Lê identificador desta máquina num arquivo de configuração."""
+    try:
+        with open(config_path) as config_file:
+            config = json.load(config_file)
+            try:
+                mid = config.get("machine_id")
+            except (ValueError, AttributeError):
+                # invalid config file
+                mid = None
+    except IOError:
+        mid = None
+    return mid
+
+def write_machine_id(config_path, mid):
+    u"""Persiste um identificador para esta máquina num arquivo de configuração."""
+    if not os.path.isfile(config_path):
+        os.makedirs(os.path.dirname(config_path))
+    with open(config_path, "w") as config_file:
+        json.dump(dict(machine_id=mid), config_file)
+
+def machine_id():
+    u"""Retorna um identificador único para esta máquina/usuário."""
+    if platform.system() == "Windows":
+        config_path = os.path.expandvars("$APPDATA\\XMPPVOX\\config.json")
+    else:
+        config_path = os.path.expanduser("~/.xmppvox/config.json")
+    mid = read_machine_id(config_path)
+    if mid is None:
+        mid = str(uuid.uuid4())
+        write_machine_id(config_path, mid)
+    return mid
+
+MACHINE_ID = machine_id()
 
 def new_session(jid):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""
