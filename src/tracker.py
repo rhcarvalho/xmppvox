@@ -78,18 +78,24 @@ MACHINE_ID = machine_id()
 
 def new_session(jid):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""
+    message = None
     try:
         r = requests.post("{}session/new".format(TRACKER_URL),
                           data=dict(jid=jid,
                                     machine_id=MACHINE_ID,
                                     xmppvox_version=__version__))
+        if r.status_code == requests.codes.forbidden:
+            message = r.text.strip()
         r.raise_for_status()
-        session_id = r.text.strip()
+        try:
+            session_id, message = r.text.split(None, 1)
+        except ValueError:
+            session_id = r.text.strip()
         log.debug(u"Identificador de sessão do XMPPVOX: %s" % session_id)
     except requests.exceptions.RequestException, e:
         session_id = None
         log.error(u"Falha ao obter identificador de sessão: %s" % e)
-    return session_id
+    return session_id, message
 
 def close_session(session_id):
     u"""Encerra uma sessão no tracker central do XMPPVOX."""

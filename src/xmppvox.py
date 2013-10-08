@@ -60,7 +60,10 @@ def main():
         # Valida JID e tenta conectar ao servidor XMPP.
         if xmpp.validate_jid():
             # Cria sessão no tracker.
-            session_id = tracker.new_session(jid)
+            session_id, message = tracker.new_session(jid)
+
+            if message is not None:
+                papovox.sendmessage(message)
 
             if session_id is not None:
                 if xmpp.connect():
@@ -77,6 +80,8 @@ def main():
 
                 # Encerra sessão no tracker.
                 tracker.close_session(session_id)
+            else:
+                papovox.disconnect()
     else:
         log.error(u"Erro: Não foi possível conectar ao Papovox.")
     log.info(u"Fim do XMPPVOX")
