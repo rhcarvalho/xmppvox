@@ -36,6 +36,10 @@ import strings
 import logging
 log = logging.getLogger(__name__)
 
+# import apenas para ajudar o PyInstaller a detectar dependências do projeto.
+import _pyinstaller
+del _pyinstaller
+
 
 def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
