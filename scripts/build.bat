@@ -25,23 +25,14 @@ REM
 REM
 REM  Para distribuir o projeto usando o PyInstaller:
 REM
-REM  0. Instalar pywin32
-REM     http://sourceforge.net/projects/pywin32/files/pywin32/Build216/
-REM  1. Baixar o PyInstaller:
-REM     http://www.pyinstaller.org/changeset/latest/trunk?old_path=%2F&format=zip
-REM     (testado com pyinstalller-trunk-1899.zip)
-REM  2. Descompactar em C:\pyinstaller
-REM  3. Baixar o UPX:
-REM     http://upx.sourceforge.net/download/upx308w.zip
-REM  4. Extrair o execut†vel upx.exe em C:\Python27 (ou outro lugar no PATH)
+REM  0. Baixar e instalar o pywin32:
+REM     http://sourceforge.net/projects/pywin32/files/pywin32/Build%20218/pywin32-218.win32-py2.7.exe/download
+REM  1. Instalar o PyInstaller:
+REM     pip install pyinstaller==2.1
+REM  2. Baixar o UPX:
+REM     http://upx.sourceforge.net/download/upx391w.zip
+REM  3. Extrair o execut†vel upx.exe em C:\Python27 (ou outro lugar no PATH)
 REM
-REM
-REM  OBS: O PyInstaller n∆o funciona bem com eggs descompactados (diret¢rios),
-REM       mas funciona bem com eggs compactados (zip).
-REM       Antes de executar este script, certifique-se que os eggs est∆o
-REM       compactados:
-REM          pip zip dns
-REM          pip zip sleekxmpp
 REM
 REM Execute este script a partir do diret¢rio principal do projeto:
 REM     scripts\build.bat
@@ -52,23 +43,10 @@ IF EXIST dist (
     RMDIR /Q /S dist
 )
 
-SETLOCAL
-SET DNSPYTHON_ZIP=%CD%\thirdparty\dnspython-master-d5dc023.zip
-SET SLEEKXMPP_ZIP=%CD%\thirdparty\sleekxmpp-develop-3ab7c8b.zip
-
-IF NOT EXIST "%DNSPYTHON_ZIP%" (
-    ECHO Atená∆o: falta dependància -- dnspython
-    EXIT 2
-)
-IF NOT EXIST "%SLEEKXMPP_ZIP%" (
-    ECHO Atená∆o: falta dependància -- sleekxmpp
-    EXIT 3
-)
-
-REM Executa o pyinstaller.py se existir ou exibe mensagem e termina.
-IF EXIST c:\pyinstaller\pyinstaller.py (
-    c:\pyinstaller\pyinstaller.py --onefile --version-file=version ^
-        --paths="%DNSPYTHON_ZIP%;%SLEEKXMPP_ZIP%" src/xmppvox.py
+REM Executa o PyInstaller se existir ou exibe mensagem e termina.
+for %%G in (pyinstaller.exe) do (set FOUND=%%~$PATH:G)
+IF DEFINED FOUND (
+    pyinstaller --onefile --version-file=version src/xmppvox.py
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     EXIT 1
@@ -79,13 +57,10 @@ IF NOT EXIST dist (
     GOTO:EOF
 )
 
-REM Copia c¢digo-fonte para ser distribu°do:
-bzr export dist\xmppvox-src
-
-REM Copia dependàncias:
-COPY "%DNSPYTHON_ZIP%" dist\xmppvox-src\thirdparty\
-COPY "%SLEEKXMPP_ZIP%" dist\xmppvox-src\thirdparty\
-ENDLOCAL
+REM Copia bootstrap script:
+COPY scripts\xmppvox.cmd dist\
+REM Copia manual do XMPPVOX:
+REM COPY docs\manual.txt dist\
 
 REM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 REM Abaixo seguem dois mÇtodos diferentes para descobrir se um execut†vel
@@ -99,7 +74,7 @@ for %%G in (zip.exe) do (set FOUND=%%~$PATH:G)
 IF DEFINED FOUND (
     REM Compacta todos os arquivos em um zip.
     PUSHD dist
-    zip -v -9 -r xmppvox-1.0.zip *
+    zip -v -9 -r xmppvox-1.1.zip *
     POPD
 ) ELSE (
     ECHO.
