@@ -120,4 +120,4 @@ Para terminar o XMPPVOX, basta sair do Papovox. Use a tecla ESC.
 
     O XMPPVOX também é distribuído como um binário executável autocontido, para
     o sistema operacional "Windows". A versão mais atual do código-fonte pode
-    ser obtida em https://launchpad.net/xmppvox.
+    ser obtida em https://github.com/rhcarvalho/xmppvox.
