@@ -22,9 +22,8 @@ XMPPVOX is used through Papovox. Papovox is an existing program, part of DOSVOX,
 To use XMPPVOX you first need an account in an XMPP server.
 
 You you have a Google Account/Gmail, then you already have an
-usable account <_your\_name@gmail.com_>. If you have an account on
-Facebook, then your XMPP account is
-<_your\_facebook\_id@chat.facebook.com_>.
+usable account your_name@gmail.com. If you have an account on
+Facebook, then your XMPP account is your_facebook_id@chat.facebook.com.
 
 
 ### 2.2. Start XMPPVOX
