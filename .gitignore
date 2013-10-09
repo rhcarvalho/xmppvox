@@ -2,5 +2,4 @@
 build
 dist
 xmppvox.spec
-thirdparty/*.zip
 *.pyc
