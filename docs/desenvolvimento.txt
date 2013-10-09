@@ -3,22 +3,26 @@ Dependências
 
 *Atenção: Esta seção é destinada a usuários avançados do XMPPVOX
 que desejam alterar seu código-fonte. Se você não sabe o que isto
-significa, pode ignorar esta seção.*
+significa, ignore esta seção.*
 
 Para utilizar o XMPPVOX é preciso que estejam instalados os seguintes
 programas e bibliotecas:
 
-    - DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
-    - Python 2.7 (testado com 2.7.2)
-    - dnspython (versão incluída no diretório thirdparty)
-    - SleekXMPP (versão incluída no diretório thirdparty)
+- DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
+- Python 2.7 (testado com 2.7.5)
+- Bibliotecas descritas no arquivo "requirements.txt"
 
-Dependências para gerar executável do Windows:
+Para instalar as dependências:
 
-    - pywin32 (testado com Build216)
-    - PyInstaller (testado com versão de desenvolvimento trunk-1899)
-    - UPX (opcional, testado com versão 3.08)
+    pip install -r requirements.txt
 
-Dependências para usar scripts ".sh":
+Dependências para gerar executável:
 
-    - MinGW
+- pywin32 (testado com Build 218)
+- PyInstaller (testado com versão 2.1)
+- UPX (testado com versão 3.91)
+
+Opcionais:
+
+- MinGW (para usar scripts ".sh")
+- snakefood (para gerar grafo de dependências do projeto)
