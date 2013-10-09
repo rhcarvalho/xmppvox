@@ -95,6 +95,11 @@ def new_session(jid):
         log.debug(u"Identificador de sessão do XMPPVOX: %s" % session_id)
     except requests.exceptions.RequestException, e:
         session_id = None
+        if message is None:
+            message = (u"Problema com o servidor do XMPP Vox. "
+                       u"Por favor, tente conectar novamente mais tarde.\n\n"
+                       u"Se o problema persistir, peça ajuda pelo email "
+                       u"xmppvox@googlegroups.com.")
         log.error(u"Falha ao obter identificador de sessão: %s" % e)
     return session_id, message
 
