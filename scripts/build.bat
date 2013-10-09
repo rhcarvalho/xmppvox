@@ -46,7 +46,7 @@ IF EXIST dist (
 REM Executa o PyInstaller se existir ou exibe mensagem e termina.
 for %%G in (pyinstaller.exe) do (set FOUND=%%~$PATH:G)
 IF DEFINED FOUND (
-    pyinstaller --onefile --version-file=version src/xmppvox.py
+    pyinstaller --onefile --version-file=version xmppvox/xmppvox.py
 ) ELSE (
     ECHO Aten‡Æo: PyInstaller nÆo encontrado!
     EXIT 1
@@ -58,9 +58,9 @@ IF NOT EXIST dist (
 )
 
 REM Copia bootstrap script:
-COPY scripts\xmppvox.cmd dist\
+COPY scripts\xmppvox.cmd dist\xmppvox.cmd
 REM Copia manual do XMPPVOX:
-REM COPY docs\manual.txt dist\
+REM COPY docs\manual.txt dist\manual.txt
 
 REM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 REM Abaixo seguem dois m‚todos diferentes para descobrir se um execut vel
