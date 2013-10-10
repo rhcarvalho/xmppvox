@@ -25,7 +25,7 @@ XMPPVOX - módulo principal
 Este módulo é responsável pela coordenação entre os demais módulos.
 """
 
-from optparse import OptionParser
+import argparse
 import getpass
 
 from xmppvox import client
@@ -46,15 +46,15 @@ def main():
 
     Esta função é o ponto de partida da execução do XMPPVOX."""
     # Configuração.
-    opts, args = parse_command_line()
-    configure_logging(opts)
-    strings.get_string.show_code = opts.show_code
+    args = parse_command_line()
+    configure_logging(args)
+    strings.get_string.show_code = args.show_code
 
     # Instancia servidor e aguarda conexão do Papovox.
-    papovox = server.PapovoxLikeServer(opts.host, opts.port)
+    papovox = server.PapovoxLikeServer(args.host, args.port)
 
     if papovox.connect():
-        jid, password = get_jid_and_password(opts)
+        jid, password = get_jid_and_password(args)
 
         # Inicia cliente XMPP.
         xmpp = client.BotXMPP(jid, password, papovox)
@@ -98,40 +98,39 @@ def main():
 
 def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
-    optp = OptionParser()
+    parser = argparse.ArgumentParser(description='XMPPVOX: cliente de bate-papo XMPP para o DOSVOX.')
     # Configuração de verbosidade.
-    optp.add_option('-d', '--debug',
-                    help=u"exibe mais detalhes sobre a execução",
-                    action='store_const', dest='loglevel',
-                    const=logging.DEBUG, default=logging.INFO)
+    parser.add_argument('-d', '--debug',
+                        help=u"exibe mais detalhes sobre a execução",
+                        action='store_const', dest='loglevel',
+                        const=logging.DEBUG, default=logging.INFO)
     # Configuração de strings.
-    optp.add_option('-c', '--codificar',
-                    help=u"envia strings codificadas",
-                    action='store_true', dest='show_code', default=False)
+    parser.add_argument('-c', '--codificar',
+                        help=u"envia strings codificadas",
+                        action='store_true', dest='show_code', default=False)
     # JID e senha
-    optp.add_option("-j", "--jid", dest="jid",
-                    help="identificador do usuário")
-    optp.add_option("-s", "--senha", dest="password",
-                    help="senha")
-    optp.add_option("--host", type="string", dest="host",
-                    help="IP da interface de escuta")
-    optp.add_option("-p", "--porta", type="int", dest="port",
-                    help="porta de escuta")
-    return optp.parse_args()
+    parser.add_argument("-j", "--jid", dest="jid",
+                        help="identificador do usuário")
+    parser.add_argument("-s", "--senha", dest="password",
+                        help="senha", metavar="XXX")
+    parser.add_argument("--host", help="IP da interface de escuta")
+    parser.add_argument("-p", "--porta", type=int, dest="port",
+                        help="porta de escuta", metavar="XXX")
+    return parser.parse_args()
 
-def configure_logging(opts):
+def configure_logging(args):
     # Configura logging.
-    if opts.loglevel == logging.DEBUG:
+    if args.loglevel == logging.DEBUG:
         _format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
     else:
         _format = '%(levelname)-8s %(message)s'
     logging.basicConfig(format=_format,
                         datefmt='%H:%M:%S')
-    logging.getLogger('xmppvox').setLevel(opts.loglevel)
+    logging.getLogger('xmppvox').setLevel(args.loglevel)
 
-def get_jid_and_password(opts):
-    jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
-    password = opts.password or getpass.getpass("Senha para %r: " % jid)
+def get_jid_and_password(args):
+    jid = args.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
+    password = args.password or getpass.getpass("Senha para %r: " % jid)
     return jid, password
 
 
