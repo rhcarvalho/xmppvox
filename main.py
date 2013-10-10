@@ -140,4 +140,5 @@ def get_jid_and_password(args):
     return jid, password
 
 
-main()
+if __name__ == "__main__":
+    main()
