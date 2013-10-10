@@ -28,6 +28,7 @@ atividade do XMPPVOX.
 import json
 import os
 import platform
+import sys
 import threading
 import uuid
 
@@ -40,8 +41,16 @@ from xmppvox.strings import safe_unicode
 from xmppvox.version import __version__
 
 
-#TRACKER_URL = "http://xmppvox.rodolfocarvalho.net/api/1/"
-TRACKER_URL = "http://localhost:9090/1/"
+if getattr(sys, 'frozen', False):
+    # we are running in a PyInstaller bundle
+    TRACKER_URL = "http://xmppvox.rodolfocarvalho.net/api/"
+else:
+    # development mode
+    TRACKER_URL = (os.environ.get('TRACKER_URL') or
+                   raw_input("TRACKER_URL [http://localhost:9090/]: ") or
+                   "http://localhost:9090/")
+    if not TRACKER_URL.endswith("/"):
+        TRACKER_URL += "/"
 
 def read_machine_id(config_path):
     u"""Lê identificador desta máquina num arquivo de configuração."""
@@ -82,7 +91,7 @@ def new_session(jid):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""
     message = None
     try:
-        r = requests.post("{}session/new".format(TRACKER_URL),
+        r = requests.post("{}1/session/new".format(TRACKER_URL),
                           data=dict(jid=jid,
                                     machine_id=MACHINE_ID,
                                     xmppvox_version=__version__))
@@ -107,7 +116,7 @@ def new_session(jid):
 def close_session(session_id):
     u"""Encerra uma sessão no tracker central do XMPPVOX."""
     try:
-        r = requests.post("{}session/close".format(TRACKER_URL),
+        r = requests.post("{}1/session/close".format(TRACKER_URL),
                           data=dict(session_id=session_id,
                                     machine_id=MACHINE_ID))
         r.raise_for_status()
@@ -139,7 +148,7 @@ class Timer(threading.Thread):
 
 def _ping(session_id):
     try:
-        r = requests.post("{}session/ping".format(TRACKER_URL),
+        r = requests.post("{}1/session/ping".format(TRACKER_URL),
                           data=dict(session_id=session_id,
                                     machine_id=MACHINE_ID))
         r.raise_for_status()
