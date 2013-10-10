@@ -28,10 +28,10 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 from optparse import OptionParser
 import getpass
 
-import client
-import tracker
-import server
-import strings
+from xmppvox import client
+from xmppvox import tracker
+from xmppvox import server
+from xmppvox import strings
 
 import logging
 log = logging.getLogger(__name__)

@@ -27,7 +27,7 @@ Este módulo implementa comandos que o servidor reconhece.
 import re
 import textwrap
 
-from strings import get_string as S
+from xmppvox.strings import get_string as S
 
 import logging
 log = logging.getLogger(__name__)

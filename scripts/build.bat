@@ -46,7 +46,7 @@ IF EXIST dist (
 REM Executa o PyInstaller se existir ou exibe mensagem e termina.
 for %%G in (pyinstaller.exe) do (set FOUND=%%~$PATH:G)
 IF DEFINED FOUND (
-    pyinstaller --onefile --version-file=version xmppvox/xmppvox.py
+    pyinstaller --name=xmppvox --onefile --version-file=version main.py
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     EXIT 1

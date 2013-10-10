@@ -31,9 +31,9 @@ from threading import Timer
 
 import sleekxmpp
 
-import commands
-from strings import get_string as S
-from version import __version__
+from xmppvox import commands
+from xmppvox.strings import get_string as S
+from xmppvox.version import __version__
 
 import logging
 log = logging.getLogger(__name__)

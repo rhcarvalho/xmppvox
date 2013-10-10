@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 import requests
 
-from version import __version__
+from xmppvox.version import __version__
 
 
 #TRACKER_URL = "http://xmppvox.rodolfocarvalho.net/api/1/"

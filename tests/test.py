@@ -30,11 +30,11 @@ import sys
 
 # Coloca código-fonte do XMPPVOX no path.
 import os.path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'xmppvox'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.path.pardir))
 
-from server import PapovoxLikeServer, SYSTEM_ENCODING
-from client import BotXMPP
-import commands
+from xmppvox.server import PapovoxLikeServer, SYSTEM_ENCODING
+from xmppvox.client import BotXMPP
+from xmppvox import commands
 
 
 # Necessário para corrigir bug no unittest.

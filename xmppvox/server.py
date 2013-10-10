@@ -32,8 +32,8 @@ import time
 import sys
 from cStringIO import StringIO
 
-import commands
-from strings import get_string as S
+from xmppvox import commands
+from xmppvox.strings import get_string as S
 
 import logging
 log = logging.getLogger(__name__)
