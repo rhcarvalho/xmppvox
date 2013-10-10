@@ -24,6 +24,20 @@ XMPPVOX - módulo de strings
 Este módulo contém strings transmitidas para o Papovox.
 """
 
+import sys
+
+
+def safe_unicode(obj):
+    u"""Returna uma representação em Unicode para obj."""
+    if type(obj) is unicode:
+        return obj
+    else:
+        try:
+            return unicode(obj)
+        except UnicodeDecodeError:
+            return unicode(str(obj), sys.getfilesystemencoding(), "replace")
+
+
 class get_string(object):
     u"""Retorna uma string marcada para ser interpretada pelo Papovox."""
     _show_code = False
@@ -141,5 +155,6 @@ WARN_MSG_TO_NOBODY = (802, u"Mensagem não enviada. "
 
 # Erros -----------------------------------------------------------------------#
 ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos.")
-ERROR_INVALID_JID = (902, u"Erro: conta inválida ({jid}).")
+ERROR_INVALID_JID = (902, u"""Erro: conta inválida ({jid}).
+Exemplos: paulo@gmail.com, marcio@chat.facebook.com, regina@jabber.org.""")
 ERROR_SOCKET_ERROR = (903, u"Erro: falha na conexão com o servidor {host}.")

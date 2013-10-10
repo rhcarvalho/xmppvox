@@ -72,7 +72,7 @@ def process_command(xmpp, data, papovox):
         mo = re.match(cmd_re, cmd, re.I)
         # Se o comando for encontrado...
         if mo is not None:
-            log.debug("[comando %s]" % cmd_func.__name__)
+            log.debug("(%s %s)", cmd_func.__name__, mo.groups())
             # ... executa o comando e encerra o loop
             cmd_func(xmpp, mo, papovox=papovox)
             break

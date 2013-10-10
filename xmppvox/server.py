@@ -33,7 +33,7 @@ import sys
 from cStringIO import StringIO
 
 from xmppvox import commands
-from xmppvox.strings import get_string as S
+from xmppvox.strings import safe_unicode, get_string as S
 
 import logging
 log = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ class PapovoxLikeServer(object):
             self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(1)
 
-            log.debug(u"XMPPVOX servindo em %s:%s" % (self.host, self.port))
+            log.debug(u"XMPPVOX servindo em %s:%s", self.host, self.port)
 
             # Conecta ao Papovox ----------------------------------------------#
             try:
@@ -104,7 +104,7 @@ class PapovoxLikeServer(object):
             #------------------------------------------------------------------#
             return True
         except socket.error, e:
-            log.error(e.message or u" ".join(map(unicode, e.args)))
+            log.error(safe_unicode(e.message) or u" ".join(map(safe_unicode, e.args)))
             sys.exit(1)
 
     def _accept(self):
@@ -127,8 +127,8 @@ class PapovoxLikeServer(object):
         # O SítioVox aguarda 100ms (arquivo SVPROC.PAS).
         time.sleep(0.1)
 
-        log.info(u"Conectado ao Papovox")
-        log.info(u"Apelido: %s", self.nickname)
+        log.info(u"Conectado ao Papovox.")
+        log.debug(u"Apelido: %s", self.nickname)
 
     def disconnect(self):
         u"""Desliga a conexão com o Papovox."""
@@ -137,12 +137,12 @@ class PapovoxLikeServer(object):
             self.socket.shutdown(socket.SHUT_RDWR)
             self.socket.close()
         except socket.error, e:
-            log.debug("Client socket: %s" % e)
+            log.debug("Client socket: %s", safe_unicode(e))
         try:
             self.server_socket.shutdown(socket.SHUT_RDWR)
             self.server_socket.close()
         except socket.error, e:
-            log.debug("Server socket: %s" % e)
+            log.debug("Server socket: %s", safe_unicode(e))
 
     # Funções de integração com o cliente XMPP --------------------------------#
 
@@ -165,9 +165,9 @@ class PapovoxLikeServer(object):
                     # Caso contrário, envia a mensagem para a rede XMPP.
                     self.send_xmpp_message(xmpp, data)
         except socket.error, e:
-            log.debug(e.message)
+            log.debug(safe_unicode(e))
         finally:
-            log.info(u"Conexão com o Papovox encerrada")
+            log.info(u"Conexão com o Papovox encerrada.")
 
     def show_online_contacts(self, xmpp):
         u"""Envia para o Papovox informação sobre contatos disponíveis."""
@@ -200,7 +200,7 @@ class PapovoxLikeServer(object):
         else:
             mto = u"ninguém"
             self.sendmessage(S.WARN_MSG_TO_NOBODY)
-        log.debug(u"[send_xmpp_message] para %(mto)s: %(mbody)s", locals())
+        log.debug(u"-> %(mto)s: %(mbody)s", locals())
 
     # Funções de envio de dados para o Papovox --------------------------------#
 
@@ -212,13 +212,13 @@ class PapovoxLikeServer(object):
         Nota: esta função *não* deve ser usada para enviar mensagens. Use apenas
         para transmitir dados brutos de comunicação.
         """
-        log.debug(u"[sendline] %s", line)
+        log.debug(u"> %s", line)
         line = line.encode(SYSTEM_ENCODING, 'replace')
         self.socket.sendall("%s\r\n" % (line,))
 
     def sendmessage(self, msg):
         u"""Codifica e envia uma mensagem via socket pelo protocolo do Papovox."""
-        log.debug(u"[sendmessage] %s", msg)
+        log.debug(u">> %s", msg)
         msg = msg.encode(SYSTEM_ENCODING, 'replace')
 
         # Apesar de teoricamente o protocolo do Papovox suportar mensagens com até
@@ -296,7 +296,7 @@ class PapovoxLikeServer(object):
         data = self.recv(size).rstrip('\r\n')
         data = data.decode(SYSTEM_ENCODING)
         if any(c in data for c in '\r\n'):
-            log.warning("[recvline] recebeu mais que uma linha!")
+            log.warning("Mais que uma linha recebida!")
         return data
 
     def recvall(self, size):
@@ -326,7 +326,7 @@ class PapovoxLikeServer(object):
 
             # Recusa dados do Papovox que não sejam do tipo DADOTECLADO
             if datatype != self.DADOTECLADO:
-                log.warning(u"Recebi tipo de dados desconhecido: (%d)" % datatype)
+                log.warning(u"Tipo de dado desconhecido: (%d).", datatype)
                 continue
 
             # Ignora mensagens vazias

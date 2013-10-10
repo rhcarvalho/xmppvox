@@ -91,15 +91,14 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         self.register_plugin('xep_0199') # XMPP Ping
 
     def connect(self, *args, **kwargs):
-        log.info(u"Tentando conectar ao servidor %s...", self.boundjid.host)
+        log.info(u"Conectando-se ao servidor %s...", self.boundjid.host)
         return sleekxmpp.ClientXMPP.connect(self, *args, **kwargs)
 
     def handle_connected(self, event):
-        log.debug(u"** Conectado **")
-        log.info(u"Conectado ao servidor %s", self.boundjid.host)
+        log.info(u"Conectado ao servidor %s.", self.boundjid.host)
 
     def handle_disconnected(self, event):
-        log.debug(u"** Desconectado **")
+        log.info(u"Desconectado do servidor %s.", self.boundjid.host)
 
     def start(self, event):
         u"""Processa evento de início de sessão.
@@ -150,11 +149,11 @@ class BotXMPP(sleekxmpp.ClientXMPP):
 
     def got_online(self, presence):
         u"""Registra que um contato apareceu online."""
-        log.debug(u"Entrou: %s" % presence['from'])
+        log.debug(u"Entrou: %s", presence['from'])
 
     def got_offline(self, presence):
         u"""Registra que um contato ficou offline."""
-        log.debug(u"Saiu: %s" % presence['from'])
+        log.debug(u"Saiu: %s", presence['from'])
 
     def changed_status(self, presence):
         u"""Processa evento de presenças de contatos.
@@ -177,7 +176,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         # Este é o caso quando dois usuários do XMPPVOX falam entre si, pois o
         # XMPPVOX envia o apelido do usuário quando ele se conecta à rede XMPP.
         if jid in self.client_roster and not self.client_roster[jid]['name'] and nick:
-            log.debug(u"Novo apelido: %s (%s)" % (nick, jid))
+            log.debug(u"Novo apelido: %s (%s)", nick, jid)
             # Guarda o nome localmente, mas não salva no servidor XMPP.
             # Se fosse desejável salvar, usar método self.update_roster.
             self.client_roster[jid]['name'] = nick
@@ -232,9 +231,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         u"""Valida e avisa ao Papovox caso o JID seja inválido."""
         jid = self.boundjid.full
         if not commands.jid_regexp.match(jid):
-            log.error(u"Usuário inválido '%s'.\n"
-                      u"Exemplos: paulo@gmail.com, marcio@chat.facebook.com, "
-                      u"regina@jabber.org", jid)
+            log.error(u"Conta inválida '%s'.", jid)
             # Avisa ao Papovox que o JID é inválido.
             self.papovox.signal_error(S.ERROR_INVALID_JID.format(jid=jid))
             return False

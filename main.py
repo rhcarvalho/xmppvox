@@ -92,8 +92,8 @@ def main():
             else:
                 papovox.disconnect()
     else:
-        log.error(u"Erro: Não foi possível conectar ao Papovox.")
-    log.info(u"Fim do XMPPVOX")
+        log.error(u"Não foi possível conectar ao Papovox.")
+    log.info(u"Fim do XMPPVOX.")
 
 
 def parse_command_line():

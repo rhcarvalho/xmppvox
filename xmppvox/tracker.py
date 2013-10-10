@@ -36,6 +36,7 @@ log = logging.getLogger(__name__)
 
 import requests
 
+from xmppvox.strings import safe_unicode
 from xmppvox.version import __version__
 
 
@@ -92,7 +93,7 @@ def new_session(jid):
             session_id, message = r.text.split(None, 1)
         except ValueError:
             session_id = r.text.strip()
-        log.debug(u"Identificador de sessão do XMPPVOX: %s" % session_id)
+        log.debug(u"Sessão criada: %s", session_id)
     except requests.exceptions.RequestException, e:
         session_id = None
         if message is None:
@@ -100,7 +101,7 @@ def new_session(jid):
                        u"Por favor, tente conectar novamente mais tarde.\n\n"
                        u"Se o problema persistir, peça ajuda pelo email "
                        u"xmppvox@googlegroups.com.")
-        log.error(u"Falha ao obter identificador de sessão: %s" % e)
+        log.error(u"Falha ao obter identificador de sessão: %s", safe_unicode(e))
     return session_id, message
 
 def close_session(session_id):
@@ -111,10 +112,10 @@ def close_session(session_id):
                                     machine_id=MACHINE_ID))
         r.raise_for_status()
         session_id = r.text.strip()
-        log.debug(u"Sessão encerrada: %s" % session_id)
+        log.debug(u"Sessão encerrada: %s", session_id)
     except requests.exceptions.RequestException, e:
         session_id = None
-        log.error(u"Falha ao encerrar sessão: %s" % e)
+        log.error(u"Falha ao encerrar sessão: %s", safe_unicode(e))
     return session_id
 
 
@@ -142,9 +143,9 @@ def _ping(session_id):
                           data=dict(session_id=session_id,
                                     machine_id=MACHINE_ID))
         r.raise_for_status()
-        log.debug(u"PING da sessão: %s" % session_id)
+        log.debug(u"PING da sessão: %s", session_id)
     except requests.exceptions.RequestException, e:
-        log.error(u"PING falhou: %s" % e)
+        log.error(u"PING falhou: %s", safe_unicode(e))
 
 def ping(session_id, interval):
     u"""Envia sinal de vida para o tracker central do XMPPVOX em intervalos regulares."""
