@@ -152,9 +152,10 @@ WARN_MSG_TO_NOBODY = (802, u"Mensagem não enviada. "
                            u"Com quem deseja falar? \n"
                            u"Tecle /para seguido do número do contato. \n"
                            u"Se não souber o número tecle /lista ou /todos.")
+WARN_INVALID_JID = (803, u"Aviso: a conta '{jid}' parece ser inválida.")
 
 # Erros -----------------------------------------------------------------------#
 ERROR_NO_AUTH = (901, u"Erro: usuário ou senha incorretos.")
-ERROR_INVALID_JID = (902, u"""Erro: conta inválida ({jid}).
+ERROR_INVALID_JID = (902, u"""Erro: a conta '{jid}' é inválida.
 Exemplos: paulo@gmail.com, marcio@chat.facebook.com, regina@jabber.org.""")
-ERROR_SOCKET_ERROR = (903, u"Erro: falha na conexão com o servidor {host}.")
+ERROR_SOCKET_ERROR = (903, u"Erro: falha na conexão com o servidor '{host}'.")

@@ -28,10 +28,12 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 import argparse
 import getpass
 
+import sleekxmpp
+
 from xmppvox import client
 from xmppvox import tracker
 from xmppvox import server
-from xmppvox import strings
+from xmppvox.strings import safe_unicode, get_string as S
 
 import logging
 log = logging.getLogger('xmppvox')
@@ -48,53 +50,66 @@ def main():
     # Configuração.
     args = parse_command_line()
     configure_logging(args)
-    strings.get_string.show_code = args.show_code
+    S.show_code = args.show_code
+    try:
+        return _main(args)
+    except Exception, e:
+        log.critical(safe_unicode(e))
+        return 42
+    finally:
+        log.info(u"Fim do XMPPVOX.")
 
+def _main(args):
     # Instancia servidor e aguarda conexão do Papovox.
     papovox = server.PapovoxLikeServer(args.host, args.port)
-
-    if papovox.connect():
-        jid, password = get_jid_and_password(args)
-
-        # Inicia cliente XMPP.
-        xmpp = client.BotXMPP(jid, password, papovox)
-        # Para especificar o mecanismo de autenticação:
-        #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
-
-        # Valida JID e tenta conectar ao servidor XMPP.
-        if xmpp.validate_jid():
-            # Cria sessão no tracker.
-            session_id, message = tracker.new_session(jid)
-
-            if message is not None:
-                papovox.sendmessage(message)
-
-            if session_id is not None:
-                # Envia um PING para o tracker a cada 20 minutos.
-                timer = tracker.ping(session_id, 20 * 60)
-
-                if xmpp.connect():
-                    # Executa cliente XMPP em outra thread.
-                    xmpp.process(block=False)
-
-                    # Bloqueia processando mensagens do Papovox.
-                    # Sem o bloqueio, a thread principal termina e o executável
-                    # gerado pelo PyInstaller termina prematuramente.
-                    papovox.process(xmpp)
-
-                    # Interrompe cliente XMPP quando Papovox desconectar.
-                    xmpp.disconnect()
-
-                # Cancela envio de PINGs para o tracker.
-                timer.cancel()
-                # Encerra sessão no tracker.
-                tracker.close_session(session_id)
-            else:
-                papovox.disconnect()
-    else:
+    if not papovox.connect():
         log.error(u"Não foi possível conectar ao Papovox.")
-    log.info(u"Fim do XMPPVOX.")
-
+        return 1
+    try:
+        jid, password = get_jid_and_password(args)
+        try:
+            # Inicia cliente XMPP.
+            xmpp = client.BotXMPP(jid, password, papovox)
+            # Para especificar o mecanismo de autenticação:
+            #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
+        except sleekxmpp.jid.InvalidJID:
+            log.error(u"A conta '%s' é inválida.", jid)
+            papovox.sendmessage(S.ERROR_INVALID_JID.format(jid=jid))
+            return 2
+        # Verifica JID.
+        if not xmpp.validate_jid():
+            log.warn(u"A conta '%s' parece ser inválida.", jid)
+            # Avisa ao Papovox que o JID é inválido.
+            papovox.sendmessage(S.WARN_INVALID_JID.format(jid=jid))
+        # Cria sessão no tracker.
+        session_id, message = tracker.new_session(jid)
+        if message is not None:
+            papovox.sendmessage(message)
+        if session_id is None:
+            return 3
+        # Envia um PING para o tracker a cada 20 minutos.
+        timer = tracker.ping(session_id, 20 * 60)
+        try:
+            # Tenta conectar ao servidor XMPP.
+            if not xmpp.connect():
+                return 4
+            try:
+                # Executa cliente XMPP em outra thread.
+                xmpp.process(block=False)
+                # Bloqueia processando mensagens do Papovox.
+                # Sem o bloqueio, a thread principal termina e o executável
+                # gerado pelo PyInstaller termina prematuramente.
+                papovox.process(xmpp)
+            finally:
+                # Interrompe cliente XMPP quando Papovox desconectar.
+                xmpp.disconnect()
+        finally:
+            # Cancela envio de PINGs para o tracker.
+            timer.cancel()
+            # Encerra sessão no tracker.
+            tracker.close_session(session_id)
+    finally:
+        papovox.disconnect()
 
 def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
@@ -141,4 +156,5 @@ def get_jid_and_password(args):
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())

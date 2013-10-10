@@ -228,11 +228,8 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         return bare_jid
 
     def validate_jid(self):
-        u"""Valida e avisa ao Papovox caso o JID seja inválido."""
+        u"""Retorna True se JID parecer válido, False caso contrário."""
         jid = self.boundjid.full
         if not commands.jid_regexp.match(jid):
-            log.error(u"Conta inválida '%s'.", jid)
-            # Avisa ao Papovox que o JID é inválido.
-            self.papovox.signal_error(S.ERROR_INVALID_JID.format(jid=jid))
             return False
         return True
