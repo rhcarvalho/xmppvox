@@ -100,10 +100,9 @@ def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
     parser = argparse.ArgumentParser(description='XMPPVOX: cliente de bate-papo XMPP para o DOSVOX.')
     # Configuração de verbosidade.
-    parser.add_argument('-d', '--debug',
+    parser.add_argument('-v', '--verbose',
                         help=u"exibe mais detalhes sobre a execução",
-                        action='store_const', dest='loglevel',
-                        const=logging.DEBUG, default=logging.INFO)
+                        action='count', dest='verbose')
     # Configuração de strings.
     parser.add_argument('-c', '--codificar',
                         help=u"envia strings codificadas",
@@ -120,13 +119,14 @@ def parse_command_line():
 
 def configure_logging(args):
     # Configura logging.
-    if args.loglevel == logging.DEBUG:
-        _format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
-    else:
+    if args.verbose == 0:
         _format = '%(levelname)-8s %(message)s'
-    logging.basicConfig(format=_format,
-                        datefmt='%H:%M:%S')
-    logging.getLogger('xmppvox').setLevel(args.loglevel)
+        _level = logging.INFO
+    else:
+        _format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
+        _level = logging.DEBUG
+    logging.basicConfig(format=_format, datefmt='%H:%M:%S')
+    logging.getLogger('xmppvox').setLevel(_level)
 
 def get_jid_and_password(args):
     jid = args.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
