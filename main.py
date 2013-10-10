@@ -34,7 +34,7 @@ from xmppvox import server
 from xmppvox import strings
 
 import logging
-log = logging.getLogger(__name__)
+log = logging.getLogger('xmppvox')
 
 # import apenas para ajudar o PyInstaller a detectar dependências do projeto.
 import _pyinstaller
@@ -121,14 +121,13 @@ def parse_command_line():
 
 def configure_logging(opts):
     # Configura logging.
-    logging.basicConfig(level=opts.loglevel,
-                        format='%(levelname)-8s %(asctime)s %(message)s',
-                        datefmt='%H:%M:%S')
-    # Não mostrar mensagens de DEBUG do SleekXMPP.
     if opts.loglevel == logging.DEBUG:
-        logging.getLogger('sleekxmpp').setLevel(logging.INFO)
+        _format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
     else:
-        logging.getLogger('sleekxmpp').setLevel(logging.WARNING)
+        _format = '%(levelname)-8s %(message)s'
+    logging.basicConfig(format=_format,
+                        datefmt='%H:%M:%S')
+    logging.getLogger('xmppvox').setLevel(opts.loglevel)
 
 def get_jid_and_password(opts):
     jid = opts.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
