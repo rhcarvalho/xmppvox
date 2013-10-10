@@ -119,14 +119,20 @@ def parse_command_line():
 
 def configure_logging(args):
     # Configura logging.
-    if args.verbose == 0:
-        _format = '%(levelname)-8s %(message)s'
-        _level = logging.INFO
-    else:
-        _format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
-        _level = logging.DEBUG
-    logging.basicConfig(format=_format, datefmt='%H:%M:%S')
-    logging.getLogger('xmppvox').setLevel(_level)
+    basic_format = '%(levelname)-8s %(message)s'
+    detailed_format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
+    date_format = '%H:%M:%S'
+    # Mostra informações mínimas na tela
+    if not args.verbose:
+        logging.basicConfig(level=logging.ERROR, format=basic_format, datefmt=date_format)
+        logging.getLogger('xmppvox').setLevel(logging.INFO)
+    # Gradualmente, mostra mais e mais detalhes
+    if args.verbose >= 1:
+        logging.basicConfig(level=logging.ERROR, format=detailed_format, datefmt=date_format)
+        logging.getLogger('xmppvox').setLevel(logging.DEBUG)
+        logging.getLogger('xmppvox.commands').setLevel(logging.WARNING)
+    if args.verbose >= 2:
+        logging.getLogger('xmppvox.commands').setLevel(logging.DEBUG)
 
 def get_jid_and_password(args):
     jid = args.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
