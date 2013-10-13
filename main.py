@@ -27,6 +27,10 @@ Este módulo é responsável pela coordenação entre os demais módulos.
 
 import argparse
 import getpass
+import os
+import shutil
+import subprocess
+import sys
 
 import sleekxmpp
 
@@ -51,6 +55,52 @@ def main():
     args = parse_command_line()
     configure_logging(args)
     S.show_code = args.show_code
+    if getattr(sys, 'frozen', False) and len(sys.argv) == 1:
+        # we are running in a PyInstaller bundle
+        EXECUTABLE_NAME = "xmppvox.exe"
+        DOSVOX_PATH = "C:\\winvox"
+        # check for required executables
+        required_executables = ("scripvox.exe", "papovox.exe")
+        missing = [exe for exe in required_executables if not os.path.isfile(exe)]
+        if missing:
+            # check for DOSVOX in the default install path and try to install itself
+            if all(os.path.isfile(os.path.join(DOSVOX_PATH, exe)) for exe in required_executables):
+                destination = os.path.join(DOSVOX_PATH, EXECUTABLE_NAME)
+                try:
+                    shutil.copy2(sys.executable, destination)
+                    # run my new self
+                    os.chdir(DOSVOX_PATH)
+                    os.spawnl(os.P_NOWAIT, destination, EXECUTABLE_NAME)
+                    return 0
+                except:
+                    print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
+                          u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
+                          (EXECUTABLE_NAME, DOSVOX_PATH))
+                    raw_input(u"Pressione qualquer tecla para continuar. . .")
+                    return 99
+            # DOSVOX not found, cannot continue
+            print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
+                  u'Procurei e não encontrei o DOSVOX em "%s".' % (EXECUTABLE_NAME, DOSVOX_PATH))
+            print(u'Aplicativo(s) não encontrado(s) no diretório atual: "%s".' % '", "'.join(missing))
+            raw_input(u"Pressione qualquer tecla para continuar. . .")
+            return 99
+        # self-check
+        my_name = os.path.basename(sys.executable)
+        if not my_name == EXECUTABLE_NAME:
+            try:
+                shutil.copy2(my_name, EXECUTABLE_NAME)
+                os.spawnl(os.P_NOWAIT, EXECUTABLE_NAME, EXECUTABLE_NAME)
+                return 0
+            except:
+                print(u'Para usar o XMPPVOX, renomeie este arquivo "%s" para "%s".' %
+                      (my_name, EXECUTABLE_NAME))
+                raw_input(u"Pressione qualquer tecla para continuar. . .")
+                return 99
+        # run scripvox.exe xmppvox.cmd
+        basedir = sys._MEIPASS
+        subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
+        return 0
+    # normal execution
     try:
         return _main(args)
     except Exception, e:
@@ -156,5 +206,4 @@ def get_jid_and_password(args):
 
 
 if __name__ == "__main__":
-    import sys
     sys.exit(main())
