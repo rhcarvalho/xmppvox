@@ -36,7 +36,7 @@ REM
 REM
 REM Execute este script a partir do diret¢rio principal do projeto:
 REM     scripts\build.bat
-REM Ou use o bash script (com MINGW)
+REM Ou use o bash script (com MinGW)
 
 REM Remove arquivos antigos se existirem
 IF EXIST dist (
@@ -46,7 +46,8 @@ IF EXIST dist (
 REM Executa o PyInstaller se existir ou exibe mensagem e termina.
 for %%G in (pyinstaller.exe) do (set FOUND=%%~$PATH:G)
 IF DEFINED FOUND (
-    pyinstaller --name=xmppvox --onefile --version-file=version main.py
+    REM pyinstaller --name=xmppvox --onefile --version-file=version main.py
+    pyinstaller xmppvox.spec
 ) ELSE (
     ECHO Atená∆o: PyInstaller n∆o encontrado!
     EXIT 1
@@ -57,8 +58,6 @@ IF NOT EXIST dist (
     GOTO:EOF
 )
 
-REM Copia bootstrap script:
-COPY scripts\xmppvox.cmd dist\xmppvox.cmd
 REM Copia manual do XMPPVOX:
 REM COPY docs\manual.txt dist\manual.txt
 

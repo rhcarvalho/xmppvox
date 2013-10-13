@@ -1,5 +1,4 @@
 *.log
 build
 dist
-xmppvox.spec
 *.pyc
