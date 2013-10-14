@@ -86,7 +86,8 @@ def process_command(xmpp, data, papovox):
 
 def ajuda(xmpp=None, mo=None, papovox=None):
     # Ajuda dividida em blocos para facilitar a leitura.
-    help = (S.CMD_HELP1, S.CMD_HELP2, S.CMD_HELP3, S.CMD_HELP4)
+    help = (S.CMD_HELP1, S.CMD_HELP2, S.CMD_HELP3,
+            S.CMD_HELP4, S.CMD_HELP5, S.CMD_HELP6)
     def send_help(help):
         # Completa string com o prefixo de comando.
         help = help.format(prefix=S.CMD_PREFIX)

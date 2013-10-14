@@ -92,7 +92,7 @@ CMD_PREFIX = '/'
 
 CMD_UNKNOWN = (200, u"Comando desconhecido: {cmd}")
 
-CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
+CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4, CMD_HELP5, CMD_HELP6 = (
     (211, u"""\
 
     Ajuda do XMPPVOX:
@@ -121,6 +121,17 @@ CMD_HELP1, CMD_HELP2, CMD_HELP3, CMD_HELP4 = (
     {prefix}responder = {prefix}r .
     {prefix}quem = {prefix}q .
     {prefix}adicionar = {prefix}a .
+
+    """),
+    (215, u"""\
+    Sítio oficial do XMPPVOX: http://xmppvox.rodolfocarvalho.net
+
+    Lista de discussão oficial: http://groups.google.com/d/forum/xmppvox
+
+    """),
+    (216, u"""\
+    Para fazer parte da lista, envie um email em branco para "xmppvox+subscribe@googlegroups.com".
+    Depois de confirmar sua participação, você poderá enviar emails para "xmppvox@googlegroups.com".
 
     """),
     )
