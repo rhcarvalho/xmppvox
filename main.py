@@ -164,6 +164,7 @@ def _main(args):
             tracker.close_session(session_id)
     finally:
         papovox.disconnect()
+        return 0
 
 def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
