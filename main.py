@@ -57,6 +57,8 @@ def main():
     S.show_code = args.show_code
     if getattr(sys, 'frozen', False) and len(sys.argv) == 1:
         # we are running in a PyInstaller bundle
+        # set current working directory to where this executable is
+        os.chdir(os.path.dirname(sys.executable))
         EXECUTABLE_NAME = "xmppvox.exe"
         DOSVOX_PATH = "C:\\winvox"
         # check for required executables
