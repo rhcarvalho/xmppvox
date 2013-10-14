@@ -88,7 +88,7 @@ def main():
             return 99
         # self-check
         my_name = os.path.basename(sys.executable)
-        if not my_name == EXECUTABLE_NAME:
+        if not my_name.lower() == EXECUTABLE_NAME.lower():
             try:
                 shutil.copy2(my_name, EXECUTABLE_NAME)
                 os.spawnl(os.P_NOWAIT, EXECUTABLE_NAME, EXECUTABLE_NAME)
