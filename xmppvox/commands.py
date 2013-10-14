@@ -132,15 +132,13 @@ def quem(xmpp, mo=None, papovox=None):
     if not warning:
         papovox.sendmessage(S.CMD_WHO.format(who=who))
     else:
-        papovox.sendmessage(S.CMD_WHO_WARN.format(who=who,
-                                                         warning=warning))
+        papovox.sendmessage(S.CMD_WHO_WARN.format(who=who, warning=warning))
 
 def lista(xmpp, mo=None, papovox=None):
     u"""Lista contatos disponíveis/online."""
     for number, roster_item in enumerate_online_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        papovox.sendmessage(S.CMD_LIST_ITEM.format(number=number,
-                                                          name=name))
+        papovox.sendmessage(S.CMD_LIST_ITEM.format(number=number, name=name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
@@ -151,8 +149,7 @@ def todos(xmpp, mo=None, papovox=None):
     u"""Lista todos os contatos (online/offline)."""
     for number, roster_item in enumerate_roster(xmpp):
         name = roster_item['name'] or roster_item.jid
-        papovox.sendmessage(S.CMD_ALL_ITEM.format(number=number,
-                                                         name=name))
+        papovox.sendmessage(S.CMD_ALL_ITEM.format(number=number, name=name))
     # Se 'number' não está definido, então nenhum contato foi listado.
     try:
         number
