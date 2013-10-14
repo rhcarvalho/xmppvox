@@ -105,6 +105,8 @@ def main():
     # normal execution
     try:
         return _main(args)
+    except KeyboardInterrupt:
+        pass
     except Exception, e:
         log.critical(safe_unicode(e))
         return 42
