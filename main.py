@@ -50,32 +50,33 @@ del _pyinstaller
 BUNDLED = getattr(sys, 'frozen', False)
 
 
-EXECUTABLE_NAME = "xmppvox.exe"
-REQUIRED_EXECUTABLES = ("scripvox.exe", "papovox.exe")
+if BUNDLED:
+    EXECUTABLE_NAME = "xmppvox.exe"
+    REQUIRED_EXECUTABLES = ("scripvox.exe", "papovox.exe")
 
-def install(missing):
-    DOSVOX_PATH = "C:\\winvox"
-    # check for DOSVOX in the default install path and try to install itself
-    if all(os.path.isfile(os.path.join(DOSVOX_PATH, exe)) for exe in REQUIRED_EXECUTABLES):
-        destination = os.path.join(DOSVOX_PATH, EXECUTABLE_NAME)
-        try:
-            shutil.copy2(sys.executable, destination)
-            # run my new self
-            os.chdir(DOSVOX_PATH)
-            os.spawnl(os.P_NOWAIT, destination, EXECUTABLE_NAME)
-            return 0
-        except:
-            print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
-                  u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
-                  (EXECUTABLE_NAME, DOSVOX_PATH))
-            raw_input(u"Pressione qualquer tecla para continuar. . .")
-            return 99
-    # DOSVOX not found, cannot continue
-    print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
-          u'Procurei e não encontrei o DOSVOX em "%s".' % (EXECUTABLE_NAME, DOSVOX_PATH))
-    print(u'Aplicativo(s) não encontrado(s) no diretório atual: "%s".' % '", "'.join(missing))
-    raw_input(u"Pressione qualquer tecla para continuar. . .")
-    return 99
+    def install(missing):
+        DOSVOX_PATH = "C:\\winvox"
+        # check for DOSVOX in the default install path and try to install itself
+        if all(os.path.isfile(os.path.join(DOSVOX_PATH, exe)) for exe in REQUIRED_EXECUTABLES):
+            destination = os.path.join(DOSVOX_PATH, EXECUTABLE_NAME)
+            try:
+                shutil.copy2(sys.executable, destination)
+                # run my new self
+                os.chdir(DOSVOX_PATH)
+                os.spawnl(os.P_NOWAIT, destination, EXECUTABLE_NAME)
+                return 0
+            except:
+                print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
+                      u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
+                      (EXECUTABLE_NAME, DOSVOX_PATH))
+                raw_input(u"Pressione qualquer tecla para continuar. . .")
+                return 99
+        # DOSVOX not found, cannot continue
+        print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
+              u'Procurei e não encontrei o DOSVOX em "%s".' % (EXECUTABLE_NAME, DOSVOX_PATH))
+        print(u'Aplicativo(s) não encontrado(s) no diretório atual: "%s".' % '", "'.join(missing))
+        raw_input(u"Pressione qualquer tecla para continuar. . .")
+        return 99
 
 def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
