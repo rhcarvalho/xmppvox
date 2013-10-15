@@ -148,8 +148,6 @@ def main():
 def start_client_server(host, port, jid, password):
     try:
         return _start_client_server(host, port, jid, password)
-    except KeyboardInterrupt:
-        return 1
     except Exception, e:
         log.critical(safe_unicode(e))
         return 1
@@ -253,4 +251,7 @@ def get_jid_and_password(jid, password):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        sys.exit(1)
