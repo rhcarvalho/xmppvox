@@ -70,6 +70,10 @@ if BUNDLED:
         return subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
 
     def assert_can_run_launch_script():
+        # the launch script needs to call this program again,
+        # so we must have the same name as the script expects
+        my_name = os.path.basename(sys.executable)
+        assert my_name.lower() == EXECUTABLE_NAME.lower()
         # the launch script uses relative paths to executables, so we
         # need to ensure that the current working directory is correct
         os.chdir(os.path.dirname(sys.executable))
@@ -77,10 +81,6 @@ if BUNDLED:
         required_executables = ("scripvox.exe", "papovox.exe")
         missing = [exe for exe in required_executables if not os.path.isfile(exe)]
         assert not missing
-        # the launch script also calls this program again,
-        # so we must have the same name as the script expects
-        my_name = os.path.basename(sys.executable)
-        assert my_name.lower() == EXECUTABLE_NAME.lower()
 
     def install(dosvox_root, exe_name):
         destination = os.path.join(dosvox_root, exe_name)
