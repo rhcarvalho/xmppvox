@@ -119,17 +119,27 @@ def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
 
     Esta função é o ponto de partida da execução do XMPPVOX."""
-    # Configuração.
-    args = parse_command_line()
-    configure_logging(args)
-    S.show_code = args.show_code
     # check if we need to use the launch script
     need_launch_script = (BUNDLED and len(sys.argv) == 1)
     if need_launch_script:
+        # the launch script uses ScriptVox to
+        # ask the user for JID and password,
+        # then calls XMMPVOX again with arguments
         return run_launch_script()
-    # normal execution
+    else:
+        # normal execution
+        # <config>
+        args = parse_command_line()
+        configure_logging(args)
+        S.show_code = args.show_code
+        # </config>
+        host, port = args.host, args.port
+        jid, password = get_jid_and_password(args)
+        return start_client_server(host, port, jid, password)
+
+def start_client_server(host, port, jid, password):
     try:
-        return _main(args)
+        return _start_client_server(host, port, jid, password)
     except KeyboardInterrupt:
         return 13
     except Exception, e:
@@ -138,14 +148,13 @@ def main():
     finally:
         log.info(u"Fim do XMPPVOX.")
 
-def _main(args):
+def _start_client_server(host, port, jid, password):
     # Instancia servidor e aguarda conexão do Papovox.
-    papovox = server.PapovoxLikeServer(args.host, args.port)
+    papovox = server.PapovoxLikeServer(host, port)
     if not papovox.connect():
         log.error(u"Não foi possível conectar ao Papovox.")
         return 1
     try:
-        jid, password = get_jid_and_password(args)
         try:
             # Inicia cliente XMPP.
             xmpp = client.BotXMPP(jid, password, papovox)
