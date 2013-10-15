@@ -119,16 +119,23 @@ def main():
         os.chdir(dosvox_root)
         # try to add an entry for XMMPVOX in DOSVOX menu
         if not is_program_in_dosvox_menu(xmppvox_exe, vals):
-            append_to_dosvox_menu(canonical_exe_path, keys)
+            try:
+                append_to_dosvox_menu(canonical_exe_path, keys)
+            except:
+                run_script("failed-append-menu")
+            else:
+                run_script("success-append-menu")
         try:
             assert_can_run_launch_script(canonical_exe_path)
             return run_script("launch")
         except AssertionError:
             if install(canonical_exe_path):
+                run_script("success-install")
                 # run my new self in a another process
                 os.spawnl(os.P_NOWAIT, canonical_exe_path, xmppvox_exe)
                 return 0
             else:
+                run_script("failed-install")
                 print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
                       u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
                       (xmppvox_exe, dosvox_root))

@@ -1,4 +1,6 @@
 # -*- mode: python -*-
+import glob
+import os.path
 a = Analysis(['main.py'],
              pathex=['.'],
              hiddenimports=[],
@@ -7,7 +9,7 @@ a = Analysis(['main.py'],
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries + [('launch.cmd', 'scripts/launch.cmd', 'DATA')],
+          a.binaries + [(os.path.basename(s), s, 'DATA') for s in glob.iglob('scripts/*.cmd')],
           a.zipfiles,
           a.datas,
           name='xmppvox.exe',
