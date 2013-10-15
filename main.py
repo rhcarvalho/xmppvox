@@ -54,10 +54,11 @@ if BUNDLED:
     # we are running in a PyInstaller bundle
     import win32api
 
-    def run_launch_script():
-        # run "scripvox.exe /path/to/xmppvox.cmd"
+    def run_script(name):
+        # run "scripvox.exe /path/to/script/name.cmd"
         basedir = sys._MEIPASS
-        return subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
+        script = os.path.join(basedir, "%s.cmd" % name)
+        return subprocess.call(["scripvox.exe", script], close_fds=True)
 
     def assert_can_run_launch_script(canonical_exe_name):
         # the launch script needs to call this program again,
@@ -122,7 +123,7 @@ def main():
             append_to_dosvox_menu(canonical_exe_path, keys)
         try:
             assert_can_run_launch_script(xmppvox_exe)
-            return run_launch_script()
+            return run_script("launch")
         except AssertionError:
             if install(canonical_exe_path):
                 # run my new self in a another process

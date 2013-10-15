@@ -7,7 +7,7 @@ a = Analysis(['main.py'],
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries + [('xmppvox.cmd', 'scripts/xmppvox.cmd', 'DATA')],
+          a.binaries + [('launch.cmd', 'scripts/launch.cmd', 'DATA')],
           a.zipfiles,
           a.datas,
           name='xmppvox.exe',
