@@ -87,22 +87,18 @@ if BUNDLED:
         raw_input(u"Pressione qualquer tecla para continuar. . .")
         return 99
 
-def main():
-    u"""Executa o cliente XMPP e o servidor compatível com Papovox.
-
-    Esta função é o ponto de partida da execução do XMPPVOX."""
-    # Configuração.
-    args = parse_command_line()
-    configure_logging(args)
-    S.show_code = args.show_code
-    if BUNDLED and len(sys.argv) == 1:
-        # set current working directory to where this executable is
+    def run_launch_script():
+        # the launch script uses relative paths to executables, so we
+        # need to ensure that the current working directory is correct
         os.chdir(os.path.dirname(sys.executable))
         # check for required executables for the launch script
         missing = [exe for exe in REQUIRED_EXECUTABLES if not os.path.isfile(exe)]
         if missing:
+            # since we cannot find some required programs,
+            # we need to install XMPPVOX first
             return install(missing)
-        # self-check
+        # the launch script also calls this program again,
+        # so we must have the same name as the script expects
         my_name = os.path.basename(sys.executable)
         if not my_name.lower() == EXECUTABLE_NAME.lower():
             try:
@@ -118,6 +114,19 @@ def main():
         basedir = sys._MEIPASS
         subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
         return 0
+
+def main():
+    u"""Executa o cliente XMPP e o servidor compatível com Papovox.
+
+    Esta função é o ponto de partida da execução do XMPPVOX."""
+    # Configuração.
+    args = parse_command_line()
+    configure_logging(args)
+    S.show_code = args.show_code
+    # check if we need to use the launch script
+    need_launch_script = (BUNDLED and len(sys.argv) == 1)
+    if need_launch_script:
+        return run_launch_script()
     # normal execution
     try:
         return _main(args)
