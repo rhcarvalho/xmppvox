@@ -97,6 +97,14 @@ def main():
         xmppvox_exe = "xmppvox.exe"
         keys = win32api.GetProfileVal("PROGREDE", None, "", "dosvox.ini").split("\x00")[:-1]
         vals = [win32api.GetProfileVal("PROGREDE", key, "", "dosvox.ini") for key in keys]
+        # make sure DOSVOX is installed
+        dosvox_installed = bool(keys)
+        if not dosvox_installed:
+            print(u'Não foi possível encontrar a instalação do DOSVOX.\n'
+                  u'Antes de usar o XMPPVOX, é preciso instalar o DOSVOX.\n'
+                  u'Para mais ajuda, visite http://xmppvox.rodolfocarvalho.net')
+            raw_input(u"Pressione qualquer tecla para continuar. . .")
+            return 1
         dosvox_root = find_dosvox_root(vals)
         canonical_exe_path = os.path.join(dosvox_root, xmppvox_exe)
         try:
