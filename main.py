@@ -130,10 +130,10 @@ def start_client_server(host, port, jid, password):
     try:
         return _start_client_server(host, port, jid, password)
     except KeyboardInterrupt:
-        return 13
+        return 1
     except Exception, e:
         log.critical(safe_unicode(e))
-        return 42
+        return 1
     finally:
         log.info(u"Fim do XMPPVOX.")
 
@@ -152,7 +152,7 @@ def _start_client_server(host, port, jid, password):
         except sleekxmpp.jid.InvalidJID:
             log.error(u"A conta '%s' é inválida.", jid)
             papovox.sendmessage(S.ERROR_INVALID_JID.format(jid=jid))
-            return 2
+            return 1
         # Verifica JID.
         if not xmpp.validate_jid():
             log.warn(u"A conta '%s' parece ser inválida.", jid)
@@ -163,13 +163,13 @@ def _start_client_server(host, port, jid, password):
         if message is not None:
             papovox.sendmessage(message)
         if session_id is None:
-            return 3
+            return 1
         # Envia um PING para o tracker a cada 20 minutos.
         timer = tracker.ping(session_id, 20 * 60)
         try:
             # Tenta conectar ao servidor XMPP.
             if not xmpp.connect():
-                return 4
+                return 1
             try:
                 # Executa cliente XMPP em outra thread.
                 xmpp.process(block=False)
