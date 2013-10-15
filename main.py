@@ -60,16 +60,12 @@ if BUNDLED:
         script = os.path.join(basedir, "%s.cmd" % name)
         return subprocess.call(["scripvox.exe", script], close_fds=True)
 
-    def assert_can_run_launch_script(canonical_exe_name):
-        # the launch script needs to call this program again,
-        # so we must have the same name as the script expects
-        my_name = os.path.basename(sys.executable)
-        assert my_name.lower() == canonical_exe_name.lower()
-        # the launch script uses relative paths to executables, so we
-        # need to ensure that the current working directory is correct
-        os.chdir(os.path.dirname(sys.executable))
+    def assert_can_run_launch_script(canonical_exe_path):
+        # check that we are the canonical executable
+        assert sys.executable.lower() == canonical_exe_path.lower()
+        xmppvox_exe = os.path.basename(canonical_exe_path)
         # check for required executables for the launch script
-        required_executables = ("scripvox.exe", "papovox.exe")
+        required_executables = (xmppvox_exe, "scripvox.exe", "papovox.exe")
         missing = [exe for exe in required_executables if not os.path.isfile(exe)]
         assert not missing
 
@@ -118,11 +114,14 @@ def main():
             return 1
         dosvox_root = find_dosvox_root(vals)
         canonical_exe_path = os.path.join(dosvox_root, xmppvox_exe)
+        # to run external programs we use relative paths, therefore
+        # we set the current working directory to a known place
+        os.chdir(dosvox_root)
         # try to add an entry for XMMPVOX in DOSVOX menu
         if not is_program_in_dosvox_menu(xmppvox_exe, vals):
             append_to_dosvox_menu(canonical_exe_path, keys)
         try:
-            assert_can_run_launch_script(xmppvox_exe)
+            assert_can_run_launch_script(canonical_exe_path)
             return run_script("launch")
         except AssertionError:
             if install(canonical_exe_path):
