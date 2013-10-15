@@ -138,11 +138,11 @@ def main():
         # normal execution
         # <config>
         args = parse_command_line()
-        configure_logging(args)
+        configure_logging(args.verbose)
         S.show_code = args.show_code
         # </config>
         host, port = args.host, args.port
-        jid, password = get_jid_and_password(args)
+        jid, password = get_jid_and_password(args.jid, args.password)
         return start_client_server(host, port, jid, password)
 
 def start_client_server(host, port, jid, password):
@@ -229,26 +229,26 @@ def parse_command_line():
                         help="porta de escuta", metavar="XXX")
     return parser.parse_args()
 
-def configure_logging(args):
+def configure_logging(verbose):
     # Configura logging.
     basic_format = '%(levelname)-8s %(message)s'
     detailed_format = '%(levelname)-8s %(asctime)s [%(module)s:%(lineno)d:%(funcName)s] %(message)s'
     date_format = '%H:%M:%S'
     # Mostra informações mínimas na tela
-    if not args.verbose:
+    if not verbose:
         logging.basicConfig(level=logging.ERROR, format=basic_format, datefmt=date_format)
         logging.getLogger('xmppvox').setLevel(logging.INFO)
     # Gradualmente, mostra mais e mais detalhes
-    if args.verbose >= 1:
+    if verbose >= 1:
         logging.basicConfig(level=logging.ERROR, format=detailed_format, datefmt=date_format)
         logging.getLogger('xmppvox').setLevel(logging.DEBUG)
         logging.getLogger('xmppvox.commands').setLevel(logging.WARNING)
-    if args.verbose >= 2:
+    if verbose >= 2:
         logging.getLogger('xmppvox.commands').setLevel(logging.DEBUG)
 
-def get_jid_and_password(args):
-    jid = args.jid or raw_input("Conta (ex.: fulano@gmail.com): ")
-    password = args.password or getpass.getpass("Senha para %r: " % jid)
+def get_jid_and_password(jid, password):
+    jid = jid or raw_input("Conta (ex.: fulano@gmail.com): ")
+    password = password or getpass.getpass("Senha para %r: " % jid)
     return jid, password
 
 
