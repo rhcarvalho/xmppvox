@@ -51,6 +51,7 @@ BUNDLED = getattr(sys, 'frozen', False)
 
 
 if BUNDLED:
+    # we are running in a PyInstaller bundle
     import win32api
     EXECUTABLE_NAME = "xmppvox.exe"
     REQUIRED_EXECUTABLES = ("scripvox.exe", "papovox.exe")
@@ -95,10 +96,9 @@ def main():
     configure_logging(args)
     S.show_code = args.show_code
     if BUNDLED and len(sys.argv) == 1:
-        # we are running in a PyInstaller bundle
         # set current working directory to where this executable is
         os.chdir(os.path.dirname(sys.executable))
-        # check for required executables
+        # check for required executables for the launch script
         missing = [exe for exe in REQUIRED_EXECUTABLES if not os.path.isfile(exe)]
         if missing:
             return install(missing)
@@ -114,7 +114,7 @@ def main():
                       (my_name, EXECUTABLE_NAME))
                 raw_input(u"Pressione qualquer tecla para continuar. . .")
                 return 99
-        # run scripvox.exe xmppvox.cmd
+        # run "scripvox.exe /path/to/xmppvox.cmd"
         basedir = sys._MEIPASS
         subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
         return 0
