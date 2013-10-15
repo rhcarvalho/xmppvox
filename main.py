@@ -84,6 +84,16 @@ if BUNDLED:
         dosvox_root = os.path.dirname(first_executable)
         return dosvox_root
 
+    def is_program_in_dosvox_menu(exe_name, vals):
+        programs = set(os.path.basename(val.split(',', 2)[1]).lower() for val in vals)
+        return exe_name.lower() in programs
+
+    def append_to_dosvox_menu(exe_path, keys):
+        next_index = max(int(''.join(c for c in key if c.isdigit())) for key in keys) + 1
+        new_key = 'Rede%d' % next_index
+        new_val = 'X,%s,-RDXMPP,XMPPVOX bate-papo com amigos do Google e Facebook' % (exe_path,)
+        win32api.WriteProfileVal("PROGREDE", new_key, new_val, "dosvox.ini")
+
 def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
 
@@ -107,6 +117,9 @@ def main():
             return 1
         dosvox_root = find_dosvox_root(vals)
         canonical_exe_path = os.path.join(dosvox_root, xmppvox_exe)
+        # try to add an entry for XMMPVOX in DOSVOX menu
+        if not is_program_in_dosvox_menu(xmppvox_exe, vals):
+            append_to_dosvox_menu(canonical_exe_path, keys)
         try:
             assert_can_run_launch_script(xmppvox_exe)
             return run_launch_script()
