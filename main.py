@@ -54,26 +54,16 @@ if BUNDLED:
     # we are running in a PyInstaller bundle
     import win32api
 
-    EXECUTABLE_NAME = "xmppvox.exe"
-
-    def _find_dosvox_root():
-        keys = win32api.GetProfileVal("PROGREDE", None, "", "dosvox.ini").split("\x00")[:-1]
-        vals = [win32api.GetProfileVal("PROGREDE", key, "", "dosvox.ini") for key in keys]
-        first_executable = vals[0].split(',', 2)[1]
-        dosvox_root = os.path.dirname(first_executable)
-        return dosvox_root
-    DOSVOX_ROOT = _find_dosvox_root()
-
     def run_launch_script():
         # run "scripvox.exe /path/to/xmppvox.cmd"
         basedir = sys._MEIPASS
         return subprocess.call(["scripvox.exe", os.path.join(basedir, "xmppvox.cmd")], close_fds=True)
 
-    def assert_can_run_launch_script():
+    def assert_can_run_launch_script(canonical_exe_name):
         # the launch script needs to call this program again,
         # so we must have the same name as the script expects
         my_name = os.path.basename(sys.executable)
-        assert my_name.lower() == EXECUTABLE_NAME.lower()
+        assert my_name.lower() == canonical_exe_name.lower()
         # the launch script uses relative paths to executables, so we
         # need to ensure that the current working directory is correct
         os.chdir(os.path.dirname(sys.executable))
@@ -82,37 +72,45 @@ if BUNDLED:
         missing = [exe for exe in required_executables if not os.path.isfile(exe)]
         assert not missing
 
-    def install(dosvox_root, exe_name):
-        destination = os.path.join(dosvox_root, exe_name)
+    def install(destination):
         try:
             shutil.copy2(sys.executable, destination)
             return True
         except:
             return False
 
+    def find_dosvox_root(vals):
+        first_executable = vals[0].split(',', 2)[1]
+        dosvox_root = os.path.dirname(first_executable)
+        return dosvox_root
+
 def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
 
     Esta função é o ponto de partida da execução do XMPPVOX."""
     # check if we need to use the launch script
+    # the launch script uses ScriptVox to
+    # ask the user for JID and password,
+    # then calls XMMPVOX again with arguments
     need_launch_script = (BUNDLED and len(sys.argv) == 1)
     if need_launch_script:
-        # the launch script uses ScriptVox to
-        # ask the user for JID and password,
-        # then calls XMMPVOX again with arguments
+        xmppvox_exe = "xmppvox.exe"
+        keys = win32api.GetProfileVal("PROGREDE", None, "", "dosvox.ini").split("\x00")[:-1]
+        vals = [win32api.GetProfileVal("PROGREDE", key, "", "dosvox.ini") for key in keys]
+        dosvox_root = find_dosvox_root(vals)
+        canonical_exe_path = os.path.join(dosvox_root, xmppvox_exe)
         try:
-            assert_can_run_launch_script()
+            assert_can_run_launch_script(xmppvox_exe)
             return run_launch_script()
         except AssertionError:
-            if install(DOSVOX_ROOT, EXECUTABLE_NAME):
+            if install(canonical_exe_path):
                 # run my new self in a another process
-                os.chdir(DOSVOX_ROOT)
-                os.spawnl(os.P_NOWAIT, EXECUTABLE_NAME, EXECUTABLE_NAME)
+                os.spawnl(os.P_NOWAIT, canonical_exe_path, xmppvox_exe)
                 return 0
             else:
                 print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
                       u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
-                      (EXECUTABLE_NAME, DOSVOX_ROOT))
+                      (xmppvox_exe, dosvox_root))
                 raw_input(u"Pressione qualquer tecla para continuar. . .")
                 return 1
     else:
