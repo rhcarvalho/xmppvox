@@ -51,12 +51,20 @@ BUNDLED = getattr(sys, 'frozen', False)
 
 
 if BUNDLED:
+    import win32api
     EXECUTABLE_NAME = "xmppvox.exe"
     REQUIRED_EXECUTABLES = ("scripvox.exe", "papovox.exe")
+    keys = win32api.GetProfileVal("PROGREDE", None, "", "dosvox.ini").split("\x00")[:-1]
+    vals = [win32api.GetProfileVal("PROGREDE", key, "", "dosvox.ini") for key in keys]
+
+    def find_dosvox_root():
+        first_executable = vals[0].split(',', 2)[1]
+        dosvox_root = os.path.dirname(first_executable)
+        return dosvox_root
 
     def install(missing):
-        DOSVOX_PATH = "C:\\winvox"
-        # check for DOSVOX in the default install path and try to install itself
+        DOSVOX_PATH = find_dosvox_root()
+        # check for DOSVOX in the discovered install path and try to install itself
         if all(os.path.isfile(os.path.join(DOSVOX_PATH, exe)) for exe in REQUIRED_EXECUTABLES):
             destination = os.path.join(DOSVOX_PATH, EXECUTABLE_NAME)
             try:
