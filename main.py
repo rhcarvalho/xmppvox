@@ -52,35 +52,31 @@ def main():
     u"""Executa o cliente XMPP e o servidor compatível com Papovox.
 
     Esta função é o ponto de partida da execução do XMPPVOX."""
-    # check if we need to use the launch script
-    # the launch script uses ScriptVox to
-    # ask the user for JID and password,
-    # then calls XMMPVOX again with arguments
-    need_launch_script = (BUNDLED and len(sys.argv) == 1)
-    if need_launch_script:
-        import xmppvox.prod_utils as utils
-        return utils.do_the_magic()
-    else:
-        # normal execution
-        # <config>
-        args = parse_command_line()
-        configure_logging(args.verbose)
-        S.show_code = args.show_code
-        # </config>
-        host, port = args.host, args.port
-        jid, password = get_jid_and_password(args.jid, args.password)
-        return start_client_server(host, port, jid, password)
-
-def start_client_server(host, port, jid, password):
+    # Configuração.
+    args = parse_command_line()
+    configure_logging(args.verbose)
+    S.show_code = args.show_code
     try:
-        return _start_client_server(host, port, jid, password)
+        # check if we need to use the launch script
+        # the launch script uses ScriptVox to
+        # ask the user for JID and password,
+        # then calls XMMPVOX again with arguments
+        need_launch_script = (BUNDLED and len(sys.argv) == 1)
+        if need_launch_script:
+            import xmppvox.prod_utils as utils
+            return utils.do_the_magic()
+        else:
+            # normal execution
+            host, port = args.host, args.port
+            jid, password = get_jid_and_password(args.jid, args.password)
+            return start_client_server(host, port, jid, password)
     except Exception, e:
         log.critical(safe_unicode(e))
         return 1
     finally:
         log.info(u"Fim do XMPPVOX.")
 
-def _start_client_server(host, port, jid, password):
+def start_client_server(host, port, jid, password):
     machine_id = tracker.machine_id()
     # Instancia servidor e aguarda conexão do Papovox.
     papovox = server.PapovoxLikeServer(host, port)
