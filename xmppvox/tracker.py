@@ -147,7 +147,7 @@ class Timer(threading.Thread):
             if not self.finished.is_set():
                 self.function(*self.args, **self.kwargs)
 
-def _ping(session_id):
+def ping_once(session_id):
     try:
         r = requests.post("{}1/session/ping".format(TRACKER_URL),
                           data=dict(session_id=session_id,
@@ -159,6 +159,6 @@ def _ping(session_id):
 
 def ping(session_id, interval):
     u"""Envia sinal de vida para o tracker central do XMPPVOX em intervalos regulares."""
-    t = Timer(interval, _ping, (session_id,))
+    t = Timer(interval, ping_once, (session_id,))
     t.start()
     return t
