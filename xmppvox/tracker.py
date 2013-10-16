@@ -86,15 +86,13 @@ def machine_id():
         write_machine_id(config_path, mid)
     return mid
 
-MACHINE_ID = machine_id()
-
-def new_session(jid):
+def new_session(jid, machine_id):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""
     message = None
     try:
         r = requests.post("{}1/session/new".format(TRACKER_URL),
                           data=dict(jid=jid,
-                                    machine_id=MACHINE_ID,
+                                    machine_id=machine_id,
                                     xmppvox_version=__version__))
         if r.status_code == requests.codes.forbidden:
             message = r.text.strip()
@@ -114,12 +112,12 @@ def new_session(jid):
         log.error(u"Falha ao obter identificador de sessão: %s", safe_unicode(e))
     return session_id, message
 
-def close_session(session_id):
+def close_session(session_id, machine_id):
     u"""Encerra uma sessão no tracker central do XMPPVOX."""
     try:
         r = requests.post("{}1/session/close".format(TRACKER_URL),
                           data=dict(session_id=session_id,
-                                    machine_id=MACHINE_ID))
+                                    machine_id=machine_id))
         r.raise_for_status()
         session_id = r.text.strip()
         log.debug(u"Sessão encerrada: %s", session_id)
@@ -147,18 +145,18 @@ class Timer(threading.Thread):
             if not self.finished.is_set():
                 self.function(*self.args, **self.kwargs)
 
-def ping_once(session_id):
+def ping_once(session_id, machine_id):
     try:
         r = requests.post("{}1/session/ping".format(TRACKER_URL),
                           data=dict(session_id=session_id,
-                                    machine_id=MACHINE_ID))
+                                    machine_id=machine_id))
         r.raise_for_status()
         log.debug(u"PING da sessão: %s", session_id)
     except requests.exceptions.RequestException, e:
         log.error(u"PING falhou: %s", safe_unicode(e))
 
-def ping(session_id, interval):
+def ping(session_id, machine_id, interval):
     u"""Envia sinal de vida para o tracker central do XMPPVOX em intervalos regulares."""
-    t = Timer(interval, ping_once, (session_id,))
+    t = Timer(interval, ping_once, (session_id, machine_id))
     t.start()
     return t

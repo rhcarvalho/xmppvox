@@ -81,6 +81,7 @@ def start_client_server(host, port, jid, password):
         log.info(u"Fim do XMPPVOX.")
 
 def _start_client_server(host, port, jid, password):
+    machine_id = tracker.machine_id()
     # Instancia servidor e aguarda conexão do Papovox.
     papovox = server.PapovoxLikeServer(host, port)
     if not papovox.connect():
@@ -102,13 +103,13 @@ def _start_client_server(host, port, jid, password):
             # Avisa ao Papovox que o JID é inválido.
             papovox.sendmessage(S.WARN_INVALID_JID.format(jid=jid))
         # Cria sessão no tracker.
-        session_id, message = tracker.new_session(jid)
+        session_id, message = tracker.new_session(jid, machine_id)
         if message is not None:
             papovox.sendmessage(message)
         if session_id is None:
             return 1
         # Envia um PING para o tracker a cada 20 minutos.
-        timer = tracker.ping(session_id, 20 * 60)
+        timer = tracker.ping(session_id, machine_id, 20 * 60)
         try:
             # Tenta conectar ao servidor XMPP.
             if not xmpp.connect():
@@ -127,7 +128,7 @@ def _start_client_server(host, port, jid, password):
             # Cancela envio de PINGs para o tracker.
             timer.cancel()
             # Encerra sessão no tracker.
-            tracker.close_session(session_id)
+            tracker.close_session(session_id, machine_id)
     finally:
         papovox.disconnect()
         return 0
