@@ -31,10 +31,16 @@ import sys
 import win32api
 
 
+XMPPVOX_EXE = "xmppvox.exe"
+SCRIPTVOX_EXE = "scripvox.exe"
+PAPOVOX_EXE = "papovox.exe"
+DOSVOX_INI = "dosvox.ini"
+DV_PROGREDE = "PROGREDE"
+
+
 def do_the_magic():
-    xmppvox_exe = "xmppvox.exe"
-    keys = win32api.GetProfileVal("PROGREDE", None, "", "dosvox.ini").split("\x00")[:-1]
-    vals = [win32api.GetProfileVal("PROGREDE", key, "", "dosvox.ini") for key in keys]
+    keys, vals = read_dosvox_menu_items()
+
     # make sure DOSVOX is installed
     dosvox_installed = bool(keys)
     if not dosvox_installed:
@@ -43,33 +49,41 @@ def do_the_magic():
               u'Para mais ajuda, visite http://xmppvox.rodolfocarvalho.net')
         raw_input(u"Pressione qualquer tecla para continuar. . .")
         return 1
+
     dosvox_root = find_dosvox_root(vals)
-    canonical_exe_path = os.path.join(dosvox_root, xmppvox_exe)
+    canonical_exe_path = os.path.join(dosvox_root, XMPPVOX_EXE)
+
     # to run external programs we use relative paths, therefore
     # we set the current working directory to a known place
     os.chdir(dosvox_root)
+
     # try to add an entry for XMMPVOX in DOSVOX menu
-    if not is_program_in_dosvox_menu(xmppvox_exe, vals):
+    # this is executed outside the install process in case
+    # the user performed a manual install
+    if not is_program_in_dosvox_menu(XMPPVOX_EXE, vals):
         try:
-            append_to_dosvox_menu(canonical_exe_path, keys)
+            append_xmppvox_to_dosvox_menu(canonical_exe_path, keys)
         except:
             run_script("failed-append-menu")
         else:
             run_script("success-append-menu")
+
+    # run launch script
     try:
         assert_can_run_launch_script(canonical_exe_path)
         return run_script("launch")
     except AssertionError:
+        # install XMPPVOX
         if install(canonical_exe_path):
             run_script("success-install")
             # run my new self in a another process
-            os.spawnl(os.P_NOWAIT, canonical_exe_path, xmppvox_exe)
+            os.spawnl(os.P_NOWAIT, canonical_exe_path, XMPPVOX_EXE)
             return 0
         else:
             run_script("failed-install")
             print(u'O "%s" deve ficar no diretório onde o DOSVOX foi instalado.\n'
                   u'Para instalar o XMPPVOX, copie ou mova este arquivo para "%s".' %
-                  (xmppvox_exe, dosvox_root))
+                  (XMPPVOX_EXE, dosvox_root))
             raw_input(u"Pressione qualquer tecla para continuar. . .")
             return 1
 
@@ -77,15 +91,14 @@ def run_script(name):
     # run "scripvox.exe /path/to/script/name.cmd"
     basedir = sys._MEIPASS
     script = os.path.join(basedir, "%s.cmd" % name)
-    return subprocess.call(["scripvox.exe", script], close_fds=True)
+    return subprocess.call([SCRIPTVOX_EXE, script], close_fds=True)
 
 def assert_can_run_launch_script(canonical_exe_path):
     # check that we are the canonical executable
     assert sys.executable.lower() == canonical_exe_path.lower()
-    xmppvox_exe = os.path.basename(canonical_exe_path)
     # check for required executables for the launch script
-    required_executables = (xmppvox_exe, "scripvox.exe", "papovox.exe")
-    missing = [exe for exe in required_executables if not os.path.isfile(exe)]
+    required = (XMPPVOX_EXE, SCRIPTVOX_EXE, PAPOVOX_EXE)
+    missing = [exe for exe in required if not os.path.isfile(exe)]
     assert not missing
 
 def install(destination):
@@ -94,6 +107,11 @@ def install(destination):
         return True
     except:
         return False
+
+def read_dosvox_menu_items():
+    keys = win32api.GetProfileVal(DV_PROGREDE, None, "", DOSVOX_INI).split("\x00")[:-1]
+    vals = [win32api.GetProfileVal(DV_PROGREDE, key, "", DOSVOX_INI) for key in keys]
+    return keys, vals
 
 def find_dosvox_root(vals):
     first_executable = vals[0].split(',', 2)[1]
@@ -104,8 +122,8 @@ def is_program_in_dosvox_menu(exe_name, vals):
     programs = set(os.path.basename(val.split(',', 2)[1]).lower() for val in vals)
     return exe_name.lower() in programs
 
-def append_to_dosvox_menu(exe_path, keys):
+def append_xmppvox_to_dosvox_menu(exe_path, keys):
     next_index = max(int(''.join(c for c in key if c.isdigit())) for key in keys) + 1
     new_key = 'Rede%d' % next_index
     new_val = 'X,%s,-RDXMPP,XMPPVOX bate-papo com amigos do Google e Facebook' % (exe_path,)
-    win32api.WriteProfileVal("PROGREDE", new_key, new_val, "dosvox.ini")
+    win32api.WriteProfileVal(DV_PROGREDE, new_key, new_val, DOSVOX_INI)
