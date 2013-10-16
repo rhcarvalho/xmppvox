@@ -39,7 +39,7 @@ DV_PROGREDE = "PROGREDE"
 
 
 def do_the_magic():
-    keys, vals = read_dosvox_menu_items()
+    keys, vals = read_dosvox_ini_items(DV_PROGREDE)
 
     # make sure DOSVOX is installed
     dosvox_installed = bool(keys)
@@ -108,9 +108,9 @@ def install(destination):
     except:
         return False
 
-def read_dosvox_menu_items():
-    keys = win32api.GetProfileVal(DV_PROGREDE, None, "", DOSVOX_INI).split("\x00")[:-1]
-    vals = [win32api.GetProfileVal(DV_PROGREDE, key, "", DOSVOX_INI) for key in keys]
+def read_dosvox_ini_items(section):
+    keys = win32api.GetProfileVal(section, None, "", DOSVOX_INI).split("\x00")[:-1]
+    vals = [win32api.GetProfileVal(section, key, "", DOSVOX_INI) for key in keys]
     return keys, vals
 
 def find_dosvox_root(vals):
