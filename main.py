@@ -56,6 +56,7 @@ def main():
     args = parse_command_line()
     configure_logging(args.verbose)
     S.show_code = args.show_code
+    clean_execution = False
     try:
         # check if we need to use the launch script
         # the launch script uses ScriptVox to
@@ -73,8 +74,12 @@ def main():
     except Exception, e:
         log.critical(safe_unicode(e))
         return 1
+    else:
+        clean_execution = True
     finally:
         log.info(u"Fim do XMPPVOX.")
+        if BUNDLED and not clean_execution:
+            raw_input(u"Pressione qualquer tecla para continuar. . .")
 
 def start_client_server(host, port, jid, password):
     machine_id = tracker.machine_id()
