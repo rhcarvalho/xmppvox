@@ -66,12 +66,13 @@ def read_machine_id(config_path):
         mid = None
     return mid
 
-def write_machine_id(config_path, mid):
+def write_machine_id(config_path, machine_id):
     u"""Persiste um identificador para esta máquina num arquivo de configuração."""
-    if not os.path.isfile(config_path):
-        os.makedirs(os.path.dirname(config_path))
+    config_dir = os.path.dirname(config_path)
+    if not os.path.isdir(config_dir):
+        os.makedirs(config_dir)
     with open(config_path, "w") as config_file:
-        json.dump(dict(machine_id=mid), config_file)
+        json.dump(dict(machine_id=machine_id), config_file)
 
 def machine_id():
     u"""Retorna um identificador único para esta máquina/usuário."""
