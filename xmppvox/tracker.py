@@ -106,10 +106,10 @@ def new_session(jid):
     except requests.exceptions.RequestException, e:
         session_id = None
         if message is None:
-            message = (u"Problema com o servidor do XMPP Vox. "
+            message = (u"Problema com o servidor do XMPPVOX. "
                        u"Por favor, tente conectar novamente mais tarde.\n\n"
-                       u"Se o problema persistir, peça ajuda pelo email "
-                       u"xmppvox@googlegroups.com.")
+                       u"Se o problema persistir, visite http://xmppvox.rodolfocarvalho.net "
+                       u"para obter ajuda.")
         log.error(u"Falha ao obter identificador de sessão: %s", safe_unicode(e))
     return session_id, message
 
