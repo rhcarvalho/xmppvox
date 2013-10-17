@@ -41,8 +41,11 @@ from xmppvox.strings import safe_unicode
 from xmppvox.version import __version__
 
 
-if getattr(sys, 'frozen', False):
-    # we are running in a PyInstaller bundle
+# are we running in a PyInstaller bundle?
+BUNDLED = getattr(sys, 'frozen', False)
+
+if BUNDLED:
+    # production mode
     TRACKER_URL = "http://xmppvox.rodolfocarvalho.net/api/"
 else:
     # development mode
@@ -51,6 +54,7 @@ else:
                    "http://localhost:9090/")
     if not TRACKER_URL.endswith("/"):
         TRACKER_URL += "/"
+
 
 def read_machine_id(config_path):
     u"""Lê identificador desta máquina num arquivo de configuração."""
@@ -82,9 +86,37 @@ def machine_id():
         config_path = os.path.expanduser("~/.xmppvox/config.json")
     mid = read_machine_id(config_path)
     if mid is None:
-        mid = str(uuid.uuid4())
-        write_machine_id(config_path, mid)
+        mid = first_install(config_path)
     return mid
+
+def first_install(config_path):
+    machine_id = str(uuid.uuid4())
+    write_machine_id(config_path, machine_id)
+    if BUNDLED:
+        # track this installation
+        import xmppvox.prod_utils as utils
+        dosvox_info = utils.get_dosvox_info()
+        machine_info = utils.get_machine_info()
+        # dump compact JSON
+        dumps = json.JSONEncoder(separators=(',', ':')).encode
+        data = dict(
+            machine_id=machine_id,
+            xmppvox_version=__version__,
+            dosvox_info=dumps(dosvox_info),
+            machine_info=dumps(machine_info),
+        )
+        track_installation(data)
+    return machine_id
+
+def track_installation(data):
+    u"""Informa tracker central sobre esta instância do XMPPVOX."""
+    try:
+        r = requests.post("{}1/installation/new".format(TRACKER_URL), data=data)
+        r.raise_for_status()
+    except requests.exceptions.RequestException, e:
+        log.warn(u"Falha na ativação do XMPPVOX: %s", safe_unicode(e))
+        return False
+    return True
 
 def new_session(jid, machine_id):
     u"""Cria uma nova sessão no tracker central do XMPPVOX."""

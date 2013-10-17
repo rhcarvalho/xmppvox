@@ -58,6 +58,9 @@ def main():
     S.show_code = args.show_code
     returncode = 0
     try:
+        # read/create machine id as soon as possible
+        # for installation tracking purposes
+        machine_id = tracker.machine_id()
         # check if we need to use the launch script
         # the launch script uses ScriptVox to
         # ask the user for JID and password,
@@ -70,7 +73,7 @@ def main():
             # normal execution
             host, port = args.host, args.port
             jid, password = get_jid_and_password(args.jid, args.password)
-            returncode = start_client_server(host, port, jid, password)
+            returncode = start_client_server(machine_id, host, port, jid, password)
     except KeyboardInterrupt:
         returncode = 1
     except Exception, e:
@@ -84,8 +87,7 @@ def main():
             raw_input(u"Pressione qualquer tecla para continuar. . .")
         return returncode
 
-def start_client_server(host, port, jid, password):
-    machine_id = tracker.machine_id()
+def start_client_server(machine_id, host, port, jid, password):
     # Instancia servidor e aguarda conexão do Papovox.
     papovox = server.PapovoxLikeServer(host, port)
     if not papovox.connect():

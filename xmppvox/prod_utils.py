@@ -25,6 +25,8 @@ Este módulo contém rotinas usadas quando o XMPPVOX está sendo executado em pr
 """
 
 import os
+import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -36,6 +38,7 @@ SCRIPTVOX_EXE = "scripvox.exe"
 PAPOVOX_EXE = "papovox.exe"
 DOSVOX_INI = "dosvox.ini"
 DV_PROGREDE = "PROGREDE"
+DV_CARTAVOX = "CARTAVOX"
 
 
 def do_the_magic():
@@ -127,3 +130,58 @@ def append_xmppvox_to_dosvox_menu(exe_path, keys):
     new_key = 'Rede%d' % next_index
     new_val = 'X,%s,-RDXMPP,XMPPVOX bate-papo com amigos do Google e Facebook' % (exe_path,)
     win32api.WriteProfileVal(DV_PROGREDE, new_key, new_val, DOSVOX_INI)
+
+def get_dosvox_info():
+    keys, vals = read_dosvox_ini_items(DV_PROGREDE)
+    installed = bool(keys)
+    if installed:
+        root = find_dosvox_root(vals)
+        version = get_dosvox_version(root)
+        email = get_dosvox_user_email()
+        info = dict(
+            root=root,
+            version=version,
+            email=email,
+        )
+    else:
+        info = dict()
+    return info
+
+def get_dosvox_version(dosvox_root):
+    # best effort to determine DOSVOX version
+    version = version_type = ""
+    src = os.path.join(dosvox_root, "fontes", "dosvox", "dosvox.dpr")
+    if os.path.isfile(src):
+        try:
+            with open(src) as f:
+                src_code = f.read()
+                mo = re.search("versao\s*=\s*([^;]+);", src_code)
+                if mo:
+                    version = mo.group(1).strip("\"' ")
+                    mo = re.search("tipoVersao\s*=\s*([^;]+);", src_code[mo.end():])
+                    if mo:
+                        version_type = mo.group(1).strip("\"' ")
+        except:
+            pass
+    if version_type:
+        version = "%s %s" % (version, version_type)
+    return version
+
+def get_dosvox_user_email():
+    # determine user's email address based on CARTAVOX settings
+    # CARTAVOX is DOSVOX's email client
+    return dict(zip(*read_dosvox_ini_items(DV_CARTAVOX))).get("ENDERUSUARIO", "")
+
+def get_machine_info():
+    system, node, release, version, machine, processor = platform.uname()
+    _, _, csd, ptype = platform.win32_ver()
+    return dict(
+        system=system,
+        node=node,
+        release=release,
+        version=version,
+        csd=csd,
+        ptype=ptype,
+        machine=machine,
+        processor=processor,
+    )
