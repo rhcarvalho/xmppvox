@@ -8,8 +8,10 @@ significa, ignore esta seção.*
 Para utilizar o XMPPVOX é preciso que estejam instalados os seguintes
 programas e bibliotecas:
 
-- DOSVOX / Papovox (testado com DOSVOX 4.2alfa, Papovox 3.3B)
-- Python 2.7 (testado com 2.7.5)
+- DOSVOX / Papovox, testado com:
+  - DOSVOX 4.0 BETA + Papovox 3.3B
+  - DOSVOX 4.5 + Papovox 3.3B
+- Python 2.7, testado com Python 2.7.5
 - Bibliotecas descritas no arquivo "requirements.txt"
 
 Para instalar as dependências:
@@ -18,9 +20,9 @@ Para instalar as dependências:
 
 Dependências para gerar executável:
 
-- pywin32 (testado com Build 218)
-- PyInstaller (testado com versão 2.1)
-- UPX (testado com versão 3.91)
+- pywin32, testado com Build 218
+- PyInstaller, testado com versão 2.1
+- UPX, testado com versão 3.91
 
 Opcionais:
 
