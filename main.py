@@ -56,7 +56,7 @@ def main():
     args = parse_command_line()
     configure_logging(args.verbose)
     S.show_code = args.show_code
-    clean_execution = False
+    returncode = 0
     try:
         # check if we need to use the launch script
         # the launch script uses ScriptVox to
@@ -65,21 +65,24 @@ def main():
         need_launch_script = (BUNDLED and len(sys.argv) == 1)
         if need_launch_script:
             import xmppvox.prod_utils as utils
-            return utils.do_the_magic()
+            returncode = utils.do_the_magic()
         else:
             # normal execution
             host, port = args.host, args.port
             jid, password = get_jid_and_password(args.jid, args.password)
-            return start_client_server(host, port, jid, password)
+            returncode = start_client_server(host, port, jid, password)
+    except KeyboardInterrupt:
+        returncode = 1
     except Exception, e:
         log.critical(safe_unicode(e))
-        return 1
-    else:
-        clean_execution = True
+        returncode = 1
     finally:
-        log.info(u"Fim do XMPPVOX.")
-        if BUNDLED and not clean_execution:
+        # Prevent console window from closing when an error happens.
+        # On Windows, we would be unable to see what was the error
+        # if the window closed instantly.
+        if BUNDLED and returncode != 0:
             raw_input(u"Pressione qualquer tecla para continuar. . .")
+        return returncode
 
 def start_client_server(host, port, jid, password):
     machine_id = tracker.machine_id()
@@ -131,8 +134,9 @@ def start_client_server(host, port, jid, password):
             # Encerra sessão no tracker.
             tracker.close_session(session_id, machine_id)
     finally:
+        log.info(u"Fim do XMPPVOX.")
         papovox.disconnect()
-        return 0
+    return 0
 
 def parse_command_line():
     u"""Processa opções de linha de comando passadas para o XMPPVOX."""
@@ -179,7 +183,4 @@ def get_jid_and_password(jid, password):
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except KeyboardInterrupt:
-        sys.exit(1)
+    sys.exit(main())
