@@ -64,6 +64,9 @@ class BotXMPP(sleekxmpp.ClientXMPP):
     def __init__(self, jid, password, papovox):
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
+        # Disable IPv6 to avoid connectivity problems
+        self.use_ipv6 = False
+
         # Referência para o servidor compatível com o Papovox
         self.papovox = papovox
         self.nickname = papovox.nickname
