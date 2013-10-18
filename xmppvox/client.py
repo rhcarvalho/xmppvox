@@ -231,8 +231,7 @@ class BotXMPP(sleekxmpp.ClientXMPP):
         return bare_jid
 
     def validate_jid(self):
-        u"""Retorna True se JID parecer válido, False caso contrário."""
+        u"""Causa uma exceção 'InvalidJID' se o JID for inválido para o XMPPVOX."""
         jid = self.boundjid.full
         if not commands.jid_regexp.match(jid):
-            return False
-        return True
+            raise sleekxmpp.InvalidJID('JID failed validation.')

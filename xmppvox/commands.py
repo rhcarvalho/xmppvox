@@ -33,12 +33,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-# Baseado em http://www.regular-expressions.info/email.html
-# Um JID não é um email, mas serve como boa aproximação para o que é
-# preciso neste módulo. Além da parte do email, é possível especificar
-# o resource (opcional).
-jid_regexp = re.compile(r'^([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4})(/.*)?$',
-                        re.I)
+jid_regexp = re.compile(r'^([^\s@/]{1,1023}@[^\s@/]{1,1023})(?:/(.{1,1023}))?$')
 
 
 def process_command(xmpp, data, papovox):

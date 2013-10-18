@@ -97,17 +97,14 @@ def start_client_server(machine_id, host, port, jid, password):
         try:
             # Inicia cliente XMPP.
             xmpp = client.BotXMPP(jid, password, papovox)
+            # Verifica JID.
+            xmpp.validate_jid()
             # Para especificar o mecanismo de autenticação:
             #xmpp = client.BotXMPP(jid, password, papovox, sasl_mech="X-GOOGLE-TOKEN")
-        except sleekxmpp.jid.InvalidJID:
+        except sleekxmpp.InvalidJID:
             log.error(u"A conta '%s' é inválida.", jid)
             papovox.sendmessage(S.ERROR_INVALID_JID.format(jid=jid))
             return 1
-        # Verifica JID.
-        if not xmpp.validate_jid():
-            log.warn(u"A conta '%s' parece ser inválida.", jid)
-            # Avisa ao Papovox que o JID é inválido.
-            papovox.sendmessage(S.WARN_INVALID_JID.format(jid=jid))
         # Cria sessão no tracker.
         session_id, message = tracker.new_session(jid, machine_id)
         if message is not None:
