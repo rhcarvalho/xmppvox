@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 1, 0, 0),
-    prodvers=(1, 1, 0, 0),
+    filevers=(1, 1, 1, 0),
+    prodvers=(1, 1, 1, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x4,
@@ -17,12 +17,12 @@ VSVersionInfo(
         u'040904e4',
         [StringStruct(u'CompanyName', u'DOSVOX / NCE / UFRJ'),
         StringStruct(u'FileDescription', u'Cliente de bate-papo XMPPVOX'),
-        StringStruct(u'FileVersion', u'1, 1, 0, 0'),
+        StringStruct(u'FileVersion', u'1, 1, 1, 0'),
         StringStruct(u'InternalName', u'xmppvox.exe'),
         StringStruct(u'LegalCopyright', u'Copyright \xa9 2012-2013 Rodolfo Henrique Carvalho.'),
         StringStruct(u'OriginalFilename', u'xmppvox.exe'),
         StringStruct(u'ProductName', u'XMPPVOX'),
-        StringStruct(u'ProductVersion', u'1, 1, 0, 0')])
+        StringStruct(u'ProductVersion', u'1, 1, 1, 0')])
       ]), 
     VarFileInfo([VarStruct('Translation', [1046, 1252])])
   ]

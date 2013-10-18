@@ -73,7 +73,7 @@ for %%G in (zip.exe) do (set FOUND=%%~$PATH:G)
 IF DEFINED FOUND (
     REM Compacta todos os arquivos em um zip.
     PUSHD dist
-    zip -v -9 -r xmppvox-1.1.zip *
+    zip -v -9 -r xmppvox-1.1.1.zip *
     POPD
 ) ELSE (
     ECHO.
