@@ -3,6 +3,8 @@ XMPPVOX: DOSVOX's XMPP chat client
 
 XMPPVOX enables visually impaired computer users to communicate with their friends from Google Talk and Facebook using the chat client PAPOVOX, part of [DOSVOX](http://intervox.nce.ufrj.br/dosvox/) system.
 
+![XMPPVOX screenshot](http://xmppvox.rodolfocarvalho.net/img/xmppvox-1.1.2-screenshot.png "XMPPVOX screenshot")
+
 ## 1. What is XMPPVOX?
 
 XMPPVOX is a chat client that supports the XMPP protocol. This protocol
